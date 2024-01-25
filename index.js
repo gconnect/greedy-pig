@@ -14,23 +14,38 @@ function askQuestion(question) {
 }
 
 async function playGame() {
-  // Get the number of players
-  const numPlayers = parseInt(await askQuestion('Enter the number of players: '));
+// Collect usernames
+  const usernames = [];
+  while (true) {
+    const username = await askQuestion('Enter a username (or type "done" to finish): ');
+    if (username.toLowerCase() === 'done') {
+      break;
+    }
+    usernames.push(username);
+  }
 
+  // Number of players
+  const numPlayers = usernames.length;
   // Number of turns per player
   const numTurns = parseInt(await askQuestion('Enter the number of turns: '));
   console.log(typeof numTurns)
 
   // Player scores
-  const playerScores = new Array(numPlayers).fill(0);
+  const playerScores = {};
+  // const playerScores = new Array(numPlayers).fill(0);
+
+  // Initialize scores for each player
+  for (const username of usernames) {
+    playerScores[username] = 0;
+  }
 
   // Loop for each turn
   for (let turn = 0; turn < numTurns; turn++) {
     console.log(`Turn ${turn + 1} begins!`);
 
     // Loop for each player
-    for (let player = 0; player < numPlayers; player++) {
-      console.log(`Player ${player + 1}'s turn-${turn + 1} :`);
+    for (const username of usernames) {
+      console.log(`${username}'s turn-${turn + 1}:`);
 
       // Current turn score
       let turnScore = 0;
@@ -57,22 +72,23 @@ async function playGame() {
       }
 
       // Add turn score to player's total score
-      playerScores[player] += turnScore;
-      console.log(`Player ${player + 1}'s turn score: ${turnScore}`);
+      playerScores[username] += turnScore;
+      console.log(`${username}'s turn score: ${turnScore}`);
     }
   }
 
   // Find the player with the highest score
-  const highestScore = Math.max(...playerScores);
-  const winningPlayer = playerScores.indexOf(highestScore) + 1;
+  const highestScore = Math.max(...Object.values(playerScores));
+  const winningPlayer = Object.keys(playerScores).find((username) => playerScores[username] === highestScore);
 
   console.log(`Game over! The highest score is ${highestScore} by Player ${winningPlayer}`);
 
   // Display the summary of all participants' scores
   console.log('\nSummary of Participants\' Scores:');
-  for (let player = 0; player < numPlayers; player++) {
-    console.log(`Player ${player + 1}: ${playerScores[player]}`);
+  for (const username of usernames) {
+    console.log(`${username}: ${playerScores[username]}`);
   }
+
 
   readline.close();
 }
