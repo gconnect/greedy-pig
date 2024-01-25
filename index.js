@@ -18,7 +18,8 @@ async function playGame() {
   const numPlayers = parseInt(await askQuestion('Enter the number of players: '));
 
   // Number of turns per player
-  const numTurns = 2;
+  const numTurns = parseInt(await askQuestion('Enter the number of turns: '));
+  console.log(typeof numTurns)
 
   // Player scores
   const playerScores = new Array(numPlayers).fill(0);
@@ -29,7 +30,7 @@ async function playGame() {
 
     // Loop for each player
     for (let player = 0; player < numPlayers; player++) {
-      console.log(`Player ${player + 1}'s turn:`);
+      console.log(`Player ${player + 1}'s turn-${turn + 1} :`);
 
       // Current turn score
       let turnScore = 0;
@@ -42,6 +43,7 @@ async function playGame() {
 
         if (roll === 1) {
           console.log("Bust! Your turn score is 0.");
+          turnScore = 0;
           break;
         } else {
           turnScore += roll;
