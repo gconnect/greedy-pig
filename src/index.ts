@@ -1,11 +1,12 @@
 
+import { createInterface, ReadLine } from 'readline';
 
-const readline = require('readline').createInterface({
+const readline: ReadLine = createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-function askQuestion(question) {
+function askQuestion(question: string) {
   return new Promise((resolve) => {
     readline.question(question, (answer) => {
       resolve(answer);
@@ -14,11 +15,13 @@ function askQuestion(question) {
 }
 
 async function playGame() {
-// Collect usernames
+  // Collect usernames
   const usernames = [];
   while (true) {
-    const username = await askQuestion('Enter a username (or type "done" to finish): ');
-    if (username.toLowerCase() === 'done') {
+    const username = await askQuestion(
+      'Enter a username (or type "done" to finish): '
+    );
+    if (username.toLowerCase() === "done") {
       break;
     }
     usernames.push(username);
@@ -27,8 +30,8 @@ async function playGame() {
   // Number of players
   const numPlayers = usernames.length;
   // Number of turns per player
-  const numTurns = parseInt(await askQuestion('Enter the number of turns: '));
-  console.log(typeof numTurns)
+  const numTurns = parseInt(await askQuestion("Enter the number of turns: "));
+  console.log(typeof numTurns);
 
   // Player scores
   const playerScores = {};
@@ -64,8 +67,10 @@ async function playGame() {
           turnScore += roll;
 
           // Ask if the player wants to roll again or stop after each turn
-          const answer = await askQuestion(`Your current score is ${turnScore}. Roll again? (y/n): `);
-          if (answer.toLowerCase() !== 'y') {
+          const answer = await askQuestion(
+            `Your current score is ${turnScore}. Roll again? (y/n): `
+          );
+          if (answer.toLowerCase() !== "y") {
             continueRolling = false;
           }
         }
@@ -79,16 +84,19 @@ async function playGame() {
 
   // Find the player with the highest score
   const highestScore = Math.max(...Object.values(playerScores));
-  const winningPlayer = Object.keys(playerScores).find((username) => playerScores[username] === highestScore);
+  const winningPlayer = Object.keys(playerScores).find((username) => {
+    return playerScores[username] === highestScore;
+  });
 
-  console.log(`Game over! The highest score is ${highestScore} by Player ${winningPlayer}`);
+  console.log(
+    `Game over! The highest score is ${highestScore} by Player ${winningPlayer}`
+  );
 
   // Display the summary of all participants' scores
-  console.log('\nSummary of Participants\' Scores:');
+  console.log("\nSummary of Participants' Scores:");
   for (const username of usernames) {
     console.log(`${username}: ${playerScores[username]}`);
   }
-
 
   readline.close();
 }
