@@ -12,9 +12,15 @@ export default function Home() {
   const [modalQuestion, setModalQuestion] = useState('');
   const [output, setOutput] = useState('');
   const [handleUserInput, setHandleUserInput] = useState<(answer: string) => void>(() => () => {});
+  const [rollResult, setRollResult] = useState<number | null>(null);
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
+
+
+  const handleRollResult = (result: number) => {
+    setRollResult(result); // Update roll result state
+  };
 
   const getInput: InputFunction = async (question: string) => {
     return new Promise((resolve) => {
@@ -41,7 +47,7 @@ export default function Home() {
   const startGame = async () => {
 
     try {
-      const result = await playGame(usernames, getInput, 2);
+      const result = await playGame(usernames, getInput, 2, handleRollResult);
       setOutput(`Game finished!. ${result}`); // Update output state to indicate game finish
     } catch (error) {
       console.error('Error during game:', error);
@@ -55,6 +61,7 @@ export default function Home() {
   return (
     <div>
       <UsernamesForm usernames={usernames} setUsernames={setUsernames} />
+      <div>Roll Result: {rollResult !== null ? rollResult : 'No roll yet'}</div>
       <GameForms 
         isOpen={modalIsOpen}
         closeModal={closeModal}

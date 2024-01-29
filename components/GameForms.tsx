@@ -34,7 +34,7 @@ const GameModal: React.FC<Props> = ({ isOpen, closeModal, onSubmit, question }) 
                     type="text"
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
-                    className="border rounded-md px-2 py-1 w-full mb-2"
+                    className="text-black border rounded-md px-2 py-1 w-full mb-2"
                   />
                   <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">Submit</button>
                 </form>

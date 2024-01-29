@@ -2,7 +2,12 @@
 
 export type InputFunction = (question: string) => Promise<string>;
 
-export async function playGame(usernames: string[], getInput: InputFunction, numTurns: number): Promise<string> {
+export async function playGame(
+  usernames: string[], 
+  getInput: InputFunction, 
+  numTurns: number,
+  handleRollResult: (result: number) => void
+  ): Promise<string> {
 
   let result
 
@@ -24,6 +29,7 @@ export async function playGame(usernames: string[], getInput: InputFunction, num
       while (continueRolling) {
 
         const roll: number = Math.floor(Math.random() * 6) + 1;
+        handleRollResult(roll);
         console.log(`Rolled a ${roll}`);
 
         if (roll === 1) {
@@ -64,9 +70,3 @@ export async function playGame(usernames: string[], getInput: InputFunction, num
 
   return result
 }
-
-
-
-
-
-
