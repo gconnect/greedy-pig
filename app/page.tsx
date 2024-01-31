@@ -13,6 +13,7 @@ export default function Home() {
   const [gameInProgress, setGameInProgress] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [usernames, setUsernames] = useState<string[]>([]);  
+  const [leaderboard, setLeaderboard] = useState<string[]>([]);  
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalQuestion, setModalQuestion] = useState('');
   const [output, setOutput] = useState('');
@@ -69,9 +70,10 @@ export default function Home() {
     onStop();
   };
 
-  const getOutput: OutputFunction = (user: string, message: string) => {
+  const getOutput: OutputFunction = (user: string, message: string, leaderboard: string[]) => {
     return new Promise((resolve) => {
     setOutput(`${user} ${message}`);
+    setLeaderboard(leaderboard)
     resolve(message)
     })  
     
@@ -151,8 +153,8 @@ const getRoll: RollFunction = async () => {
         <div className="mt-4">{output}</div>
         {!gameInProgress && <UsernamesForm usernames={usernames} setUsernames={setUsernames} />}
       </div>
-      <div>Roll Result: {rollResult !== null ? rollResult : 'No roll yet'}</div>
-      <div id="roll-result">{rollResult}</div>
+      
+      <div className='hidden' id="roll-result">{rollResult}</div>
       <ResponseForm
         isOpen={modalIsOpen}
         closeModal={closeModal}
@@ -164,6 +166,11 @@ const getRoll: RollFunction = async () => {
       
      
       <Roulette roulette={roulette} />
+
+      {leaderboard && leaderboard.map((user) => <div>
+        <p>Player: {user.username} Turn: {user.turn} - score: {user.turnScore} - total score: {user.totalScore}</p>
+      </div>)}
+
     
       <button className='hidden' ref={stopButtonRef} type="button" onClick={handleStopGame} disabled={!isGameStarted} />
   
