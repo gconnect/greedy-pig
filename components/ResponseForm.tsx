@@ -5,14 +5,17 @@ interface Props {
   closeModal: () => void;
   onSubmit: (answer: string) => void;
   question: string;
+  handleUserInput: (answer: string) => void;
 }
 
-const GameModal: React.FC<Props> = ({ isOpen, closeModal, onSubmit, question }) => {
+const GameModal: React.FC<Props> = ({ isOpen, closeModal, onSubmit, question, handleUserInput }) => {
   const [answer, setAnswer] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(answer);
+    handleUserInput(answer); // Pass the answer to the parent component
+    
     setAnswer(''); // Clear input field after submission
     closeModal();
   };

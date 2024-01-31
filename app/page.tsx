@@ -45,14 +45,6 @@ export default function Home() {
     onStop();
   };
 
-  
-
-  const handleRollResult = (result: number) => {
-   
-    // setRollResult(result); // Update roll result state
-    // openModal()
-  };
-
 
   const getInput: InputFunction = async (question: string) => {
     return new Promise((resolve) => {
@@ -60,12 +52,11 @@ export default function Home() {
       openModal();
     
       const handleUserInput = (answer: string) => {
-        
-        resolve(answer);
       
         closeModal();
+        resolve(answer);
       };
-
+      
       setHandleUserInput(() => handleUserInput);
     });
   };
@@ -107,13 +98,13 @@ const getRoll: RollFunction = async () => {
     // You can set state or perform any actions based on the submitted answer
     console.log('Submitted answer:', answer);
   
-   
+   return answer
   };
 
   const startGame = async () => {
 
     try {
-      const result = await playGame(usernames, getInput, getRoll, 2, handleRollResult);
+      const result = await playGame(usernames, getInput, getRoll, 2);
       setOutput(`Game finished!. ${result}`); // Update output state to indicate game finish
     } catch (error) {
       console.error('Error during game:', error);
@@ -131,6 +122,7 @@ const getRoll: RollFunction = async () => {
         closeModal={closeModal}
         onSubmit={handleModalSubmit}
         question={modalQuestion}
+        handleUserInput={handleUserInput}
       />
       <button onClick={startGame} type="button">Play game</button>
       <div className="mt-4">{output}</div>

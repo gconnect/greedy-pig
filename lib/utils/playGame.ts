@@ -7,8 +7,7 @@ export async function playGame(
   usernames: string[], 
   getInput: InputFunction,
   getRoll: RollFunction, 
-  numTurns: number,
-  handleRollResult: (result: number) => void
+  numTurns: number
   ): Promise<string> {
 
   let result
@@ -24,16 +23,13 @@ export async function playGame(
 
     for (const username of usernames) {
       console.log(`${username}'s turn-${turn + 1}:`);
-debugger
+
       let turnScore: number = 0;
       let continueRolling: boolean = true;
 
       while (continueRolling) {
 
-        // const roll: number = Math.floor(Math.random() * 6) + 1;
         const roll: number = await getRoll();
-
-        handleRollResult(roll);
     
         console.log(`Rolled a ${roll}`);
 
@@ -52,7 +48,6 @@ debugger
       }
 
       playerScores[username] += turnScore;
-      console.log(`${username}'s turn score: ${turnScore}`);
     }
   }
 
@@ -62,7 +57,6 @@ debugger
   console.log('\nGame over!');
 
   if (winningPlayers.length === 1) {
-    console.log(`The highest score is ${highestScore} by Player ${winningPlayers[0]}`);
     result = `The highest score is ${highestScore} by Player ${winningPlayers[0]}`
   } else {
     console.log(`There is a tie for the highest score (${highestScore}) among Players: ${winningPlayers.join(', ')}`);
