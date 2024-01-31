@@ -1,10 +1,12 @@
 
 
 export type InputFunction = (question: string) => Promise<string>;
+export type RollFunction = () => Promise<number>;
 
 export async function playGame(
   usernames: string[], 
-  getInput: InputFunction, 
+  getInput: InputFunction,
+  getRoll: RollFunction, 
   numTurns: number,
   handleRollResult: (result: number) => void
   ): Promise<string> {
@@ -22,14 +24,17 @@ export async function playGame(
 
     for (const username of usernames) {
       console.log(`${username}'s turn-${turn + 1}:`);
-
+debugger
       let turnScore: number = 0;
       let continueRolling: boolean = true;
 
       while (continueRolling) {
 
-        const roll: number = Math.floor(Math.random() * 6) + 1;
+        // const roll: number = Math.floor(Math.random() * 6) + 1;
+        const roll: number = await getRoll();
+
         handleRollResult(roll);
+    
         console.log(`Rolled a ${roll}`);
 
         if (roll === 1) {
@@ -43,6 +48,7 @@ export async function playGame(
             continueRolling = false; // Exit the loop if the player doesn't want to roll again
           }
         }
+
       }
 
       playerScores[username] += turnScore;
