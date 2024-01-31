@@ -1,13 +1,15 @@
 
 
-export type InputFunction = (question: string) => Promise<string>;
-export type RollFunction = () => Promise<number>;
+export type InputFunction = (question: string) => Promise<string>
+export type RollFunction = () => Promise<number>
+export type OutputFunction = (user: string, message: string) => void
 
 export async function playGame(
-  usernames: string[], 
+  usernames: string[],
   getInput: InputFunction,
   getRoll: RollFunction, 
-  numTurns: number
+  numTurns: number,
+  output: OutputFunction
   ): Promise<string> {
 
   let result
@@ -19,10 +21,11 @@ export async function playGame(
 
 
   for (let turn = 0; turn < numTurns; turn++) {
-    console.log(`Turn ${turn + 1} begins!`);
+   
 
     for (const username of usernames) {
-      console.log(`${username}'s turn-${turn + 1}:`);
+
+      await output(username, `${username}'s turn-${turn + 1}:`);
 
       let turnScore: number = 0;
       let continueRolling: boolean = true;
@@ -30,15 +33,15 @@ export async function playGame(
       while (continueRolling) {
 
         const roll: number = await getRoll();
-    
-        console.log(`Rolled a ${roll}`);
 
         if (roll === 1) {
-          console.log("Bust! Your turn score is 0.");
+       
+          await output(username, `Bust! Your turn score is 0.`);
           turnScore = 0;
           continueRolling = false; // Exit the loop on a bust
         } else {
           turnScore += roll;
+          await output(username, `Your turn score is ${turnScore}.`);
           const answer: string = await getInput(`Your current score is ${turnScore}. Roll again? (y/n): `);
           if (answer.toLowerCase() !== 'y') {
             continueRolling = false; // Exit the loop if the player doesn't want to roll again
@@ -67,6 +70,6 @@ export async function playGame(
   for (const username of usernames) {
     console.log(`${username}: ${playerScores[username]}`);
   }
-
+  await output('', result)
   return result
 }
