@@ -2,7 +2,7 @@
 
 export type InputFunction = (question: string) => Promise<string>
 export type RollFunction = () => Promise<number>
-export type OutputFunction = (user: string, message: string, playerInfo?: PlayerInfo[]) => void
+export type OutputFunction = (user: string, message: string, playerInfo?: PlayerInfo[]) => Promise<string>
 export type PlayerInfo = {
   turn: number;
   username: string;

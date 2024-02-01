@@ -1,20 +1,29 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import UsernamesForm from "@/components/UsernamesForm";
 import ResponseForm from '@/components/ResponseForm'
 import { InputFunction, RollFunction, OutputFunction, playGame } from "@/lib/utils"
 import { useState } from "react";
 import { Roulette, useRoulette } from 'react-hook-roulette';
+import { useDispatch } from 'react-redux';
+import { updateLeaderboard } from '@/store/features/leaderboard/leaderboardSlice';
 
 
 
 export default function Home() {
 
+  const dispatch = useDispatch();
+
+  // const handleIncrement = useCallback(() => {
+  //   dispatch(updateLeaderboard('justin'));
+  // }, [dispatch]);
+
+ 
+
   const [gameInProgress, setGameInProgress] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [usernames, setUsernames] = useState<string[]>([]);  
-  const [leaderboard, setLeaderboard] = useState<string[]>([]);  
+  const [usernames, setUsernames] = useState<string[]>([]);   
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalQuestion, setModalQuestion] = useState('');
   const [output, setOutput] = useState('');
@@ -71,10 +80,10 @@ export default function Home() {
     onStop();
   };
 
-  const getOutput: OutputFunction = (user: string, message: string, leaderboard: string[]) => {
+  const getOutput: OutputFunction = (user: string, message: string, participants: string[]) => {
     return new Promise((resolve) => {
     setOutput(`${user} ${message}`);
-    setLeaderboard(leaderboard)
+    dispatch(updateLeaderboard(participants));
     resolve(message)
     })  
     
