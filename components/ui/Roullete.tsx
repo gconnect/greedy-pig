@@ -5,9 +5,8 @@ import UsernamesForm from "@/components/UsernamesForm";
 import ResponseForm from '@/components/ResponseForm'
 import { InputFunction, RollFunction, OutputFunction, playGame } from "@/lib/utils"
 import { useState } from "react";
-// import { Roulette, useRoulette } from 'react-hook-roulette';
+import { Roulette, useRoulette } from 'react-hook-roulette';
 
-import GameArena from '@/components/ui/GameArena';
 
 
 export default function Home() {
@@ -23,45 +22,45 @@ export default function Home() {
   const [rollResult, setRollResult] = useState<number | null>(null);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const stopButtonRef = useRef(null);
-  // const { roulette, onStart, onStop } = useRoulette({
-  //   items: [
-  //     { name: "1", bg: "#b26527", color: "#ffffff" },
-  //     { name: "2", bg: "#ce9729", color: "#ffffff" },
-  //     { name: "3", bg: "#e7c02b", color: "#ffffff" },
-  //     { name: "4" },
-  //     { name: "5" },
-  //     { name: "6" },
-  //     { name: "7" },
-  //     { name: "8" }
-  //   ],
-  //   onSpinEnd: res => {
-  //     setLoading(false)
-  //     setRollResult(Number(res))
-  //   },
-  //   options: {
-  //     maxSpeed: 10,
-  //     acceleration: 6,
-  //     determineAngle: 90,
-  //     style: {
-  //       canvas: {
-  //         bg: 'transparent'
-  //       },
-  //       arrow: {
-  //         bg: "#000",
-  //         size: 26,
-  //         boxShadow: "3px 33px 30px 3px #fff"
-  //       },
-  //       label: {
-  //         font: "28px Arial",
-  //         align: "right",
-  //         baseline: "middle",
-  //         offset: 0.65,
-  //         defaultColor: "#000",
-  //         fontWeight: "bold"
-  //       },
-  //     }
-  //   }
-  // });
+  const { roulette, onStart, onStop } = useRoulette({
+    items: [
+      { name: "1", bg: "#b26527", color: "#ffffff" },
+      { name: "2", bg: "#ce9729", color: "#ffffff" },
+      { name: "3", bg: "#e7c02b", color: "#ffffff" },
+      { name: "4" },
+      { name: "5" },
+      { name: "6" },
+      { name: "7" },
+      { name: "8" }
+    ],
+    onSpinEnd: res => {
+      setLoading(false)
+      setRollResult(Number(res))
+    },
+    options: {
+      maxSpeed: 10,
+      acceleration: 6,
+      determineAngle: 90,
+      style: {
+        canvas: {
+          bg: 'transparent'
+        },
+        arrow: {
+          bg: "#000",
+          size: 26,
+          boxShadow: "3px 33px 30px 3px #fff"
+        },
+        label: {
+          font: "28px Arial",
+          align: "right",
+          baseline: "middle",
+          offset: 0.65,
+          defaultColor: "#000",
+          fontWeight: "bold"
+        },
+      }
+    }
+  });
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
@@ -151,14 +150,13 @@ const getRoll: RollFunction = async () => {
 
   return (
     <div>
-      <GameArena />
-      {/* <div className="min-h-2">
+ 
+      <div className="min-h-2">
         <div className="mt-4">{output}</div>
         {!gameInProgress && <UsernamesForm usernames={usernames} setUsernames={setUsernames} />}
-      </div> */}
+      </div>
       
-      {/* <div className='hidden' id="roll-result">{rollResult}</div> */}
-      {/* <ResponseForm
+      <ResponseForm
         isOpen={modalIsOpen}
         closeModal={closeModal}
         onSubmit={handleModalSubmit}
@@ -168,16 +166,11 @@ const getRoll: RollFunction = async () => {
       <button onClick={startGame} type="button">Play game</button>
       
      
-      <Roulette roulette={roulette} /> */}
-
-
-
-      {/* {leaderboard && leaderboard.map((user) => <div>
-        <p>Player: {user.username} Turn: {user.turn} - score: {user.turnScore} - total score: {user.totalScore}</p>
-      </div>)}
+      <Roulette roulette={roulette} />
 
     
-      <button className='hidden' ref={stopButtonRef} type="button" onClick={handleStopGame} disabled={!isGameStarted} /> */}
+      <div className='hidden' id="roll-result">{rollResult}</div>
+      <button className='hidden' ref={stopButtonRef} type="button" onClick={handleStopGame} disabled={!isGameStarted} />
   
    
     </div>

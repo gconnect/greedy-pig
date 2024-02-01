@@ -43,8 +43,8 @@ export async function playGame(
       let turnScore: number = 0;
       let continueRolling: boolean = true;
       playerInfos[i].totalScore = playerScores[username]
-      
-      await output(username, `Your turn score is ${turnScore}.`, playerInfos);
+
+      await output(username, `${username} turn score is ${turnScore}.`, playerInfos);
 
       playerInfos[i].turn += 1
 
@@ -74,8 +74,8 @@ export async function playGame(
 
       }
 
+      
       playerScores[username] += turnScore;
-       
     }
   }
 
@@ -85,10 +85,10 @@ export async function playGame(
   console.log('\nGame over!');
 
   if (winningPlayers.length === 1) {
-    result = `\nGame over! \n The highest score is ${highestScore} by Player ${winningPlayers[0]}`;
+    result = `Game over! \n The highest score is ${highestScore} by Player ${winningPlayers[0]}`;
   } else {
-    console.log(`\nGame over! \n There is a tie for the highest score (${highestScore}) among Players: ${winningPlayers.join(', ')}`);
-    result = `\nGame over! \n There is a tie for the highest score (${highestScore}) among Players: ${winningPlayers.join(', ')}`;
+    console.log(`Game over! \n There is a tie for the highest score (${highestScore}) among Players: ${winningPlayers.join(', ')}`);
+    result = `Game over! \n There is a tie for the highest score (${highestScore}) among Players: ${winningPlayers.join(', ')}`;
   }
 
   console.log('\nSummary of Participants\' Scores:');
