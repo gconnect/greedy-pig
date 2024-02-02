@@ -3,7 +3,7 @@
 import Roulette from '@/components/ui/Roullete'
 import LeaderBoard from './Leaderboard';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateLeaderboard } from '@/store/features/leaderboard/leaderboardSlice';
+import { initLeaderboard } from '@/features/leaderboard/leaderboardSlice';
 import { useCallback } from 'react';
 const GameArena = () => { 
 

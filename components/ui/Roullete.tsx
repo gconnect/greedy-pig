@@ -6,8 +6,8 @@ import ResponseForm from '@/components/ResponseForm'
 import { InputFunction, RollFunction, OutputFunction, playGame } from "@/lib/utils"
 import { useState } from "react";
 import { Roulette, useRoulette } from 'react-hook-roulette';
+import { initLeaderboard } from '@/features/leaderboard/leaderboardSlice';
 import { useDispatch } from 'react-redux';
-import { updateLeaderboard } from '@/store/features/leaderboard/leaderboardSlice';
 
 
 
@@ -15,15 +15,9 @@ export default function Home() {
 
   const dispatch = useDispatch();
 
-  // const handleIncrement = useCallback(() => {
-  //   dispatch(updateLeaderboard('justin'));
-  // }, [dispatch]);
-
- 
-
   const [gameInProgress, setGameInProgress] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [usernames, setUsernames] = useState<string[]>([]);   
+  // const [usernames, setUsernames] = useState<string[]>([]);     
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalQuestion, setModalQuestion] = useState('');
   const [output, setOutput] = useState('');
@@ -80,10 +74,10 @@ export default function Home() {
     onStop();
   };
 
-  const getOutput: OutputFunction = (user: string, message: string, participants: string[]) => {
-    return new Promise((resolve) => {
+  const getOutput: OutputFunction = (user: string, message: string) => {
+    return new Promise(async (resolve) => {
     setOutput(`${user} ${message}`);
-    dispatch(updateLeaderboard(participants));
+    // setLeaderboard(leaderboard)
     resolve(message)
     })  
     
@@ -148,7 +142,7 @@ const getRoll: RollFunction = async () => {
   const startGame = async () => {
     setGameInProgress(true);
     try {
-      const result = await playGame(usernames, getInput, getRoll, 2, getOutput);
+      const result = await playGame(getInput, getRoll, 2, getOutput, dispatch);
       setGameInProgress(false);
       setOutput(`Game finished!. ${result}`); // Update output state to indicate game finish
     } catch (error) {
@@ -162,7 +156,7 @@ const getRoll: RollFunction = async () => {
  
       <div className="min-h-2">
         <div className="mt-4">{output}</div>
-        {!gameInProgress && <UsernamesForm usernames={usernames} setUsernames={setUsernames} />}
+        {!gameInProgress && <UsernamesForm />}
       </div>
       
       <ResponseForm
@@ -173,15 +167,12 @@ const getRoll: RollFunction = async () => {
         handleUserInput={handleUserInput}
       />
       <button onClick={startGame} type="button">Play game</button>
-      
-     
+
       <Roulette roulette={roulette} />
 
-    
       <div className='hidden' id="roll-result">{rollResult}</div>
       <button className='hidden' ref={stopButtonRef} type="button" onClick={handleStopGame} disabled={!isGameStarted} />
-  
-   
+
     </div>
   )
 }
