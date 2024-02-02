@@ -1,6 +1,6 @@
 'use client'
 
-import Roulette from '@/components/ui/Roullete'
+import AppRoullete from '@/components/ui/AppRoullete'
 import LeaderBoard from './Leaderboard';
 import { useDispatch, useSelector } from 'react-redux';
 import { initLeaderboard } from '@/features/leaderboard/leaderboardSlice';
@@ -25,7 +25,7 @@ const GameArena = () => {
     <div className="grid gap-4 md:grid-cols-2 md:gap-8">
 
       <div className="flex flex-col items-center gap-4 rounded-lg bg-indigo-500 px-8 py-6 md:gap-6">
-        <Roulette />
+        <AppRoullete />
       </div>
      
      <div className="flex flex-col items-center gap-4 rounded-lg bg-indigo-500 px-8 py-6 md:gap-6">

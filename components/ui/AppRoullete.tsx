@@ -11,13 +11,12 @@ import { useDispatch } from 'react-redux';
 
 
 
-export default function Home() {
+export default function AppRoullete() {
 
   const dispatch = useDispatch();
 
   const [gameInProgress, setGameInProgress] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  // const [usernames, setUsernames] = useState<string[]>([]);     
+  const [loading, setLoading] = useState<boolean>(false);    
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalQuestion, setModalQuestion] = useState('');
   const [output, setOutput] = useState('');
