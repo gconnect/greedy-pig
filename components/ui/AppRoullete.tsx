@@ -1,4 +1,4 @@
-'use client'
+// 'use client'
 
 import { useCallback, useEffect, useRef } from 'react'
 import UsernamesForm from "@/components/UsernamesForm";
@@ -6,13 +6,15 @@ import ResponseForm from '@/components/ResponseForm'
 import { InputFunction, RollFunction, OutputFunction, playGame } from "@/lib/utils"
 import { useState } from "react";
 import { Roulette, useRoulette } from 'react-hook-roulette';
-import { initLeaderboard } from '@/features/leaderboard/leaderboardSlice';
-import { useDispatch } from 'react-redux';
+import { initLeaderboard, selectUsernames, updatePlayerInfo, UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/rootReducer';
 
 
 
 export default function AppRoullete() {
-
+  
+  const usernames = useSelector((state: RootState) => selectUsernames(state.leaderboard));
   const dispatch = useDispatch();
 
   const [gameInProgress, setGameInProgress] = useState<boolean>(false);
@@ -138,12 +140,21 @@ const getRoll: RollFunction = async () => {
    return answer
   };
 
+  
   const startGame = async () => {
+    
+    
     setGameInProgress(true);
     try {
-      const result = await playGame(getInput, getRoll, 2, getOutput, dispatch);
+      debugger
+      const result = await playGame(usernames, getInput, getRoll, 2, getOutput, {
+
+        updatePlayerInfo: (action: any) => {
+        return dispatch(action)
+       }
+    });
       setGameInProgress(false);
-      setOutput(`Game finished!. ${result}`); // Update output state to indicate game finish
+      setOutput(`Game finished!. ${result}`);
     } catch (error) {
       console.error('Error during game:', error);
     }

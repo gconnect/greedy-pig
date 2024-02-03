@@ -1,7 +1,7 @@
 import { selectUsernames, updatePlayerInfo } from '@/features/leaderboard/leaderboardSlice';
 import { RootState } from '@/store/rootReducer';
-import { useSelector } from 'react-redux';
-import { Dispatch } from 'redux';
+// import { useSelector } from 'react-redux';
+
 
 export type InputFunction = (question: string) => Promise<string>
 export type RollFunction = () => Promise<number>
@@ -15,23 +15,20 @@ export type PlayerInfo = {
 
 
 export async function playGame(
-  // usernames: string[],
+  usernames: string[],
   getInput: InputFunction,
   getRoll: RollFunction,
   numTurns: number,
   output: OutputFunction  ,
-  dispatch: Dispatch
+  dispatchCallbacks: {
+    updatePlayerInfo: (action: { username: string, property: keyof PlayerInfo, value: any }) => void;
+  }
 ): Promise<string> {
 
-  // const playerInfos: PlayerInfo[] = usernames.map(username => ({
-  //   turn: 0,
-  //   username,
-  //   turnScore: 0,
-  //   totalScore: 0
-  // }));
 
   let result;
-  const usernames = useSelector((state: RootState) => selectUsernames(state));
+  // const usernames = ['justin', 'hello']
+  // const usernames = useSelector((state: RootState) => selectUsernames(state));
 
   const playerScores: { [key: string]: number } = {};
   for (const username of usernames) {
@@ -47,13 +44,11 @@ export async function playGame(
       const username = usernames[i];
       let turnScore: number = 0;
       let continueRolling: boolean = true;
-      dispatch(updatePlayerInfo({ username, property: 'totalScore', value: playerScores[username] }));
+      dispatchCallbacks.updatePlayerInfo({ username, property: 'totalScore', value: playerScores[username] })
 
       await output(username, `${username} turn score is ${turnScore}.`);
 
-      dispatch(updatePlayerInfo({ username, property: 'turn', value: turn ++ }));
-
-      // playerInfos[i].turn += 1
+      dispatchCallbacks.updatePlayerInfo({ username, property: 'turn', value: turn ++ })
 
       while (continueRolling) {
 
@@ -62,8 +57,8 @@ export async function playGame(
         if (roll === 1) {
 
           turnScore = 0;
-          // playerInfos[i].turnScore = turnScore;
-          dispatch(updatePlayerInfo({ username, property: 'turnScore', value: turnScore }));
+  
+          dispatchCallbacks.updatePlayerInfo({ username, property: 'turnScore', value: turnScore })
           await output(username, `Bust! Your turn score is 0.`);
           await new Promise(resolve => setTimeout(resolve, 2000)); 
           continueRolling = false; 
@@ -72,7 +67,7 @@ export async function playGame(
 
           turnScore += roll;
 
-          dispatch(updatePlayerInfo({ username, property: 'turnScore', value: turnScore }));
+          dispatchCallbacks.updatePlayerInfo({ username, property: 'turnScore', value: turnScore })
 
           await output(username, `Your turn score is ${turnScore}.`);
           const answer: string = await getInput(`Your current score is ${turnScore}. Roll again? (y/n): `);

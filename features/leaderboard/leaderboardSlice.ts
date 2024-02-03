@@ -16,6 +16,12 @@ interface State {
   participants: Participant[];
 }
 
+export interface UpdatePlayerInfoPayload {
+  username: string;
+  property: keyof PlayerInfo;
+  value: any;
+}
+
 const leaderboardSlice = createSlice({
   name: 'leaderboard',
   initialState: {
@@ -33,7 +39,8 @@ const leaderboardSlice = createSlice({
       })
     },
 
-    updatePlayerInfo: (state, action: PayloadAction<{ username: string, property: keyof PlayerInfo, value: any }>) => {
+    updatePlayerInfo: (state, action: PayloadAction<UpdatePlayerInfoPayload>) => {
+    // updatePlayerInfo: (state, action: PayloadAction<{ username: string, property: keyof PlayerInfo, value: any }>) => {
       const { username, property, value } = action.payload;
       const participant = state.participants.find(p => p.username === username);
       if (participant) {
@@ -48,8 +55,10 @@ const leaderboardSlice = createSlice({
 
 export const selectUsernames = createSelector(
   (state: RootState) => state.leaderboard.participants,
-  (participants: Participant[]) => participants.map(participant => participant.username)
-  // participants => participants.map(participant => participant.username) as string[]
+  (participants: Participant[] | undefined) => {
+    if (!participants) return []; // Return an empty array if participants is undefined
+    return participants.map(participant => participant.username)
+  }
 );
 
 export const selectParticipants = (state: RootState) => state.leaderboard.participants;
