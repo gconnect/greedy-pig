@@ -1,7 +1,3 @@
-import { selectUsernames, updatePlayerInfo, UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice';
-import { RootState } from '@/store/rootReducer';
-// import { useSelector } from 'react-redux';
-
 
 export type InputFunction = (question: string) => Promise<string>
 export type RollFunction = () => Promise<number>
@@ -33,21 +29,24 @@ export async function playGame(
   }
 
 
+  
+
   for (let turn = 0; turn < numTurns; turn++) {
-
-
+    
+    
     for (let i = 0; i < usernames.length; i++) {
-
+      
+      let playerTurn: number = 1;
       const username = usernames[i];
       let turnScore: number = 0;
       let continueRolling: boolean = true;
-      debugger
+    
 
-      dispatchCallbacks.updatePlayerInfo({ username, property: 'totalScore', value: playerScores[username] }) // line 47
+      
 
       await output(username, `${username} turn score is ${turnScore}.`);
 
-      dispatchCallbacks.updatePlayerInfo({ username, property: 'turn', value: turn++ })
+      dispatchCallbacks.updatePlayerInfo({ username, property: 'turn', value: 1 })
 
       while (continueRolling) {
 
@@ -74,12 +73,18 @@ export async function playGame(
           if (answer.toLowerCase() !== 'y') {
             continueRolling = false;
           }
-        }      
-
+        } 
       }
 
-      
+      if (i === usernames.length - 1) {
+        playerTurn++;
+      }
+   
+
       playerScores[username] += turnScore;
+
+      dispatchCallbacks.updatePlayerInfo({ username, property: 'turnScore', value: playerScores[username] })
+      dispatchCallbacks.updatePlayerInfo({ username, property: 'totalScore', value: playerScores[username] })
     }
   }
 

@@ -7,7 +7,7 @@ interface PlayerInfo {
   totalScore: number;
 }
 
-interface Participant {
+export interface Participant {
   username: string;
   playerInfo: PlayerInfo;
 }
@@ -40,15 +40,21 @@ const leaderboardSlice = createSlice({
     },
 
     updatePlayerInfo: (state, action: PayloadAction<UpdatePlayerInfoPayload>) => {
-    // updatePlayerInfo: (state, action: PayloadAction<{ username: string, property: keyof PlayerInfo, value: any }>) => {
       const { username, property, value } = action.payload;
       const participant = state.participants.find(p => p.username === username);
       if (participant) {
-        participant.playerInfo = {
-          ...participant.playerInfo,
-          [property]: value
-        };
-      }
+        if (property === 'turn') {
+            participant.playerInfo = {
+                ...participant.playerInfo,
+                [property]: participant.playerInfo[property] + value // Increment the turn by the value
+            };
+        } else {
+            participant.playerInfo = {
+                ...participant.playerInfo,
+                [property]: value
+            };
+        }
+    }
     }
   }
 });

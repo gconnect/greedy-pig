@@ -83,7 +83,6 @@ export default function AppRoullete() {
     
   }
 
-
   const getInput: InputFunction = async (question: string) => {
     return new Promise((resolve) => {
       setModalQuestion(question);

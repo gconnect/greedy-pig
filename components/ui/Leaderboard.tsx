@@ -1,6 +1,6 @@
 
 import { RootState } from "@/store/rootReducer";
-import { selectParticipants } from '@/features/leaderboard/leaderboardSlice';
+import { selectParticipants, Participant } from '@/features/leaderboard/leaderboardSlice';
 import { useSelector } from "react-redux";
 
 const LeaderBoard = () => {
@@ -18,14 +18,15 @@ const LeaderBoard = () => {
         <thead className="align-bottom">
           <tr>
             <th className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Player</th>
-            <th className="px-6 py-3 pl-2 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Function</th>
-            <th className="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Status</th>
-            <th className="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Employed</th>
+            <th className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Round</th>
+            <th className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Score</th>
+            <th className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">Total Score</th>
+       
 
           </tr>
         </thead>
         <tbody>
-          {players && players.map((player: { username: string }, i: number) => (<tr  key={i}>
+          {players && players.map((player: Participant, i: number) => (<tr  key={i}>
             <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
               <div className="flex px-2 py-1">
                 <div>
@@ -33,19 +34,22 @@ const LeaderBoard = () => {
                 </div>
                 <div className="flex flex-col justify-center">
                   <h6 className="mb-0 leading-normal text-sm">{player.username}</h6>
-                  <p className="mb-0 leading-tight text-xs text-slate-400">john@creative-tim.com</p>
                 </div>
               </div>
             </td>
             <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
-              <p className="mb-0 font-semibold leading-tight text-xs">Manager</p>
-              <p className="mb-0 leading-tight text-xs text-slate-400">Organization</p>
-            </td>
-            <td className="p-2 leading-normal text-center align-middle bg-transparent border-b text-sm whitespace-nowrap shadow-transparent">
-              <span className="bg-gradient-to-tl from-green-600 to-lime-400 px-2 text-xxs rounded py-1 inline-block whitespace-nowrap text-center align-baseline font-bold uppercase leading-none text-white">Online</span>
+              <p className="mb-0 font-semibold leading-tight text-xs">{player.playerInfo.turn}</p>
             </td>
             <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
-              <span className="font-semibold leading-tight text-xs text-slate-400">23/04/18</span>
+              <span className="font-semibold leading-tight text-xs text-slate-400">{player.playerInfo.turnScore}</span>
+            </td>
+            <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
+              <span className="font-semibold leading-tight text-xs text-slate-400">{player.playerInfo.totalScore}</span>
+            </td>
+            <td className="p-2 leading-normal text-center align-middle bg-transparent border-b text-sm whitespace-nowrap shadow-transparent">
+              <span className="bg-gradient-to-tl from-green-600 to-lime-400 px-2 text-xxs rounded py-1 inline-block whitespace-nowrap text-center align-baseline font-bold uppercase leading-none text-white">
+                Roll
+              </span>
             </td>
       
           </tr>)
