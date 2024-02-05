@@ -3,7 +3,6 @@
 import AppRoullete from '@/components/ui/AppRoullete'
 import LeaderBoard from './Leaderboard';
 import { useDispatch, useSelector } from 'react-redux';
-import { initLeaderboard } from '@/features/leaderboard/leaderboardSlice';
 import { useCallback } from 'react';
 const GameArena = () => { 
 

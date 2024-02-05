@@ -15,7 +15,7 @@ const UsernamesForm = () => {
           const username = usernameInput.value.trim();
 
           if (username) {
-          
+          debugger
             dispatch(initLeaderboard(username));
             // Clear the input field
             usernameInput.value = "";

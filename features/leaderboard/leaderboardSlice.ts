@@ -54,14 +54,14 @@ const leaderboardSlice = createSlice({
 });
 
 export const selectUsernames = createSelector(
-  (state: RootState) => state.leaderboard.participants,
+  (state) => state.participants,
   (participants: Participant[] | undefined) => {
     if (!participants) return []; // Return an empty array if participants is undefined
     return participants.map(participant => participant.username)
   }
 );
 
-export const selectParticipants = (state: RootState) => state.leaderboard.participants;
+export const selectParticipants = (state: State) => state.participants;
 
 export const { initLeaderboard, updatePlayerInfo } = leaderboardSlice.actions;
 

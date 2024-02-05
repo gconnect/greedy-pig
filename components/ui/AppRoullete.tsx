@@ -6,7 +6,7 @@ import ResponseForm from '@/components/ResponseForm'
 import { InputFunction, RollFunction, OutputFunction, playGame } from "@/lib/utils"
 import { useState } from "react";
 import { Roulette, useRoulette } from 'react-hook-roulette';
-import { initLeaderboard, selectUsernames, updatePlayerInfo, UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice';
+import { selectUsernames, updatePlayerInfo, UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/rootReducer';
 
@@ -78,7 +78,6 @@ export default function AppRoullete() {
   const getOutput: OutputFunction = (user: string, message: string) => {
     return new Promise(async (resolve) => {
     setOutput(`${user} ${message}`);
-    // setLeaderboard(leaderboard)
     resolve(message)
     })  
     
@@ -146,11 +145,11 @@ const getRoll: RollFunction = async () => {
     
     setGameInProgress(true);
     try {
-      debugger
+
       const result = await playGame(usernames, getInput, getRoll, 2, getOutput, {
 
-        updatePlayerInfo: (action: any) => {
-        return dispatch(action)
+        updatePlayerInfo: (action: UpdatePlayerInfoPayload) => {
+          dispatch({type: 'leaderboard/updatePlayerInfo', payload: action})
        }
     });
       setGameInProgress(false);
