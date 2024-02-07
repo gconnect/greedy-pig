@@ -8,7 +8,7 @@ import injectedModule from '@web3-onboard/injected-wallets'
 import { Toaster } from 'react-hot-toast'
 
 import configFile from '@/config/cartesi.json'
-import PeepsProvider from './context'
+import ConnectProvider from '@/components/providers/ConnectProvider'
 import store from '../store'
 
 import './globals.css'
@@ -55,13 +55,13 @@ export default function RootLayout({
       <body className={`${inter.className}`}>
         <Provider store={store}>
           <ApolloProvider client={client}>
-            <PeepsProvider>
+            <ConnectProvider>
               <section className="px-custom p-custom-sm">
               <Header />
               {children}
               <Toaster position="top-right" containerStyle={{ top: '88px' }} />
               </section>
-            </PeepsProvider>
+            </ConnectProvider>
           </ApolloProvider>
         </Provider>
       </body>

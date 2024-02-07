@@ -1,3 +1,8 @@
+import Image from 'next/image'
+import Button from "../shared/Button"
+import Logo from '@/assets/img/logo.png'
+import ConnectButton from './ConnectButton'
+
 const Header = () => {
   return (
     <div className="">
@@ -8,16 +13,15 @@ const Header = () => {
             className="inline-flex items-center gap-2.5 text-2xl font-bold md:text-3xl"
             aria-label="logo"
           >
-            <svg
-              width="95"
-              height="94"
-              viewBox="0 0 95 94"
-              className="h-auto w-6 text-indigo-500"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M96 0V47L48 94H0V47L48 0H96Z" />
-            </svg>
+            <Image
+              className=""
+              data-aos="zoom-in"
+              src={Logo}
+              alt="greedy image"
+              width={70}
+              height={50}
+              loading="lazy"
+            />
             GreedyPig
           </a>
           <nav className="hidden gap-12 lg:flex">
@@ -25,13 +29,13 @@ const Header = () => {
               href="#"
               className="text-lg font-semibold text-gray-600 transition duration-100 hover:text-indigo-500 active:text-indigo-700"
             >
-              Home
+              Play
             </a>
             <a
               href="#"
               className="text-lg font-semibold text-gray-600 transition duration-100 hover:text-indigo-500 active:text-indigo-700"
             >
-              Pricing
+              Leaderboard
             </a>
             <a
               href="#"
@@ -41,19 +45,7 @@ const Header = () => {
             </a>
           </nav>
           <div className="-ml-8 hidden flex-col gap-2.5 sm:flex-row sm:justify-center lg:flex lg:justify-start">
-            <a
-              href="#"
-              className="inline-block rounded-lg px-4 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:text-indigo-500 focus-visible:ring active:text-indigo-600 md:text-base"
-            >
-              Sign in
-            </a>
-
-            <a
-              href="#"
-              className="inline-block rounded-lg bg-indigo-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-indigo-300 transition duration-100 hover:bg-indigo-600 focus-visible:ring active:bg-indigo-700 md:text-base"
-            >
-              Sign up
-            </a>
+            <ConnectButton />
           </div>
 
           <button
