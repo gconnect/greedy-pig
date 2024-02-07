@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 // Copyright 2022 Cartesi Pte. Ltd.
 
@@ -12,16 +12,16 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { FC, useEffect } from "react";
-import { useConnectWallet, useSetChain } from "@web3-onboard/react";
-import configFile from "./config.json";
-import { usePeepsContext } from "./context";
+import { FC, useEffect } from 'react'
+import { useConnectWallet, useSetChain } from '@web3-onboard/react'
+import configFile from '@/config/cartesi.json'
+import { usePeepsContext } from './context'
 
-const config: any = configFile;
+const config: any = configFile
 
 export const Network: FC = () => {
   // const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
-  const [{ chains, connectedChain, settingChain }, setChain] = useSetChain();
+  const [{ chains, connectedChain, settingChain }, setChain] = useSetChain()
   const {
     updateBaseDappAddress,
     updateCurrentUser,
@@ -30,23 +30,23 @@ export const Network: FC = () => {
     connect,
     disconnect,
     notices,
-  } = usePeepsContext();
+  } = usePeepsContext()
 
   useEffect(() => {
     if (notices) {
-      updateBaseDappAddress(wallet?.accounts[0]?.address);
+      updateBaseDappAddress(wallet?.accounts[0]?.address)
       notices?.length > 0 &&
         updateCurrentUser(
           JSON.parse(notices?.reverse()[0].payload).users.filter(
             (it: any) => it.address === wallet?.accounts[0]?.address
           )
-        );
+        )
     }
-  }, [wallet]);
+  }, [wallet])
 
   const handleWalletConnect = () => {
-    connect();
-  };
+    connect()
+  }
 
   return (
     <div>
@@ -56,7 +56,7 @@ export const Network: FC = () => {
           className="btn btn-primary rounded-box"
           onClick={handleWalletConnect}
         >
-          {connecting ? "connecting" : "connect"}
+          {connecting ? 'connecting' : 'connect'}
         </button>
       )}
       {wallet && (
@@ -69,9 +69,9 @@ export const Network: FC = () => {
               className="select select-sm ring-0 max-w-xs focus:outline-0 bg-base-200 focus:bg-base-300"
               onChange={({ target: { value } }) => {
                 if (config[value] !== undefined) {
-                  setChain({ chainId: value });
+                  setChain({ chainId: value })
                 } else {
-                  alert("No deploy on this chain");
+                  alert('No deploy on this chain')
                 }
               }}
               value={connectedChain?.id}
@@ -81,7 +81,7 @@ export const Network: FC = () => {
                   <option key={id} value={id}>
                     {label}
                   </option>
-                );
+                )
               })}
             </select>
           )}
@@ -89,5 +89,5 @@ export const Network: FC = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

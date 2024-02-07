@@ -1,13 +1,11 @@
-
-
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit'
 // import rootReducer from './rootReducer';
-import leaderboardReducer from '../features/leaderboard/leaderboardSlice';
+import leaderboardReducer from '../features/leaderboard/leaderboardSlice'
 
 const store = configureStore({
   reducer: {
-    leaderboard: leaderboardReducer
-  }
-});
+    leaderboard: leaderboardReducer,
+  },
+})
 
-export default store;
+export default store

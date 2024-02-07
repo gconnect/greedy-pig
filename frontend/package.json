@@ -11,7 +11,8 @@
         "codegen:graphql": "graphql-codegen",
         "codegen:typechain": "typechain --target ethers-v5 --out-dir src/generated/rollups './node_modules/@cartesi/rollups/export/artifacts/**/*.json'",
         "eject": "react-app-rewired eject",
-        "test": "react-app-rewired test"
+        "test": "react-app-rewired test",
+        "prettier": "prettier --write ."
     },
     "dependencies": {
         "@apollo/client": "^3.9.2",
