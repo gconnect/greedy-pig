@@ -78,7 +78,7 @@ const LeaderBoard = () => {
           </div>
         </div>
       ) : (
-        <EmptyPage icon={Logo} text="No games" />
+        <EmptyPage text="No games" />
       )}
     </div>
   )
