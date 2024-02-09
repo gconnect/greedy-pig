@@ -56,7 +56,7 @@ export default function RootLayout({
         <Provider store={store}>
           <ApolloProvider client={client}>
             <ConnectProvider>
-              <section className="px-custom p-custom-sm">
+              <section className="md:px-custom p-custom-sm">
                 <Header />
                 <div className="text-gray-500">{children}</div>
                 <Toaster
