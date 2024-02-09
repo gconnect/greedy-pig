@@ -57,9 +57,12 @@ export default function RootLayout({
           <ApolloProvider client={client}>
             <ConnectProvider>
               <section className="px-custom p-custom-sm">
-              <Header />
-              {children}
-              <Toaster position="top-right" containerStyle={{ top: '88px' }} />
+                <Header />
+                <div className="text-gray-500">{children}</div>
+                <Toaster
+                  position="top-right"
+                  containerStyle={{ top: '88px' }}
+                />
               </section>
             </ConnectProvider>
           </ApolloProvider>

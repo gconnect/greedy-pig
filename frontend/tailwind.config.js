@@ -11,7 +11,7 @@ module.exports = {
   theme: {
     extend: {
       padding: {
-        'custom': '80px',
+        custom: '80px',
         'custom-sm': '20px',
       },
       colors: {
@@ -19,5 +19,8 @@ module.exports = {
       },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('tw-elements/dist/plugin.cjs'),
+  ],
 }

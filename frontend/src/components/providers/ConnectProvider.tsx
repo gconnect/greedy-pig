@@ -57,15 +57,14 @@ interface ICurrentUser {
 const ConnectProvider: FC<ConnectProviderProps<any>> = ({
   children,
 }: ConnectProviderProps<any>) => {
-
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
   const { data, notices, loading, error } = useNotices()
 
-  const [baseDappAddress, setBaseDappAddress] = useState<string>(defaultDappAddress)
+  const [baseDappAddress, setBaseDappAddress] =
+    useState<string>(defaultDappAddress)
   const [currentUser, setCurrentUser] = useState<ICurrentUser[] | any>()
 
   const userCreated = currentUser ? currentUser?.length > 0 : false
- 
 
   const updateBaseDappAddress = (newDappAddress: string) => {
     setBaseDappAddress(newDappAddress)

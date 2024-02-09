@@ -8,22 +8,20 @@ import {
   RollFunction,
   OutputFunction,
   playGame,
-} from '../../lib/utils'
+} from '@/lib/utils'
 import { useState } from 'react'
 import { Roulette, useRoulette } from 'react-hook-roulette'
 import {
   selectParticipants,
   selectUsernames,
-  updatePlayerInfo,
   UpdatePlayerInfoPayload,
-} from '../../features/leaderboard/leaderboardSlice'
+} from '@/features/leaderboard/leaderboardSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import store from '@/store'
 import { addInput } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils/constants'
-import { ethers } from 'ethers'
-import { Network } from '@/app/Network'
+
 import Lists from './Lists'
 
 export default function AppRoullete() {
@@ -171,8 +169,7 @@ export default function AppRoullete() {
           leaderboard: updatedParticipants,
         },
       })
-      debugger
-      // const tx = await addInput(jsonPayload)
+
       const tx = await addInput(
         JSON.stringify(jsonPayload),
         dappAddress,
@@ -193,8 +190,6 @@ export default function AppRoullete() {
 
   return (
     <div>
-      <Network />
-
       <div className="min-h-2">
         <div className="mt-4">{output}</div>
         {!gameInProgress && <UsernamesForm />}

@@ -2,12 +2,11 @@ import { FC, useEffect } from 'react'
 import { useConnectWallet, useSetChain } from '@web3-onboard/react'
 import configFile from '@/config/cartesi.json'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
-import Button from "../shared/Button"
+import Button from '../shared/Button'
 
 const config: any = configFile
 
 const ConnectButton = () => {
-
   const [{ chains, connectedChain, settingChain }, setChain] = useSetChain()
   const {
     updateBaseDappAddress,
@@ -20,13 +19,13 @@ const ConnectButton = () => {
   } = useConnectContext()
 
   const handleChainChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
+    const value = event.target.value
     if (config[value] !== undefined) {
-      setChain({ chainId: value });
+      setChain({ chainId: value })
     } else {
-      alert('No deploy on this chain');
+      alert('No deploy on this chain')
     }
-  };
+  }
 
   useEffect(() => {
     // dont really understand what this is for
@@ -41,18 +40,17 @@ const ConnectButton = () => {
     }
   }, [wallet])
 
-return (
+  return (
+    <div>
+      {!wallet && (
+        <Button onClick={() => connect()} className="w-[200px]">
+          {connecting ? 'Connecting ...' : 'Connect'}
+        </Button>
+      )}
 
-  <div>
-   {!wallet && ( 
-    <Button onClick={() => connect()} className="w-[200px]">
-      {connecting ? 'Connecting ...' : 'Connect'}
-    </Button>  
-   )}
-
-   {wallet && (
-      <div className="space-x-3">
-        {/* {settingChain ? (
+      {wallet && (
+        <div className="space-x-3">
+          {/* {settingChain ? (
           <span>Switching chain...</span>
         ) : (
           <select onChange={handleChainChange} value={connectedChain?.id} >
@@ -63,15 +61,13 @@ return (
             ))}
           </select>
         )} */}
-        <Button onClick={() => disconnect(wallet)} className="w-[200px]">Disconnect Wallet</Button>
+          <Button onClick={() => disconnect(wallet)} className="w-[200px]">
+            Disconnect Wallet
+          </Button>
         </div>
-      )} 
-  </div>
-)
-
-
-
+      )}
+    </div>
+  )
 }
-
 
 export default ConnectButton
