@@ -40,7 +40,7 @@ export default function AppRoullete() {
   >(() => () => {})
   const [rollResult, setRollResult] = useState<number | null>(null)
   const [isGameStarted, setIsGameStarted] = useState(false)
-  const stopButtonRef = useRef(null)
+  const stopButtonRef = useRef<HTMLButtonElement | null>(null);
   const { roulette, onStart, onStop } = useRoulette({
     items: [
       { name: '1', bg: '#b26527', color: '#ffffff' },
