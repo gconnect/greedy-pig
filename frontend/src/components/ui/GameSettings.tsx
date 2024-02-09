@@ -27,7 +27,7 @@ const Sidebar = () => {
         data-te-modal-init
         className="fixed left-0 top-0 z-[1055] hidden h-full w-[100%] outline-none"
         id="rightTopModal"
-        tabindex="-1"
+        tabIndex={-1}
         aria-labelledby="rightTopModalLabel"
         aria-hidden="true"
       >
