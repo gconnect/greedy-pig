@@ -67,7 +67,7 @@ const leaderboardSlice = createSlice({
 })
 
 export const selectUsernames = createSelector(
-  (state) => state.participants,
+  (state: State) => state.participants,
   (participants: Participant[] | undefined) => {
     if (!participants) return [] // Return an empty array if participants is undefined
     return participants.map((participant) => participant.username)
@@ -76,8 +76,7 @@ export const selectUsernames = createSelector(
 
 export const selectParticipants = (state: State) => state.participants
 
-export const { initLeaderboard, updatePlayerInfo, resetLeaderboard } =
-  leaderboardSlice.actions
+export const { initLeaderboard, updatePlayerInfo, resetLeaderboard } = leaderboardSlice.actions
 
 export default leaderboardSlice.reducer
 
