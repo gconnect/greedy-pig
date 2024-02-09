@@ -1,4 +1,4 @@
-import { Server } from 'Socket.IO'
+import { Server } from 'socket.iO'
 
 const SocketHandler = (req, res) => {
   if (res.socket.server.io) {
