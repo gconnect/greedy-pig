@@ -1,7 +1,7 @@
 'use client'
 
 import { FC, createContext, useContext, useState } from 'react'
-import { defaultDappAddress } from '@/utils/constants'
+import { dappAddress } from '@/lib/utils'
 import { useConnectWallet } from '@web3-onboard/react'
 import { useNotices } from '@/hooks/useNotices'
 import { Address } from '@web3-onboard/core/dist/types'
@@ -61,7 +61,7 @@ const ConnectProvider: FC<ConnectProviderProps<any>> = ({
   const { data, notices, loading, error } = useNotices()
 
   const [baseDappAddress, setBaseDappAddress] =
-    useState<string>(defaultDappAddress)
+    useState<string>(dappAddress)
   const [currentUser, setCurrentUser] = useState<ICurrentUser[] | any>()
 
   const userCreated = currentUser ? currentUser?.length > 0 : false

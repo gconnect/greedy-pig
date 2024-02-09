@@ -1,14 +1,14 @@
-import { useQuery, gql } from '@apollo/client'
-import { ethers } from 'ethers'
-import { useState } from 'react'
+// import { useQuery, gql } from '@apollo/client'
+// import { ethers } from 'ethers'
+// import { useState } from 'react'
 import { useNotices } from '@/hooks/useNotices'
 
-type Notice = {
-  id: string
-  index: number
-  input: any //{index: number; epoch: {index: number; }
-  payload: string
-}
+// type Notice = {
+//   id: string
+//   index: number
+//   input: any //{index: number; epoch: {index: number; }
+//   payload: string
+// }
 
 const Lists = () => {
   const { notices } = useNotices()

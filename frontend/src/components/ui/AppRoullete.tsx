@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import store from '@/store'
 import { addInput } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
-import { dappAddress } from '@/lib/utils/constants'
+import { dappAddress } from '@/lib/utils'
 
 import Lists from './Lists'
 
@@ -32,7 +32,6 @@ export default function AppRoullete() {
   const dispatch = useDispatch()
 
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [modalQuestion, setModalQuestion] = useState('')
   const [output, setOutput] = useState('')
@@ -54,7 +53,6 @@ export default function AppRoullete() {
       { name: '8' },
     ],
     onSpinEnd: (res) => {
-      setLoading(false)
       setRollResult(Number(res))
     },
     options: {
@@ -110,7 +108,7 @@ export default function AppRoullete() {
   }
 
   const startRouletteSpin = async () => {
-    setLoading(true)
+
     setIsGameStarted(true)
     onStart() // Start the roulette spinning
   }

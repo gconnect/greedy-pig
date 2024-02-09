@@ -9,7 +9,7 @@ import { Toaster } from 'react-hot-toast'
 
 import configFile from '@/config/cartesi.json'
 import ConnectProvider from '@/components/providers/ConnectProvider'
-import store from '../store'
+import store from '@/store'
 
 import './globals.css'
 import Header from '@/components/ui/Header'

@@ -1,5 +1,5 @@
-import { FC, useEffect } from 'react'
-import { useConnectWallet, useSetChain } from '@web3-onboard/react'
+import { useEffect } from 'react'
+// import { useConnectWallet, useSetChain } from '@web3-onboard/react'
 import configFile from '@/config/cartesi.json'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 import Button from '../shared/Button'
@@ -7,7 +7,7 @@ import Button from '../shared/Button'
 const config: any = configFile
 
 const ConnectButton = () => {
-  const [{ chains, connectedChain, settingChain }, setChain] = useSetChain()
+
   const {
     updateBaseDappAddress,
     updateCurrentUser,
@@ -18,14 +18,14 @@ const ConnectButton = () => {
     notices,
   } = useConnectContext()
 
-  const handleChainChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value
-    if (config[value] !== undefined) {
-      setChain({ chainId: value })
-    } else {
-      alert('No deploy on this chain')
-    }
-  }
+  // const handleChainChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const value = event.target.value
+  //   if (config[value] !== undefined) {
+  //     setChain({ chainId: value })
+  //   } else {
+  //     alert('No deploy on this chain')
+  //   }
+  // }
 
   useEffect(() => {
     // dont really understand what this is for
