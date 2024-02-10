@@ -10,9 +10,11 @@ const SocketHandler = (req, res) => {
 
     io.on('connection', socket => {
       console.log('new user connected')
-      socket.on('input-change', msg => {
-        console.log('input from frontend ', msg)
-        socket.broadcast.emit('update-inputtt', msg)
+      // socket.broadcast.emit('user-joined', socket)
+
+      socket.on('joined', addr => {
+        console.log('address from frontend ', addr)
+        // socket.broadcast.emit('update-input', msg)
       })
     })
   }

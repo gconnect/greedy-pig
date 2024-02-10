@@ -57,7 +57,7 @@ export default function AppRoullete() {
     },
     options: {
       maxSpeed: 20,
-      acceleration: 8,
+      acceleration: 6,
       determineAngle: 90,
       style: {
         canvas: {

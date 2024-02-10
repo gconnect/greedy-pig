@@ -18,12 +18,17 @@ const Test = () => {
 
     socket.on('connect', () => {
       console.log('connected');
+      socket.emit('joined', 'Justin');
     });
 
     socket.on('update-input', (msg: string) => {
-      console.log('update-input', msg);
+      console.log('update-input from back', msg);
       setInput(msg);
     });
+
+    socket.on('user-joined', (msg: any) => {
+      console.log('joined', msg);
+    })
   };
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
