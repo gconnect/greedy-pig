@@ -1,8 +1,8 @@
 // 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import UsernamesForm from '@/components/ui/UsernamesForm'
-import ResponseForm from '@/components/ui/ResponseForm'
+import { initSocket, getSocket } from '@/lib/socket';
 import {
   InputFunction,
   RollFunction,
@@ -23,21 +23,26 @@ import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
 
 import Lists from './Lists'
+import ConfirmModal from './ConfirmModal'
+import toast from 'react-hot-toast';
+import { Socket } from 'socket.io-client';
+
+let socket: Socket;
+
 
 export default function AppRoullete() {
+
   const rollups = useRollups(dappAddress)
   const usernames = useSelector((state: any) =>
     selectUsernames(state.leaderboard)
   )
   const dispatch = useDispatch()
 
+  const [socketInitialized, setSocketInitialized] = useState(false);
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [modalQuestion, setModalQuestion] = useState('')
-  const [output, setOutput] = useState('')
-  const [handleUserInput, setHandleUserInput] = useState<
-    (answer: string) => void
-  >(() => () => {})
+  const [handleUserInput, setHandleUserInput] = useState< (answer: string) => void >(() => () => {})
   const [rollResult, setRollResult] = useState<number | null>(null)
   const [isGameStarted, setIsGameStarted] = useState(false)
   const stopButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -48,16 +53,14 @@ export default function AppRoullete() {
       { name: '3', bg: '#e7c02b', color: '#ffffff' },
       { name: '4' },
       { name: '5' },
-      { name: '6' },
-      { name: '7' },
-      { name: '8' },
+      { name: '6' }
     ],
     onSpinEnd: (res) => {
       setRollResult(Number(res))
     },
     options: {
       maxSpeed: 20,
-      acceleration: 6,
+      acceleration: 8,
       determineAngle: 90,
       style: {
         canvas: {
@@ -88,7 +91,16 @@ export default function AppRoullete() {
 
   const getOutput: OutputFunction = (user: string, message: string) => {
     return new Promise(async (resolve) => {
-      setOutput(`${user} ${message}`)
+     
+      toast.success(`${user} ${message}`, {
+         duration: 6000
+      })
+      dispatch({ type: 'leaderboard/updateActivePlayer', payload: user })
+      debugger
+      const socket = getSocket()
+      if (socket) {
+        socket.emit('activePlayer', user)
+      }
       resolve(message)
     })
   }
@@ -133,14 +145,6 @@ export default function AppRoullete() {
     })
   }
 
-  const handleModalSubmit = async (answer: string) => {
-    // Handle modal submission here
-    // You can set state or perform any actions based on the submitted answer
-    console.log('Submitted answer:', answer)
-
-    return answer
-  }
-
   const startGame = async () => {
     setGameInProgress(true)
     try {
@@ -179,27 +183,26 @@ export default function AppRoullete() {
       console.log(res)
 
       setGameInProgress(false)
-      setOutput(`Game finished!. ${result}`)
+      toast.success(`Game finished!. ${result}`, {
+        duration: 6000
+      })
       dispatch({ type: 'leaderboard/resetLeaderboard' })
     } catch (error) {
       console.error('Error during game:', error)
     }
   }
 
+
+
   return (
     <div>
-      <div className="min-h-2">
-        <div className="mt-4">{output}</div>
+      {/* <div className="min-h-2"> */}
+        {/* <div className="mt-4">{output}</div>
         {!gameInProgress && <UsernamesForm />}
-      </div>
+      </div> */}
 
-      <ResponseForm
-        isOpen={modalIsOpen}
-        closeModal={closeModal}
-        onSubmit={handleModalSubmit}
-        question={modalQuestion}
-        handleUserInput={handleUserInput}
-      />
+      <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
+
       <button onClick={startGame} type="button">
         Play game
       </button>

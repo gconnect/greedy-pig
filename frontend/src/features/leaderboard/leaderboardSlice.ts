@@ -13,6 +13,7 @@ export interface Participant {
 
 interface State {
   participants: Participant[]
+  activePlayer: string | null
 }
 
 export interface UpdatePlayerInfoPayload {
@@ -25,6 +26,7 @@ const leaderboardSlice = createSlice({
   name: 'leaderboard',
   initialState: {
     participants: [],
+    activePlayer: ''
   } as State,
   reducers: {
     initLeaderboard: (state, action: PayloadAction<string>) => {
@@ -36,6 +38,7 @@ const leaderboardSlice = createSlice({
           totalScore: 0,
         },
       })
+      state.activePlayer = action.payload;
     },
 
     updatePlayerInfo: (
@@ -60,6 +63,9 @@ const leaderboardSlice = createSlice({
         }
       }
     },
+    updateActivePlayer: (state, action: PayloadAction<string>) => {
+      state.activePlayer = action.payload; // Update the activePlayer state with the new value
+    },
     resetLeaderboard: (state) => {
       state.participants = []
     },
@@ -73,6 +79,12 @@ export const selectUsernames = createSelector(
     return participants.map((participant) => participant.username)
   }
 )
+
+export const selectActivePlayer = createSelector(
+  (state: State) => state.activePlayer,
+  (activePlayer: string | null) => activePlayer
+)
+
 
 export const selectParticipants = (state: State) => state.participants
 
