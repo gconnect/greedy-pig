@@ -24,12 +24,6 @@ const Play = () => {
 
   console.log('wallet ', wallet)
 
-  const test = () => {
-    debugger
-    console.log('here')
-
-  }
-
 
   const joinGame = async () => {
     if (!wallet) {
@@ -76,7 +70,6 @@ const Play = () => {
   return (
     <div>
       <div>
-        <p onClick={test}>Game</p> 
         <Button onClick={joinGame}>Join</Button>
       </div>
       <GameSettings />
