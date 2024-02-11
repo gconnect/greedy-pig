@@ -25,6 +25,7 @@ const Play = () => {
   console.log('wallet ', wallet)
 
   const joinGame = async () => {
+    alert('jhere')
     // if (!wallet) {
     //   return connect()
     // }
