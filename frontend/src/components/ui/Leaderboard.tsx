@@ -2,15 +2,12 @@ import { useSelector } from 'react-redux'
 import {
   selectParticipants,
   Participant,
-  selectActivePlayer,
+  // selectActivePlayer,
 } from '@/features/leaderboard/leaderboardSlice'
 import { EmptyPage } from '../shared/EmptyPage'
 
-import { useEffect, useState } from 'react'
-import { getSocket, initSocket } from '@/lib/socket'
-import { Socket } from 'socket.io-client'
+// import { useState } from 'react'
 
-let socket: Socket;
 
 const LeaderBoard = () => {
 
@@ -22,8 +19,8 @@ const LeaderBoard = () => {
   //   selectActivePlayer(state.leaderboard)
   // )
 
-  const [activePlayer, setActivePlayer] = useState('')
-  const [socketInitialized, setSocketInitialized] = useState(false);
+  // const [activePlayer, setActivePlayer] = useState('')
+  // const [socketInitialized, setSocketInitialized] = useState(false);
 
 
 
@@ -55,7 +52,8 @@ const LeaderBoard = () => {
               <tbody>
                 {players &&
                   players.map((player: Participant, i: number) => (
-                    <tr key={i} className={player.username === activePlayer ? 'bg-gray-100' : ''}>
+                    <tr key={i}>
+                    {/* <tr key={i} className={player.username === activePlayer ? 'bg-gray-100' : ''}> */}
                       <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                         <div className="flex px-2 py-1">
                           <div>
