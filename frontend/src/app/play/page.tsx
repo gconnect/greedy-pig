@@ -24,54 +24,59 @@ const Play = () => {
 
   console.log('wallet ', wallet)
 
-  const joinGame = async () => {
+  const test = () => {
     debugger
-    alert('jhere')
-    // if (!wallet) {
-    //   return connect()
-    // }
+    console.log('here')
+
+  }
+
+
+  const joinGame = async () => {
+    if (!wallet) {
+      return connect()
+    }
+
     socket = getSocket()
 
     if (socket) {
-      socket.emit('joined', 'player1');
-      // socket.emit('joined', wallet?.accounts[0].address);
+      socket.emit('joined', wallet?.accounts[0].address);
       // dispatch({type: 'leaderboard/initLeaderboard', payload: wallet?.accounts[0].address})
     }
   }
 
-  // useEffect(() => {
-  //   const initializeSocket = async () => {
-  //     await initSocket();
-  //     socket = getSocket();
-  //     // setSocketInitialized(true);
-  //   };
+  useEffect(() => {
+    const initializeSocket = async () => {
+      await initSocket();
+      socket = getSocket();
+      // setSocketInitialized(true);
+    };
 
-  //   initializeSocket();
+    initializeSocket();
 
-  //   return () => {
-  //     if (socket) {
-  //       socket.disconnect();
-  //     }
-  //   };
-  // }, []);
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, []);
 
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on('joined', (player) => {
-
-  //       if (player !== wallet?.accounts[0].address) {
-  //         console.log('hello')
+  useEffect(() => {
+    if (socket) {
+      socket.on('joined', (player) => {
+        // Dispatch only if the joined player is not the current user
+        if (player !== wallet?.accounts[0].address) {
+          console.log('hello')
         
-  //         dispatch({ type: 'leaderboard/initLeaderboard', payload: player });
-  //       }
-  //     });
-  //   }
-  // }, [socket]); 
+          dispatch({ type: 'leaderboard/initLeaderboard', payload: player });
+        }
+      });
+    }
+  }, [socket]); 
 
   return (
     <div>
       <div>
-        Game 
+        <p onClick={test}>Game</p> 
         <Button onClick={joinGame}>Join</Button>
       </div>
       <GameSettings />
