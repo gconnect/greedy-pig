@@ -25,14 +25,15 @@ const Play = () => {
   console.log('wallet ', wallet)
 
   const joinGame = async () => {
-    if (!wallet) {
-      return connect()
-    }
-
+    // if (!wallet) {
+    //   return connect()
+    // }
+debugger
     socket = getSocket()
 
     if (socket) {
-      socket.emit('joined', wallet?.accounts[0].address);
+      socket.emit('joined', 'player1');
+      // socket.emit('joined', wallet?.accounts[0].address);
       // dispatch({type: 'leaderboard/initLeaderboard', payload: wallet?.accounts[0].address})
     }
   }
