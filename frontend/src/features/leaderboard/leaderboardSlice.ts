@@ -38,7 +38,6 @@ const leaderboardSlice = createSlice({
           totalScore: 0,
         },
       })
-      state.activePlayer = action.payload;
     },
 
     updatePlayerInfo: (

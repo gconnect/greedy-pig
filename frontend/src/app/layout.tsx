@@ -13,6 +13,7 @@ import store from '@/store'
 
 import './globals.css'
 import Header from '@/components/ui/Header'
+import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -58,7 +59,9 @@ export default function RootLayout({
             <ConnectProvider>
               <section className="md:px-custom p-custom-sm">
                 <Header />
-                <div className="text-gray-500">{children}</div>
+                <div className="text-gray-500">
+                  <ConvexClientProvider>{children}</ConvexClientProvider>
+                </div>
                 <Toaster
                   position="top-right"
                   containerStyle={{ top: '88px' }}
