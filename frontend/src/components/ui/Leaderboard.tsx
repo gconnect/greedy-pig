@@ -1,4 +1,6 @@
 import { useSelector } from 'react-redux'
+import { useMutation, useQuery } from 'convex/react'
+import { api } from '@/convex/_generated/api'
 import {
   selectParticipants,
   Participant,
@@ -9,9 +11,12 @@ import { EmptyPage } from '../shared/EmptyPage'
 // import { useState } from 'react'
 
 const LeaderBoard = () => {
+
   const players = useSelector((state: any) =>
     selectParticipants(state.leaderboard)
   )
+
+  const leaderboard = useQuery(api.games.list);
 
   // const activePlayer = useSelector((state: any) =>
   //   selectActivePlayer(state.leaderboard)
@@ -25,6 +30,11 @@ const LeaderBoard = () => {
       <div className="p-6 pb-0 mb-0 rounded-t-2xl">
         <h6>Leaderboard</h6>
       </div>
+      <main className="flex flex-col items-center justify-between p-24">
+        {leaderboard?.map(({ _id, gameName }) => (
+          <div key={_id}>{gameName}</div>
+        ))}
+      </main>
       {players.length ? (
         <div className="flex-auto px-0 pt-0 pb-2">
           <div className="p-0 overflow-x-auto">

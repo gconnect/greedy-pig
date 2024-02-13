@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
+import { GameStatus } from '../interfaces'
 
 export default defineSchema({
   games: defineTable({
@@ -25,7 +26,12 @@ export default defineSchema({
         }),
       })
     ),
-    ended: v.boolean(),
+    status: v.union(
+      v.literal(GameStatus.New),
+      v.literal(GameStatus.InProgress),
+      v.literal(GameStatus.Ended),
+      v.literal(GameStatus.Cancelled)
+    ),
     startTime: v.string()
-  })
+  }).index('by_status', ['status'])
 })

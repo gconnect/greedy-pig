@@ -1,48 +1,63 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useMutation, useQuery } from 'convex/react'
+import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { selectGameModal } from '@/features/modal/modalSlice'
 import { useConnectContext } from '../providers/ConnectProvider'
 import Button from '../shared/Button'
 import toast from 'react-hot-toast'
+import { GameStatus } from '@/interfaces'
 
 const CreateGameModal = () => {
 
-  const sendTask = useMutation(api.games.send)
-  const { wallet, connect } = useConnectContext()
+  const sendTask = useMutation(api.games.create)
+  const { wallet } = useConnectContext()
   const dispatch = useDispatch()
   const createGameForm = useSelector((state: any) =>
     selectGameModal(state.modal)
   )
 
+  const [creator, setCreator] = useState<string>('')
   const [gameName, setGameName] = useState<string>('')
   const [startTime, setStartTime] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  
 
   const submitHandler = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault()
-
-       try {
-       
-        await createGame()
-        reset()
-
-        } catch (error) {
-          console.log('send game error: ', error)
-        }
-
+    
+        setLoading(true)
+        try {
+        
+          setLoading(true)
+         await createGame()
+         reset()
+         setLoading(false)
+         toast.success('Game created successfully')
+ 
+         } catch (error) {
+           console.log('send game error: ', error)
+           setLoading(false)  
+         }
     }, [] )
 
 
     const createGame = async () => {
       // alert(wallet.accounts[0].address)
       return await sendTask({
-        creator: 'hello',
+        creator,
         // creator: wallet.accounts[0].address,
         gameName,
         activePlayer: '',
-        participants: [],
+        participants: [{
+          address: '',
+          playerInfo: {
+            turn: 0,
+            turnScore: 0,
+            totalScore: 0
+          }
+        }],
         gameSettings: {
           turnTimeLimit: 0,
           winningScore: 0,
@@ -52,7 +67,7 @@ const CreateGameModal = () => {
           maxPlayer: 10,
           limitNumberOfPlayer: true,
         },
-        ended: false,
+        status: GameStatus.New,
         startTime
       })
     }
@@ -73,6 +88,13 @@ const CreateGameModal = () => {
     }
     init()
   }, [])
+
+  useEffect(() => {
+    if (wallet) {
+      setCreator(wallet.accounts[0].address)
+    }
+
+  }, [wallet])
 
   return (
     <div
@@ -214,7 +236,7 @@ const CreateGameModal = () => {
             className="w-[200px]"
             type="submit"
           >
-            Create Game
+            {loading ? 'Creating ...' : 'Create Game'}
           </Button>
         </div>
       </form>
