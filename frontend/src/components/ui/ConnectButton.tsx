@@ -7,7 +7,6 @@ import Button from '../shared/Button'
 const config: any = configFile
 
 const ConnectButton = () => {
-
   const {
     updateBaseDappAddress,
     updateCurrentUser,

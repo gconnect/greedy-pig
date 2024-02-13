@@ -26,7 +26,7 @@ const leaderboardSlice = createSlice({
   name: 'leaderboard',
   initialState: {
     participants: [],
-    activePlayer: ''
+    activePlayer: '',
   } as State,
   reducers: {
     initLeaderboard: (state, action: PayloadAction<string>) => {
@@ -63,7 +63,7 @@ const leaderboardSlice = createSlice({
       }
     },
     updateActivePlayer: (state, action: PayloadAction<string>) => {
-      state.activePlayer = action.payload; // Update the activePlayer state with the new value
+      state.activePlayer = action.payload // Update the activePlayer state with the new value
     },
     resetLeaderboard: (state) => {
       state.participants = []
@@ -84,10 +84,10 @@ export const selectActivePlayer = createSelector(
   (activePlayer: string | null) => activePlayer
 )
 
-
 export const selectParticipants = (state: State) => state.participants
 
-export const { initLeaderboard, updatePlayerInfo, resetLeaderboard } = leaderboardSlice.actions
+export const { initLeaderboard, updatePlayerInfo, resetLeaderboard } =
+  leaderboardSlice.actions
 
 export default leaderboardSlice.reducer
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import UsernamesForm from '@/components/ui/UsernamesForm'
-import { initSocket, getSocket } from '@/lib/socket';
+import { initSocket, getSocket } from '@/lib/socket'
 import {
   InputFunction,
   RollFunction,
@@ -24,28 +24,28 @@ import { dappAddress } from '@/lib/utils'
 
 import Lists from './Lists'
 import ConfirmModal from './ConfirmModal'
-import toast from 'react-hot-toast';
-import { Socket } from 'socket.io-client';
+import toast from 'react-hot-toast'
+import { Socket } from 'socket.io-client'
 
-let socket: Socket;
-
+let socket: Socket
 
 export default function AppRoullete() {
-
   const rollups = useRollups(dappAddress)
   const usernames = useSelector((state: any) =>
     selectUsernames(state.leaderboard)
   )
   const dispatch = useDispatch()
 
-  const [socketInitialized, setSocketInitialized] = useState(false);
+  const [socketInitialized, setSocketInitialized] = useState(false)
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [modalQuestion, setModalQuestion] = useState('')
-  const [handleUserInput, setHandleUserInput] = useState< (answer: string) => void >(() => () => {})
+  const [handleUserInput, setHandleUserInput] = useState<
+    (answer: string) => void
+  >(() => () => {})
   const [rollResult, setRollResult] = useState<number | null>(null)
   const [isGameStarted, setIsGameStarted] = useState(false)
-  const stopButtonRef = useRef<HTMLButtonElement | null>(null);
+  const stopButtonRef = useRef<HTMLButtonElement | null>(null)
   const { roulette, onStart, onStop } = useRoulette({
     items: [
       { name: '1', bg: '#b26527', color: '#ffffff' },
@@ -53,7 +53,7 @@ export default function AppRoullete() {
       { name: '3', bg: '#e7c02b', color: '#ffffff' },
       { name: '4' },
       { name: '5' },
-      { name: '6' }
+      { name: '6' },
     ],
     onSpinEnd: (res) => {
       setRollResult(Number(res))
@@ -91,9 +91,8 @@ export default function AppRoullete() {
 
   const getOutput: OutputFunction = (user: string, message: string) => {
     return new Promise(async (resolve) => {
-     
       toast.success(`${user} ${message}`, {
-         duration: 6000
+        duration: 6000,
       })
       dispatch({ type: 'leaderboard/updateActivePlayer', payload: user })
       debugger
@@ -120,7 +119,6 @@ export default function AppRoullete() {
   }
 
   const startRouletteSpin = async () => {
-
     setIsGameStarted(true)
     onStart() // Start the roulette spinning
   }
@@ -184,7 +182,7 @@ export default function AppRoullete() {
 
       setGameInProgress(false)
       toast.success(`Game finished!. ${result}`, {
-        duration: 6000
+        duration: 6000,
       })
       dispatch({ type: 'leaderboard/resetLeaderboard' })
     } catch (error) {
@@ -192,12 +190,10 @@ export default function AppRoullete() {
     }
   }
 
-
-
   return (
     <div>
       {/* <div className="min-h-2"> */}
-        {/* <div className="mt-4">{output}</div>
+      {/* <div className="mt-4">{output}</div>
         {!gameInProgress && <UsernamesForm />}
       </div> */}
 

@@ -60,8 +60,7 @@ const ConnectProvider: FC<ConnectProviderProps<any>> = ({
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
   const { data, notices, loading, error } = useNotices()
 
-  const [baseDappAddress, setBaseDappAddress] =
-    useState<string>(dappAddress)
+  const [baseDappAddress, setBaseDappAddress] = useState<string>(dappAddress)
   const [currentUser, setCurrentUser] = useState<ICurrentUser[] | any>()
 
   const userCreated = currentUser ? currentUser?.length > 0 : false

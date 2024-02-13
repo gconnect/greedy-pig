@@ -62,10 +62,7 @@ export default function RootLayout({
                 <div className="text-gray-500">
                   <ConvexClientProvider>{children}</ConvexClientProvider>
                 </div>
-                <Toaster
-                  position="top-right"
-                  containerStyle={{ top: '88px' }}
-                />
+                <Toaster />
               </section>
             </ConnectProvider>
           </ApolloProvider>

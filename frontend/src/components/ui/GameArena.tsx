@@ -4,7 +4,6 @@ import AppRoullete from '../../components/ui/AppRoullete'
 import LeaderBoard from './Leaderboard'
 
 const GameArena = () => {
-
   // const dispatch = useDispatch()
 
   // const handleIncrement = useCallback(() => {

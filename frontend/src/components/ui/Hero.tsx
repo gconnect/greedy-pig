@@ -1,9 +1,20 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { useDispatch } from 'react-redux'
 import GreedyHero from '@/assets/img/greedypig-hero.png'
 import Button from '../shared/Button'
+import toast from 'react-hot-toast'
+import { useConnectContext } from '@/components/providers/ConnectProvider'
 
 const Hero = () => {
+  
+  const dispatch = useDispatch()
+  const { wallet } = useConnectContext()
+  const modalHandler = () => {
+    if (!wallet) return toast.error('Connect Wallet to continue')
+    dispatch({ type: 'modal/toggleGameModal' })
+  }
+
   return (
     <section className="flex flex-col justify-between align-middle gap-6 sm:gap-10 md:gap-16 lg:flex-row">
       <div className="flex flex-col justify-center sm:text-center lg:py-12 lg:text-left xl:w-8/12 xl:py-24">
@@ -24,12 +35,29 @@ const Hero = () => {
           with every dice roll as players balance risks and rewards.
         </p>
 
-        <Link
-          href="/play"
-          className="flex flex-col gap-2.5 sm:flex-row sm:justify-center lg:justify-start"
-        >
-          <Button>Play Now</Button>
-        </Link>
+        <div className="flex gap-2.5">
+          <Link
+            href="/play"
+            className="flex items-center flex-col gap-2.5 sm:flex-row sm:justify-center lg:justify-start"
+          >
+            <Button className="md:w-[200px] w-[130px] font-bold">
+              Play Now
+            </Button>
+          </Link>
+
+          <div className="flex items-center justify-center">
+            <div className="bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 p-1 rounded-2xl">
+              <div className="md:w-[200px] w-[130px] bg-black rounded-2xl">
+                <h1
+                  onClick={modalHandler}
+                  className="cursor-pointer text-center font-bold p-2"
+                >
+                  Create Game
+                </h1>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="rounded-lg lg:h-auto xl:w-6/12 lg:mt-16">

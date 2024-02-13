@@ -8,9 +8,7 @@ import { EmptyPage } from '../shared/EmptyPage'
 
 // import { useState } from 'react'
 
-
 const LeaderBoard = () => {
-
   const players = useSelector((state: any) =>
     selectParticipants(state.leaderboard)
   )
@@ -21,8 +19,6 @@ const LeaderBoard = () => {
 
   // const [activePlayer, setActivePlayer] = useState('')
   // const [socketInitialized, setSocketInitialized] = useState(false);
-
-
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">
@@ -53,7 +49,7 @@ const LeaderBoard = () => {
                 {players &&
                   players.map((player: Participant, i: number) => (
                     <tr key={i}>
-                    {/* <tr key={i} className={player.username === activePlayer ? 'bg-gray-100' : ''}> */}
+                      {/* <tr key={i} className={player.username === activePlayer ? 'bg-gray-100' : ''}> */}
                       <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                         <div className="flex px-2 py-1">
                           <div>

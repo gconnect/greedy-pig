@@ -1,20 +1,18 @@
-"use client";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { useState } from "react";
+'use client'
+import { useMutation, useQuery } from 'convex/react'
+import { api } from '@/convex/_generated/api'
+import { useState } from 'react'
 
 export default function Home() {
   // const tasks = useQuery(api.tasks.get);
-  const sendTask = useMutation(api.games.send);
+  const sendTask = useMutation(api.games.send)
 
   const [task, setTask] = useState('')
 
   const send = async () => {
-
     try {
-
-      await sendTask({ 
-        creator: 'task', 
+      await sendTask({
+        creator: 'task',
         gameName: 'first game',
         activePlayer: '',
         participants: [],
@@ -25,15 +23,14 @@ export default function Home() {
           apparatus: 'roulette',
           bet: false,
           maxPlayer: 10,
-          limitNumberOfPlayer: false
-        }
-      });
-      setTask("");
+          limitNumberOfPlayer: false,
+        },
+      })
+      setTask('')
     } catch (error) {
       console.log('send game error: ', error)
     }
   }
-
 
   return (
     <div>
@@ -43,8 +40,14 @@ export default function Home() {
         ))}
       </main> */}
 
-        <input onChange={e => setTask(e.target.value)} type="text" placeholder="enter task" />
-        <button onClick={send} type="button">Send</button>
+      <input
+        onChange={(e) => setTask(e.target.value)}
+        type="text"
+        placeholder="enter task"
+      />
+      <button onClick={send} type="button">
+        Send
+      </button>
     </div>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import { mutation } from "./_generated/server";
-import { v } from "convex/values";
+import { mutation } from './_generated/server'
+import { v } from 'convex/values'
 
 export const send = mutation({
   args: {
@@ -25,22 +25,23 @@ export const send = mutation({
         }),
       })
     ),
+    ended: v.boolean(),
+    startTime: v.string()
   },
   handler: async (ctx, args) => {
-    const { activePlayer, creator, gameName, gameSettings, participants } = args;
+    const { activePlayer, creator, gameName, gameSettings, participants, ended, startTime } = args
     // Insert the new game into the database
-    await ctx.db.insert("games", {
+    await ctx.db.insert('games', {
       activePlayer,
       creator,
       gameName,
       gameSettings,
       participants,
-    });
+      ended,
+      startTime
+    })
   },
-});
-
-
-
+})
 
 // import { v, Infer } from "convex/values";
 // import { mutation, query } from "./_generated/server";
@@ -60,10 +61,8 @@ export const send = mutation({
 //   },
 // });
 
-
-
 // export const send = mutation({
-//   args: { 
+//   args: {
 //     creator: v.string(),
 //     gameName: v.string(),
 //     activePlayer: v.string(),
@@ -78,7 +77,7 @@ export const send = mutation({
 //     gameSettings: v.object({
 //       turnTimeLimit: v.float64(),
 //         winningScore: v.float64(),
-//         mode: v.string(), 
+//         mode: v.string(),
 //         apparatus: v.string(),
 //         bet: v.boolean(),
 //         maxPlayer: v.float64(),
@@ -87,7 +86,6 @@ export const send = mutation({
 //    },
 //   handler: async ({ db }, args) => {
 
- 
 //     await db.insert("games", args)
 //   }
 // })

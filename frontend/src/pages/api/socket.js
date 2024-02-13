@@ -8,13 +8,12 @@ const SocketHandler = (req, res) => {
     const io = new Server(res.socket.server)
     res.socket.server.io = io
 
-    io.on('connection', socket => {
+    io.on('connection', (socket) => {
       console.log('new user connected')
 
       socket.on('joined', (addr) => {
         console.log('address from frontend ', addr)
         io.emit('joined', addr)
- 
       })
     })
   }
