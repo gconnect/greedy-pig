@@ -31,3 +31,10 @@ body {
   -webkit-background-clip: text;
   color: transparent;
 }
+
+.game-bg {
+  background-image: url('../assets/img/gamebg2.jpg');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}

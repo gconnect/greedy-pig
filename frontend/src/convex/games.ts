@@ -9,7 +9,17 @@ export const list = query({
   },
 });
 
-export const ongoingGames = query({
+export const getGameById = query({
+  args: { id: v.id('games') },
+    handler: async ({ db }, { id }) => {
+      return await db
+      .query("games")
+      .filter((q) => q.eq(q.field("_id"), id))
+      .first()
+  }
+})
+
+export const getGamesByStatus = query({
   args: { gameStatus: v.union(
     v.literal(GameStatus.InProgress), 
     v.literal(GameStatus.Ended), 
@@ -20,6 +30,7 @@ export const ongoingGames = query({
 return await db
     .query("games")
     .withIndex('by_status', (q) => q.eq('status', gameStatus))
+    .collect()
  
   }
   

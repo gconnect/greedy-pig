@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Logo from '@/assets/img/logo.png'
-import ConnectButton from './ConnectButton'
-import Socials from './Socials'
+import ConnectButton from '@/components/ui/ConnectButton'
+import Socials from '@/components/ui/Socials'
 
 const Header = () => {
   return (

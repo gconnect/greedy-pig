@@ -7,35 +7,29 @@ import {
   // selectActivePlayer,
 } from '@/features/leaderboard/leaderboardSlice'
 import { EmptyPage } from '../shared/EmptyPage'
+import { useState } from 'react'
+import { GameStatus } from '@/interfaces'
+import { selectSelectedGame } from '@/features/games/gamesSlice'
 
 // import { useState } from 'react'
 
 const LeaderBoard = () => {
 
-  const players = useSelector((state: any) =>
-    selectParticipants(state.leaderboard)
+  const game = useSelector((state: any) =>
+    selectSelectedGame(state.games)
   )
 
-  const leaderboard = useQuery(api.games.list);
+  // const [status, setStatus] = useState<any>('');
+  const [status, setStatus] = useState<GameStatus>(GameStatus.New);
 
-  // const activePlayer = useSelector((state: any) =>
-  //   selectActivePlayer(state.leaderboard)
-  // )
-
-  // const [activePlayer, setActivePlayer] = useState('')
-  // const [socketInitialized, setSocketInitialized] = useState(false);
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">
       <div className="p-6 pb-0 mb-0 rounded-t-2xl">
         <h6>Leaderboard</h6>
       </div>
-      <main className="flex flex-col items-center justify-between p-24">
-        {leaderboard?.map(({ _id, gameName }) => (
-          <div key={_id}>{gameName}</div>
-        ))}
-      </main>
-      {players.length ? (
+      
+      {game && game.participants.length ? (
         <div className="flex-auto px-0 pt-0 pb-2">
           <div className="p-0 overflow-x-auto">
             <table className="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
@@ -56,8 +50,8 @@ const LeaderBoard = () => {
                 </tr>
               </thead>
               <tbody>
-                {players &&
-                  players.map((player: Participant, i: number) => (
+                {game &&
+                  game.participants.map((player: Participant, i: number) => (
                     <tr key={i}>
                       {/* <tr key={i} className={player.username === activePlayer ? 'bg-gray-100' : ''}> */}
                       <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">

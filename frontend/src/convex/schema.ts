@@ -33,5 +33,6 @@ export default defineSchema({
       v.literal(GameStatus.Cancelled)
     ),
     startTime: v.string()
-  }).index('by_status', ['status'])
+  })
+  .index('by_status', ['status'])
 })

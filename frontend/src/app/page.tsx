@@ -2,17 +2,19 @@
 
 import Hero from '@/components/ui/Hero'
 
+import Header from '@/components/shared/Header'
 import Features from '@/components/ui/Features'
 import Stats from '@/components/ui/Stats'
-import UpcomingGames from '@/components/shared/UpcomingGames'
 import CreateGameModal from '@/components/ui/CreateGameModal'
+import Games from '@/components/ui/Games'
 
 export default function Home() {
   return (
-    <div>
+    <div className="md:px-custom p-custom-sm text-gray-500">
+      <Header />
       <Hero />
       <Stats />
-      <UpcomingGames />
+      <Games />
       <Features />
       <CreateGameModal />
     </div>

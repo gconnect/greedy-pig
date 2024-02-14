@@ -12,8 +12,9 @@ import ConnectProvider from '@/components/providers/ConnectProvider'
 import store from '@/store'
 
 import './globals.css'
-import Header from '@/components/ui/Header'
+
 import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
+import GameLayout from './games/layout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -57,13 +58,15 @@ export default function RootLayout({
         <Provider store={store}>
           <ApolloProvider client={client}>
             <ConnectProvider>
-              <section className="md:px-custom p-custom-sm">
-                <Header />
-                <div className="text-gray-500">
-                  <ConvexClientProvider>{children}</ConvexClientProvider>
-                </div>
+              {/* <section className="md:px-custom p-custom-sm text-gray-500"> */}
+                {/* <Header /> */}
+                {/* <div className="text-gray-500"> */}
+                  <ConvexClientProvider>
+                    {children}
+                    </ConvexClientProvider>
+                {/* </div> */}
                 <Toaster />
-              </section>
+              {/* </section> */}
             </ConnectProvider>
           </ApolloProvider>
         </Provider>

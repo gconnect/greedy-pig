@@ -1,6 +1,6 @@
 export enum GameStatus {
-  New = 'new',
-  InProgress = 'in progress',
-  Cancelled = 'cancelled',
-  Ended = 'ended'
+  New = 'New',
+  InProgress = 'In Progress',
+  Cancelled = 'Cancelled',
+  Ended = 'Ended'
 }

@@ -17,6 +17,9 @@ module.exports = {
       colors: {
         'app-color': '#d9d9e8',
       },
+      // backgroundImage:{
+      //   'game': `url(${require('./src/assets/img/gamebg.jpg')})`
+      // }
     },
   },
   plugins: [

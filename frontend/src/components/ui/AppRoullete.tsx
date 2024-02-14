@@ -30,6 +30,8 @@ import { Socket } from 'socket.io-client'
 let socket: Socket
 
 export default function AppRoullete() {
+
+  
   const rollups = useRollups(dappAddress)
   const usernames = useSelector((state: any) =>
     selectUsernames(state.leaderboard)
