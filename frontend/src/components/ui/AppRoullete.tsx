@@ -1,9 +1,9 @@
 // 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useMutation } from 'convex/react'
-import { initSocket, getSocket } from '@/lib/socket'
+import { getSocket } from '@/lib/socket'
 import {
   InputFunction,
   RollFunction,
@@ -13,7 +13,6 @@ import {
 import { Roulette, useRoulette } from 'react-hook-roulette'
 import {
   selectParticipants,
-  selectUsernames,
   UpdatePlayerInfoPayload,
 } from '@/features/leaderboard/leaderboardSlice'
 import { useDispatch, useSelector } from 'react-redux'
@@ -29,16 +28,12 @@ import toast from 'react-hot-toast'
 import { Socket } from 'socket.io-client'
 import { selectParticipantAddresses } from '@/features/games/gamesSlice'
 import { api } from '@/convex/_generated/api'
-import type { Id } from "@/convex/_generated/dataModel";
 import { useConnectContext } from '@/components/providers/ConnectProvider'
-import { addParticipant } from '@/convex/games'
 
-let socket: Socket
 
 export default function AppRoullete() {
 
   const { wallet } = useConnectContext()
-  const router = useRouter()
   const addParticipant = useMutation(api.games.addParticipant)
   const searchParams = useSearchParams()
   const rollups = useRollups(dappAddress)
@@ -47,7 +42,6 @@ export default function AppRoullete() {
   )
   const dispatch = useDispatch()
 
-  const [socketInitialized, setSocketInitialized] = useState(false)
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [modalQuestion, setModalQuestion] = useState('')
@@ -202,7 +196,6 @@ export default function AppRoullete() {
   }
 
   const addParticipantsHandler = async (id: any) => {
-  // const addParticipantsHandler = async (id: Id<'games'>) => {
     const addr: string = wallet?.accounts[0].address
     await addParticipant({data: {id, playerAddress: addr}})
   }

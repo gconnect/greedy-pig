@@ -37,7 +37,7 @@ const Hero = () => {
 
         <div className="flex gap-2.5">
           <Link
-            href="/play"
+            href="/games"
             className="flex items-center flex-col gap-2.5 sm:flex-row sm:justify-center lg:justify-start"
           >
             <Button className="md:w-[200px] w-[130px] font-bold">
