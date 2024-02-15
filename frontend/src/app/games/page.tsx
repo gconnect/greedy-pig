@@ -1,11 +1,15 @@
 'use client'
 
+import Header from "@/components/shared/Header"
 import GamesList from "@/components/ui/Games"
 
 const Games = () => {
 
   return (
-    <GamesList />
+    <div className="md:px-custom p-custom-sm text-gray-500">
+      <Header />
+      <GamesList />
+    </div>
   )
 
 }

@@ -1,27 +1,34 @@
 import { v } from 'convex/values'
+import { GameStatus } from '../interfaces'
 
 export const vCreateGame = v.object({
-  activePlayer: v.string(),
-  creator: v.string(),
-  gameName: v.string(),
-  // participants: v.array(v.string()),
-  participants: v.array(
-    v.object({
-      address: v.string(),
-      playerInfo: v.object({
-        turn: v.number(),
-        turnScore: v.number(),
-        totalScore: v.number(),
-      }),
+    activePlayer: v.string(),
+    creator: v.string(),
+    gameName: v.string(),
+    gameSettings: v.object({
+      apparatus: v.string(),
+      bet: v.boolean(),
+      limitNumberOfPlayer: v.boolean(),
+      maxPlayer: v.float64(),
+      mode: v.string(),
+      turnTimeLimit: v.float64(),
+      winningScore: v.float64(),
+    }),
+    participants: v.array(
+      v.object({
+        address: v.optional(v.string()),
+        playerInfo: v.optional(v.object({
+          totalScore: v.float64(),
+          turn: v.float64(),
+          turnScore: v.float64(),
+        })),
     })
-  ),
-  gameSettings: v.object({
-    turnTimeLimit: v.number(),
-    winningScore: v.number(),
-    mode: v.string(),
-    apparatus: v.string(),
-    bet: v.boolean(),
-    maxPlayer: v.number(),
-    limitNumberOfPlayer: v.boolean(),
-  }),
+    ),
+    status: v.union(v.literal(GameStatus.New), v.literal(GameStatus.Cancelled), v.literal(GameStatus.Ended), v.literal(GameStatus.InProgress)),
+    startTime: v.string()
+  })
+
+export const vAddParticipant= v.object({
+  id: v.id('games'),
+  playerAddress: v.string()
 })

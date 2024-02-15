@@ -18,12 +18,13 @@ export default defineSchema({
     }),
     participants: v.array(
       v.object({
-        address: v.string(),
-        playerInfo: v.object({
+        address: v.optional(v.string()),
+        playerInfo: v.optional(v.object({
           totalScore: v.float64(),
           turn: v.float64(),
           turnScore: v.float64(),
-        }),
+        })
+        ),
       })
     ),
     status: v.union(
@@ -36,3 +37,24 @@ export default defineSchema({
   })
   .index('by_status', ['status'])
 })
+
+
+// [
+//   {
+//     activePlayer: "",
+//     creator: "",
+//     gameName: "",
+//     gameSettings: {
+//       apparatus: "",
+//       bet: false,
+//       limitNumberOfPlayer: false,
+//       maxPlayer: 0,
+//       mode: "",
+//       turnTimeLimit: 0,
+//       winningScore: 0,
+//     },
+//     participants: undefined,
+//     startTime: "",
+//     status: "",
+//   },
+// ]

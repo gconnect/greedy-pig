@@ -15,6 +15,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as games from "../games.js";
+import type * as utils from "../utils.js";
 import type * as validators from "../validators.js";
 
 /**
@@ -27,6 +28,7 @@ import type * as validators from "../validators.js";
  */
 declare const fullApi: ApiFromModules<{
   games: typeof games;
+  utils: typeof utils;
   validators: typeof validators;
 }>;
 export declare const api: FilterApi<

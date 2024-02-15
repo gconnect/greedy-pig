@@ -29,7 +29,7 @@ const LeaderBoard = () => {
         <h6>Leaderboard</h6>
       </div>
       
-      {game && game.participants.length ? (
+      {game && game.participants?.length ? (
         <div className="flex-auto px-0 pt-0 pb-2">
           <div className="p-0 overflow-x-auto">
             <table className="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
@@ -50,8 +50,8 @@ const LeaderBoard = () => {
                 </tr>
               </thead>
               <tbody>
-                {game &&
-                  game.participants.map((player: Participant, i: number) => (
+                {game.participants.length &&
+                  game.participants.map((player: any, i: number) => (
                     <tr key={i}>
                       {/* <tr key={i} className={player.username === activePlayer ? 'bg-gray-100' : ''}> */}
                       <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
@@ -65,24 +65,24 @@ const LeaderBoard = () => {
                           </div>
                           <div className="flex flex-col justify-center">
                             <h6 className="mb-0 leading-normal text-sm">
-                              {player.username}
+                              {player.address}
                             </h6>
                           </div>
                         </div>
                       </td>
                       <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                         <p className="mb-0 font-semibold leading-tight text-xs">
-                          {player.playerInfo.turn}
+                          {player.playerInfo?.turn}
                         </p>
                       </td>
                       <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                         <span className="font-semibold leading-tight text-xs text-slate-400">
-                          {player.playerInfo.turnScore}
+                          {player.playerInfo?.turnScore}
                         </span>
                       </td>
                       <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                         <span className="font-semibold leading-tight text-xs text-slate-400">
-                          {player.playerInfo.totalScore}
+                          {player.playerInfo?.totalScore}
                         </span>
                       </td>
                     </tr>

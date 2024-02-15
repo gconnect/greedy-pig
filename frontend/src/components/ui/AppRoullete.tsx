@@ -1,7 +1,8 @@
 // 'use client'
 
-import { useEffect, useRef } from 'react'
-import UsernamesForm from '@/components/ui/UsernamesForm'
+import { useState, useEffect, useRef } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useMutation } from 'convex/react'
 import { initSocket, getSocket } from '@/lib/socket'
 import {
   InputFunction,
@@ -9,7 +10,6 @@ import {
   OutputFunction,
   playGame,
 } from '@/lib/utils'
-import { useState } from 'react'
 import { Roulette, useRoulette } from 'react-hook-roulette'
 import {
   selectParticipants,
@@ -22,19 +22,28 @@ import { addInput } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
 
+
 import Lists from './Lists'
 import ConfirmModal from './ConfirmModal'
 import toast from 'react-hot-toast'
 import { Socket } from 'socket.io-client'
+import { selectParticipantAddresses } from '@/features/games/gamesSlice'
+import { api } from '@/convex/_generated/api'
+import type { Id } from "@/convex/_generated/dataModel";
+import { useConnectContext } from '@/components/providers/ConnectProvider'
+import { addParticipant } from '@/convex/games'
 
 let socket: Socket
 
 export default function AppRoullete() {
 
-  
+  const { wallet } = useConnectContext()
+  const router = useRouter()
+  const updateParticipants = useMutation(api.games.updateParticipants)
+  const searchParams = useSearchParams()
   const rollups = useRollups(dappAddress)
-  const usernames = useSelector((state: any) =>
-    selectUsernames(state.leaderboard)
+  const players = useSelector((state: any) =>
+    selectParticipantAddresses(state.games)
   )
   const dispatch = useDispatch()
 
@@ -149,7 +158,7 @@ export default function AppRoullete() {
     setGameInProgress(true)
     try {
       const result = await playGame(
-        usernames,
+        players,
         getInput,
         getRoll,
         2,
@@ -192,12 +201,29 @@ export default function AppRoullete() {
     }
   }
 
+  const addParticipantsHandler = async (id: Id<'games'>) => {
+    const addr: string = wallet?.accounts[0].address
+    await addParticipant(id, addr)
+  }
+
+  useEffect(() => {
+
+    if (searchParams) {
+      const action = searchParams.get('action')
+      if (action === 'join') {
+        const id = window.location.pathname.split('/').pop()
+
+        addParticipantsHandler(id)
+       
+      }
+    }
+  }, [searchParams])
+
   return (
+
+
     <div>
-      {/* <div className="min-h-2"> */}
-      {/* <div className="mt-4">{output}</div>
-        {!gameInProgress && <UsernamesForm />}
-      </div> */}
+  
 
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
 
@@ -206,6 +232,7 @@ export default function AppRoullete() {
       </button>
 
       <Roulette roulette={roulette} />
+      {/* <RouletteWrapper onStart={onStart} onStop={onStop} /> */}
 
       <div className="hidden" id="roll-result">
         {rollResult}

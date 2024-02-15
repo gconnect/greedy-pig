@@ -39,34 +39,39 @@ return await db
 })
 
 export const create = mutation({
-  args: {
-    activePlayer: v.string(),
-    creator: v.string(),
-    gameName: v.string(),
-    gameSettings: v.object({
-      apparatus: v.string(),
-      bet: v.boolean(),
-      limitNumberOfPlayer: v.boolean(),
-      maxPlayer: v.float64(),
-      mode: v.string(),
-      turnTimeLimit: v.float64(),
-      winningScore: v.float64(),
-    }),
-    participants: v.array(
-      v.object({
-        address: v.string(),
-        playerInfo: v.object({
-          totalScore: v.float64(),
-          turn: v.float64(),
-          turnScore: v.float64(),
-        }),
-      })
-    ),
-    status: v.union(v.literal(GameStatus.New), v.literal(GameStatus.Cancelled), v.literal(GameStatus.Ended), v.literal(GameStatus.InProgress)),
-    startTime: v.string()
-  },
-  handler: async (ctx, args) => {
+  args: {game: vCreateGame},
+  handler: async ({ db }, {game} ) => {
+    debugger
+    const { activePlayer, creator, gameName, gameSettings, participants, status, startTime } = game
     
-    await ctx.db.insert('games', args)
+    // await db.insert('games', game)
+
+    await db.insert('games', {
+      activePlayer,
+      creator,
+      gameName,
+      gameSettings,
+      participants,
+      status,
+      startTime
+    })
+  },
+})
+
+export const updateParticipants = mutation({
+  args: {id: v.id('games'), value: v.string()},
+  handler: async ({db}, args) => {
+      return await db.patch(args.id, { participants: [{address: args.value} ]})
+  },
+})
+
+export const addParticipant = mutation({
+  args: {id: v.id('games'), playerAddress: v.string()},
+  // args: {game: vAddParticipant},
+  handler: async ({ db }, args) => {
+   debugger
+    const foundGame = await findGame(db, args.id)
+    console.log('foundGame ', foundGame)
+    return await db.patch(args.id, { participants: [{address: args.playerAddress} ]})
   },
 })

@@ -7,7 +7,7 @@ import GameArena from '@/components/ui/GameArena'
 import GameSettings from '@/components/ui/GameSettings'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 // import { initLeaderboard } from '@/features/leaderboard/leaderboardSlice'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { getSocket, initSocket } from '@/lib/socket'
 
 let socket: Socket

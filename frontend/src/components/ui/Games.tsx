@@ -11,6 +11,8 @@ import {
 import { EmptyPage } from '../shared/EmptyPage'
 import { GameStatus } from '@/interfaces'
 import { capitalize } from '@/lib/utils'
+import { useConnectContext } from '@/components/providers/ConnectProvider';
+import toast from 'react-hot-toast';
 
 
 
@@ -19,11 +21,13 @@ const Games = () => {
   // const players = useSelector((state: any) =>
   //   selectParticipants(state.leaderboard)
   // )
+  const { wallet } = useConnectContext()
 
   const router = useRouter();
 
-  const handleNavigate = (id: string) => {
-    router.push(`/games/${id}`)
+  const handleNavigate = (id: string, action: string) => {
+    if (!wallet?.accounts[0].address) return toast.error('Connect Wallet')
+    router.push(`/games/${id}?action=${action}`)
   }
 
   const [status, setStatus] = useState<GameStatus>(GameStatus.New);
@@ -121,7 +125,7 @@ const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
                 </span>
                 <p>{capitalize(gameSettings.apparatus)}</p>
               </div>
-              <button onClick={() => handleNavigate(_id)} className="mt-4 text-xl w-full text-white bg-indigo-600 py-2 rounded-xl shadow-lg">
+              <button onClick={() => handleNavigate(_id, 'join')} className="mt-4 text-xl w-full text-white bg-indigo-600 py-2 rounded-xl shadow-lg">
                 Join
               </button>
             </div>
