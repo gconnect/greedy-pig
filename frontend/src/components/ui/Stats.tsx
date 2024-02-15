@@ -1,6 +1,6 @@
 const Stats = () => {
   return (
-    <div className="container my-24 mx-auto md:px-6">
+    <div className="container my-24 mx-auto md:w-[60%] md:px-6">
       <section className="text-center">
         <h2 className="mb-10 md:mb-32 text-3xl font-bold">
           There are good reasons to

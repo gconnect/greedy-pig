@@ -1,26 +1,16 @@
 import { useState } from 'react'
-import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux'
-import { useMutation, useQuery } from 'convex/react'
+import { useRouter } from 'next/navigation'
+import { useQuery } from 'convex/react'
 import { api } from '@/convex/_generated/api'
-import {
-  selectParticipants,
-  Participant,
-  // selectActivePlayer,
-} from '@/features/leaderboard/leaderboardSlice'
-import { EmptyPage } from '../shared/EmptyPage'
 import { GameStatus } from '@/interfaces'
 import { capitalize } from '@/lib/utils'
-import { useConnectContext } from '@/components/providers/ConnectProvider';
-import toast from 'react-hot-toast';
+import { useConnectContext } from '@/components/providers/ConnectProvider'
+import toast from 'react-hot-toast'
 
 
 
 const Games = () => {
 
-  // const players = useSelector((state: any) =>
-  //   selectParticipants(state.leaderboard)
-  // )
   const { wallet } = useConnectContext()
 
   const router = useRouter();
@@ -32,7 +22,7 @@ const Games = () => {
 
   const [status, setStatus] = useState<GameStatus>(GameStatus.New);
   const games = useQuery(api.games.getGamesByStatus, { gameStatus: status })
-const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setStatus(event.target.value as GameStatus);
   };
 
@@ -43,9 +33,7 @@ const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
       </h1>
 
       <div className="bg-gradient-to-r from-black-500 to-brown-800 via-[#333]">
-      {/* <div className="bg-gradient-to-r from-black-500 to-brown-800 via-[#333] flex justify-center items-center"> */}
         <div className="md:w-[300px] md:px-10">
-        {/* <label aria-readonly htmlFor="small" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Small select</label> */}
         <select 
           value={status}
           onChange={handleStatusChange} 
@@ -58,9 +46,11 @@ const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         </select>
       </div>
         <div className="md:px-4 md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 space-y-4 md:space-y-0">
-          {games?.map(({ _id, gameName, gameSettings }) => (
+          {games?.length === 0 ? (
+            <div className="text-gray-500 text-center">No games available.</div>
+          ) : (
+          games?.map(({ _id, gameName, gameSettings }) => (
           <div key={_id} className="max-w-sm px-6 pt-6 pb-2 rounded-xl shadow-lg transform hover:scale-105 transition duration-500">
-            {/* <h3 className="mb-3 text-xl font-bold text-indigo-600">Beginner Friendly</h3> */}
             <div className="relative">
               <img
                 className="w-full rounded-xl"
@@ -130,8 +120,8 @@ const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
               </button>
             </div>
           </div>
-        ))}
-          
+            ))
+          )}
         
         </div>
       </div>
