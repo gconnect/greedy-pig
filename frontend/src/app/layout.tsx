@@ -9,12 +9,11 @@ import { Toaster } from 'react-hot-toast'
 
 import configFile from '@/config/cartesi.json'
 import ConnectProvider from '@/components/providers/ConnectProvider'
+import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
 import store from '@/store'
 
 import './globals.css'
 
-import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
-import GameLayout from './games/layout'
 
 const inter = Inter({ subsets: ['latin'] })
 
