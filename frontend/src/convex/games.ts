@@ -12,7 +12,7 @@ export const list = query({
 });
 
 export const getGameById = query({
-  args: { id: v.id('games') },
+  args: { id: v.string() },
     handler: async ({ db }, { id }) => {
       return await db
       .query("games")
