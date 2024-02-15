@@ -44,10 +44,8 @@ const CreateGameModal = () => {
 
 
     const createGame = async () => {
-      // alert(wallet.accounts[0].address)
-      return await sendTask({
+      return await sendTask({game: {
         creator,
-        // creator: wallet.accounts[0].address,
         gameName,
         activePlayer: '',
         participants: [{
@@ -69,7 +67,7 @@ const CreateGameModal = () => {
         },
         status: GameStatus.New,
         startTime
-      })
+      }})
     }
 
   const cancelHandler = () => {
@@ -78,7 +76,9 @@ const CreateGameModal = () => {
   }
 
   const reset = () => {
-
+    setGameName('')
+    setStartTime('')
+    dispatch({ type: 'modal/toggleGameModal' })
   }
 
   useEffect(() => {

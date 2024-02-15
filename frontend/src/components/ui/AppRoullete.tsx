@@ -39,7 +39,7 @@ export default function AppRoullete() {
 
   const { wallet } = useConnectContext()
   const router = useRouter()
-  const updateParticipants = useMutation(api.games.updateParticipants)
+  const addParticipant = useMutation(api.games.addParticipant)
   const searchParams = useSearchParams()
   const rollups = useRollups(dappAddress)
   const players = useSelector((state: any) =>
@@ -106,7 +106,7 @@ export default function AppRoullete() {
         duration: 6000,
       })
       dispatch({ type: 'leaderboard/updateActivePlayer', payload: user })
-      debugger
+   
       const socket = getSocket()
       if (socket) {
         socket.emit('activePlayer', user)
@@ -203,7 +203,7 @@ export default function AppRoullete() {
 
   const addParticipantsHandler = async (id: Id<'games'>) => {
     const addr: string = wallet?.accounts[0].address
-    await addParticipant(id, addr)
+    await addParticipant({data: {id, playerAddress: addr}})
   }
 
   useEffect(() => {

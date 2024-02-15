@@ -41,7 +41,7 @@ return await db
 export const create = mutation({
   args: {game: vCreateGame},
   handler: async ({ db }, {game} ) => {
-    debugger
+ 
     const { activePlayer, creator, gameName, gameSettings, participants, status, startTime } = game
     
     // await db.insert('games', game)
@@ -69,7 +69,7 @@ export const addParticipant = mutation({
   args: {id: v.id('games'), playerAddress: v.string()},
   // args: {game: vAddParticipant},
   handler: async ({ db }, args) => {
-   debugger
+
     const foundGame = await findGame(db, args.id)
     console.log('foundGame ', foundGame)
     return await db.patch(args.id, { participants: [{address: args.playerAddress} ]})
