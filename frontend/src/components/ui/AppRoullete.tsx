@@ -201,7 +201,8 @@ export default function AppRoullete() {
     }
   }
 
-  const addParticipantsHandler = async (id: Id<'games'>) => {
+  const addParticipantsHandler = async (id: any) => {
+  // const addParticipantsHandler = async (id: Id<'games'>) => {
     const addr: string = wallet?.accounts[0].address
     await addParticipant({data: {id, playerAddress: addr}})
   }
