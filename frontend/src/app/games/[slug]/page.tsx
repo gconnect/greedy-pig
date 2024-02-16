@@ -1,8 +1,6 @@
 
 'use client'
 
-
-import { v } from 'convex/values'
 import { api } from '@/convex/_generated/api'
 import { useQuery } from 'convex/react'
 import GameSettings from '@/components/ui/GameSettings'
@@ -11,12 +9,9 @@ import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 
-
-
 export default function GamePage({ params }: { params: { slug: string } }) {
 
   const game = useQuery(api.games.getGameById, { id: params.slug })
-
 
   const dispatch = useDispatch()
 
@@ -32,7 +27,6 @@ export default function GamePage({ params }: { params: { slug: string } }) {
   
   <div>
     <GameSettings />
-
-      <GameArena />
+    <GameArena />
   </div>
 )}
