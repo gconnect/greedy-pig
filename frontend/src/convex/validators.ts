@@ -28,7 +28,14 @@ export const vCreateGame = v.object({
     startTime: v.string()
   })
 
-export const vAddParticipant= v.object({
+export const vAddParticipant = v.object({
   id: v.id('games'),
   playerAddress: v.string()
+})
+
+export const vUpdateParticipant = v.object({
+  id: v.id('games'),
+  playerAddress: v.string(),
+  key: v.string(),
+  value: v.float64()
 })

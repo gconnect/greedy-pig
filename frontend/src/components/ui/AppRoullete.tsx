@@ -20,21 +20,20 @@ import store from '@/store'
 import { addInput } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
-
-
-import Lists from './Lists'
 import ConfirmModal from './ConfirmModal'
 import toast from 'react-hot-toast'
-import { Socket } from 'socket.io-client'
 import { selectParticipantAddresses } from '@/features/games/gamesSlice'
 import { api } from '@/convex/_generated/api'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
+import { Id } from '@/convex/_generated/dataModel'
+import Button from '../shared/Button'
 
 
 export default function AppRoullete() {
 
   const { wallet } = useConnectContext()
   const addParticipant = useMutation(api.games.addParticipant)
+  const updateParticipant = useMutation(api.games.updateParticipants)
   const searchParams = useSearchParams()
   const rollups = useRollups(dappAddress)
   const players = useSelector((state: any) =>
@@ -151,6 +150,7 @@ export default function AppRoullete() {
   const startGame = async () => {
     setGameInProgress(true)
     try {
+      debugger
       const result = await playGame(
         players,
         getInput,
@@ -159,14 +159,15 @@ export default function AppRoullete() {
         getOutput,
         {
           updatePlayerInfo: (action: UpdatePlayerInfoPayload) => {
-            dispatch({ type: 'leaderboard/updatePlayerInfo', payload: action })
+            // updateParticipant({data: {id: action.id, playerAddress: action.playerAddress, score: action.score}})
+            // dispatch({ type: 'leaderboard/updatePlayerInfo', payload: action })
           },
         }
       )
 
       const updatedParticipants = selectParticipants(
         store.getState().leaderboard
-      )
+      ) 
 
       const jsonPayload = JSON.stringify({
         method: 'saveLeaderboard',
@@ -195,6 +196,11 @@ export default function AppRoullete() {
     }
   }
 
+
+  const test = async (id: Id<'games'>) => { 
+        updateParticipant({data: {id, playerAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', key: 'turn', value: 22}})
+      }
+
   const addParticipantsHandler = async (id: any) => {
     const addr: string = wallet?.accounts[0].address
     await addParticipant({data: {id, playerAddress: addr}})
@@ -221,9 +227,10 @@ export default function AppRoullete() {
 
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
 
-      <button onClick={startGame} type="button">
-        Play game
-      </button>
+      <Button className="mb-10" onClick={() => test('j5790zeqejgrgj8dx2vvn40jpx6kkvns')} type="button">
+      {/* <button onClick={startGame} type="button"> */}
+        Start Game
+      </Button>
 
       <Roulette roulette={roulette} />
       {/* <RouletteWrapper onStart={onStart} onStop={onStop} /> */}
@@ -238,8 +245,6 @@ export default function AppRoullete() {
         onClick={handleStopGame}
         disabled={!isGameStarted}
       />
-
-      <Lists />
     </div>
   )
 }

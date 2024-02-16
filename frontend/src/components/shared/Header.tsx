@@ -1,10 +1,21 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
 import Logo from '@/assets/img/logo.png'
 import ConnectButton from '@/components/ui/ConnectButton'
 import Socials from '@/components/ui/Socials'
+import { useConnectContext } from '@/components/providers/ConnectProvider'
 
 const Header = () => {
+
+  const dispatch = useDispatch()
+  const { wallet } = useConnectContext()
+  const modalHandler = () => {
+    if (!wallet) return toast.error('Connect Wallet to continue')
+    dispatch({ type: 'modal/toggleGameModal' })
+  }
+
   return (
     <div className="mx-auto max-w-screen-2xl">
       <header className="flex items-center justify-between py-4 md:py-8">
@@ -38,10 +49,11 @@ const Header = () => {
             My Games
           </Link>
           <Link
+            onClick={modalHandler}
             href="#"
             className="text-lg font-semibold text-gray-600 transition duration-100 hover:text-indigo-500 active:text-indigo-700"
           >
-            About
+            Create Game
           </Link>
         </nav>
         <div className="-ml-8 hidden flex-col gap-2.5 sm:flex-row sm:justify-center lg:flex lg:justify-start">

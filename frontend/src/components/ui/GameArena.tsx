@@ -19,7 +19,7 @@ const GameArena = () => {
           <AppRoullete />
         </div>
 
-        <div className="flex flex-col items-center gap-4 py-6 md:gap-6">
+        <div className="flex flex-col items-center gap-4 md:gap-6">
           <LeaderBoard />
         </div>
       </div>

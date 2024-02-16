@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
@@ -23,8 +23,7 @@ const CreateGameModal = () => {
   const [loading, setLoading] = useState<boolean>(false)
   
 
-  const submitHandler = useCallback(
-    async (e: FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault()
     
         setLoading(true)
@@ -40,22 +39,15 @@ const CreateGameModal = () => {
            console.log('send game error: ', error)
            setLoading(false)  
          }
-    }, [] )
+    }
 
 
     const createGame = async () => {
       return await sendTask({game: {
         creator,
-        gameName,
         activePlayer: '',
-        participants: [{
-          address: '',
-          playerInfo: {
-            turn: 0,
-            turnScore: 0,
-            totalScore: 0
-          }
-        }],
+        gameName,
+        participants: [],
         gameSettings: {
           turnTimeLimit: 0,
           winningScore: 0,
@@ -90,10 +82,8 @@ const CreateGameModal = () => {
   }, [])
 
   useEffect(() => {
-    if (wallet) {
-      setCreator(wallet.accounts[0].address)
-    }
 
+    setCreator(wallet?.accounts[0].address)
   }, [wallet])
 
   return (

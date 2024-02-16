@@ -1,15 +1,8 @@
 import { GameStatus } from '../interfaces';
 import { mutation, query } from './_generated/server'
 import { v } from 'convex/values'
-import { vAddParticipant, vCreateGame } from './validators';
-import { findGame } from './utils';
-
-export const list = query({
-  args: {},
-  handler: async ({  db}) => {
-    return await db.query("games").collect();
-  },
-});
+import { vAddParticipant, vCreateGame, vUpdateParticipant } from './validators';
+import { findGame } from './utils'
 
 export const getGameById = query({
   args: { id: v.string() },
@@ -30,8 +23,9 @@ export const getGamesByStatus = query({
     ) },
   handler: async ({ db }, { gameStatus }) => {
 return await db
-    .query("games")
+    .query('games')
     .withIndex('by_status', (q) => q.eq('status', gameStatus))
+    .order('desc')
     .collect()
  
   }
@@ -40,32 +34,6 @@ return await db
 
 export const create = mutation({
   args: {game: vCreateGame},
-  // args: {
-  //   activePlayer: v.string(),
-  //   creator: v.string(),
-  //   gameName: v.string(),
-  //   gameSettings: v.object({
-  //     apparatus: v.string(),
-  //     bet: v.boolean(),
-  //     limitNumberOfPlayer: v.boolean(),
-  //     maxPlayer: v.float64(),
-  //     mode: v.string(),
-  //     turnTimeLimit: v.float64(),
-  //     winningScore: v.float64(),
-  //   }),
-  //   participants: v.array(
-  //     v.object({
-  //       address: v.string(),
-  //       playerInfo: v.object({
-  //         totalScore: v.float64(),
-  //         turn: v.float64(),
-  //         turnScore: v.float64(),
-  //       }),
-  //     })
-  //   ),
-  //   status: v.union(v.literal(GameStatus.New), v.literal(GameStatus.Cancelled), v.literal(GameStatus.Ended), v.literal(GameStatus.InProgress)),
-  //   startTime: v.string()
-  // },
   handler: async ({ db }, { game }) => {
     return await db.insert('games', game)
   }, 
@@ -88,8 +56,29 @@ export const addParticipant = mutation({
       throw new Error('Player already joined')
     }
 
-const addedParticipants = [...participants, { address: data.playerAddress }];
+    const addedParticipants = [...participants, { 
+      address: data.playerAddress,
+      playerInfo: {
+        turn: 0,
+        turnScore: 0,
+        totalScore: 0
+      }
+    }];
 
     return await db.patch(data.id, { participants: addedParticipants })
+  }
+})
+
+export const updateParticipants = mutation({
+  args: {data: vUpdateParticipant},
+  handler: async ({db}, { data }) => {
+    const foundGame = await findGame(db, data.id)
+ 
+    const { playerInfo } = foundGame?.participants.find(p => p.address === data.playerAddress)
+    if (!playerInfo) {  
+      throw new Error('Player info does not exists')
+    }
+    playerInfo.turn += 1
+    return await db.patch(data.id, { participants: [{address: data.playerAddress} ]})
   },
 })
