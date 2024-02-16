@@ -34,7 +34,7 @@ export const vAddParticipant = v.object({
 })
 
 export const vUpdateParticipant = v.object({
-  id: v.id('games'),
+  id: v.any(),
   playerAddress: v.string(),
   key: v.string(),
   value: v.float64()

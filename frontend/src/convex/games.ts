@@ -69,16 +69,16 @@ export const addParticipant = mutation({
   }
 })
 
-export const updateParticipants = mutation({
-  args: {data: vUpdateParticipant},
-  handler: async ({db}, { data }) => {
-    const foundGame = await findGame(db, data.id)
+// export const updateParticipants = mutation({
+//   args: {data: vUpdateParticipant},
+//   handler: async ({db}, { data }) => {
+//     const foundGame = await findGame(db, data.id)
  
-    const { playerInfo } = foundGame?.participants.find(p => p.address === data.playerAddress)
-    if (!playerInfo) {  
-      throw new Error('Player info does not exists')
-    }
-    playerInfo.turn += 1
-    return await db.patch(data.id, { participants: [{address: data.playerAddress} ]})
-  },
-})
+//     const { playerInfo } = foundGame?.participants.find(p => p.address === data.playerAddress)
+//     if (!playerInfo) {  
+//       throw new Error('Player info does not exists')
+//     }
+//     playerInfo.turn += 1
+//     return await db.patch(data.id, { participants: [{address: data.playerAddress} ]})
+//   },
+// })

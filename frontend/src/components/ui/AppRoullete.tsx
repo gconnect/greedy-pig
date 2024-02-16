@@ -33,7 +33,7 @@ export default function AppRoullete() {
 
   const { wallet } = useConnectContext()
   const addParticipant = useMutation(api.games.addParticipant)
-  const updateParticipant = useMutation(api.games.updateParticipants)
+  // const updateParticipant = useMutation(api.games.updateParticipants)
   const searchParams = useSearchParams()
   const rollups = useRollups(dappAddress)
   const players = useSelector((state: any) =>
@@ -197,9 +197,10 @@ export default function AppRoullete() {
   }
 
 
-  const test = async (id: Id<'games'>) => { 
-        updateParticipant({data: {id, playerAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', key: 'turn', value: 22}})
-      }
+  // const test = async () => { 
+  
+  //       await updateParticipant({data: {id: 'kjk', playerAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', key: 'turn', value: 22}})
+  //     }
 
   const addParticipantsHandler = async (id: any) => {
     const addr: string = wallet?.accounts[0].address
@@ -227,8 +228,8 @@ export default function AppRoullete() {
 
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
 
-      <Button className="mb-10" onClick={() => test('j5790zeqejgrgj8dx2vvn40jpx6kkvns')} type="button">
-      {/* <button onClick={startGame} type="button"> */}
+      {/* <Button className="mb-10" onClick={test} type="button"> */}
+      <Button onClick={startGame} className="mb-10" type="button">
         Start Game
       </Button>
 
