@@ -52,9 +52,9 @@ export const addParticipant = mutation({
     const { participants } = foundGame;
     const playerJoined = foundGame.participants.find(p => p.address === data.playerAddress)
 
-    if (playerJoined) {
-      throw new Error('Player already joined')
-    }
+    // if (playerJoined) {
+    //   throw new Error('Player already joined')
+    // }
 
     const addedParticipants = [...participants, { 
       address: data.playerAddress,

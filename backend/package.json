@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "description": "JS DApp",
   "dependencies": {
+    "convex": "^1.9.0",
+    "dotenv": "^16.4.4",
     "ethers": "^6.7.1",
     "viem": "^2.7.3"
   },

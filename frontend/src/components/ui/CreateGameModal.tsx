@@ -7,43 +7,26 @@ import { useConnectContext } from '../providers/ConnectProvider'
 import Button from '../shared/Button'
 import toast from 'react-hot-toast'
 import { GameStatus } from '@/interfaces'
+import { addInput } from '@/lib/cartesi'
+import { useRollups } from '@/hooks/useRollups'
+import { dappAddress } from '@/lib/utils'
 
 const CreateGameModal = () => {
 
-  const sendTask = useMutation(api.games.create)
+  const createGame = useMutation(api.games.create)
   const { wallet } = useConnectContext()
   const dispatch = useDispatch()
   const createGameForm = useSelector((state: any) =>
     selectGameModal(state.modal)
   )
+  const rollups = useRollups(dappAddress)
 
   const [creator, setCreator] = useState<string>('')
   const [gameName, setGameName] = useState<string>('')
   const [startTime, setStartTime] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
-  
 
-  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
-    
-        setLoading(true)
-        try {
-        
-          setLoading(true)
-         await createGame()
-         reset()
-         setLoading(false)
-         toast.success('Game created successfully')
- 
-         } catch (error) {
-           console.log('send game error: ', error)
-           setLoading(false)  
-         }
-    }
-
-
-    const createGame = async () => {
-      return await sendTask({game: {
+  const game = {
         creator,
         activePlayer: '',
         gameName,
@@ -59,7 +42,48 @@ const CreateGameModal = () => {
         },
         status: GameStatus.New,
         startTime
-      }})
+      }
+  
+
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+    
+        setLoading(true)
+        try {
+        
+          setLoading(true)
+         await createGameHandler()
+         reset()
+         setLoading(false)
+         toast.success('Game created successfully')
+ 
+         } catch (error) {
+           console.log('send game error: ', error)
+           setLoading(false)  
+         }
+    }
+
+
+    const createGameHandler = async () => {
+
+      const res = await createGame({ game })
+      
+      if (res) {
+        const jsonPayload = JSON.stringify({
+          method: 'createGame',
+          data: { ...game, id: res }
+        })
+
+        const tx = await addInput(
+          JSON.stringify(jsonPayload),
+          dappAddress,
+          rollups
+        )
+
+        console.log(tx)
+        const result = await tx.wait(1)
+        console.log(result)
+      }
     }
 
   const cancelHandler = () => {

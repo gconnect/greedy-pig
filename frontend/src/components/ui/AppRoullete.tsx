@@ -11,12 +11,8 @@ import {
   playGame,
 } from '@/lib/utils'
 import { Roulette, useRoulette } from 'react-hook-roulette'
-import {
-  selectParticipants,
-  UpdatePlayerInfoPayload,
-} from '@/features/leaderboard/leaderboardSlice'
+import { UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice'
 import { useDispatch, useSelector } from 'react-redux'
-import store from '@/store'
 import { addInput } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
@@ -25,7 +21,6 @@ import toast from 'react-hot-toast'
 import { selectParticipantAddresses } from '@/features/games/gamesSlice'
 import { api } from '@/convex/_generated/api'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
-import { Id } from '@/convex/_generated/dataModel'
 import Button from '../shared/Button'
 
 
@@ -165,26 +160,26 @@ export default function AppRoullete() {
         }
       )
 
-      const updatedParticipants = selectParticipants(
-        store.getState().leaderboard
-      ) 
+      // const updatedParticipants = selectParticipants(
+      //   store.getState().leaderboard
+      // ) 
 
-      const jsonPayload = JSON.stringify({
-        method: 'saveLeaderboard',
-        data: {
-          leaderboard: updatedParticipants,
-        },
-      })
+      // const jsonPayload = JSON.stringify({
+      //   method: 'saveLeaderboard',
+      //   data: {
+      //     leaderboard: updatedParticipants,
+      //   },
+      // })
 
-      const tx = await addInput(
-        JSON.stringify(jsonPayload),
-        dappAddress,
-        rollups
-      )
+      // const tx = await addInput(
+      //   JSON.stringify(jsonPayload),
+      //   dappAddress,
+      //   rollups
+      // )
 
-      console.log(tx)
-      const res = await tx.wait(1)
-      console.log(res)
+      // console.log(tx)
+      // const res = await tx.wait(1)
+      // console.log(res)
 
       setGameInProgress(false)
       toast.success(`Game finished!. ${result}`, {
@@ -205,6 +200,24 @@ export default function AppRoullete() {
   const addParticipantsHandler = async (id: any) => {
     const addr: string = wallet?.accounts[0].address
     await addParticipant({data: {id, playerAddress: addr}})
+    
+    // if (res) {
+      const jsonPayload = JSON.stringify({
+        method: 'addParticipant',
+        data: {gameId: id, playerAddress: addr}
+      })
+      debugger
+
+        const tx = await addInput(
+          JSON.stringify(jsonPayload),
+          dappAddress,
+          rollups
+        )
+
+        console.log('txxx ', tx)
+        // const result = await tx.wait(1)
+        // console.log(result)
+      // }
   }
 
   useEffect(() => {
