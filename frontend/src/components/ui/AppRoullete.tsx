@@ -14,7 +14,7 @@ import { Roulette, useRoulette } from 'react-hook-roulette'
 import { UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { addInput } from '@/lib/cartesi'
-import { useRollups } from '@/hooks/useRollups'
+// import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
 import ConfirmModal from './ConfirmModal'
 import toast from 'react-hot-toast'
@@ -24,13 +24,13 @@ import { useConnectContext } from '@/components/providers/ConnectProvider'
 import Button from '../shared/Button'
 
 
-export default function AppRoullete() {
+export default function AppRoullete({rollups}: any) {
 
   const { wallet } = useConnectContext()
   const addParticipant = useMutation(api.games.addParticipant)
   // const updateParticipant = useMutation(api.games.updateParticipants)
   const searchParams = useSearchParams()
-  const rollups = useRollups(dappAddress)
+  // const rollups = useRollups(dappAddress)
   const players = useSelector((state: any) =>
     selectParticipantAddresses(state.games)
   )
@@ -160,26 +160,6 @@ export default function AppRoullete() {
         }
       )
 
-      // const updatedParticipants = selectParticipants(
-      //   store.getState().leaderboard
-      // ) 
-
-      // const jsonPayload = JSON.stringify({
-      //   method: 'saveLeaderboard',
-      //   data: {
-      //     leaderboard: updatedParticipants,
-      //   },
-      // })
-
-      // const tx = await addInput(
-      //   JSON.stringify(jsonPayload),
-      //   dappAddress,
-      //   rollups
-      // )
-
-      // console.log(tx)
-      // const res = await tx.wait(1)
-      // console.log(res)
 
       setGameInProgress(false)
       toast.success(`Game finished!. ${result}`, {
@@ -200,17 +180,17 @@ export default function AppRoullete() {
   const addParticipantsHandler = async (id: any) => {
     const addr: string = wallet?.accounts[0].address
     await addParticipant({data: {id, playerAddress: addr}})
-    
+    debugger
     // if (res) {
       const jsonPayload = JSON.stringify({
         method: 'addParticipant',
         data: {gameId: id, playerAddress: addr}
       })
-      debugger
+      
 
         const tx = await addInput(
           JSON.stringify(jsonPayload),
-          '0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C',
+          dappAddress,
           rollups
         )
 

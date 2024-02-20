@@ -2,14 +2,18 @@
 
 import AppRoullete from '@/components/ui/AppRoullete'
 import LeaderBoard from './Leaderboard'
+import { dappAddress } from '@/lib/utils'
+import { useRollups } from '@/hooks/useRollups'
 
 const GameArena = () => {
+
+    const rollups = useRollups(dappAddress)
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8">
         <div className="flex flex-col items-center gap-4  px-8 py-6 md:gap-6">
-          <AppRoullete />
+          <AppRoullete rollups={rollups} />
         </div>
 
         <div className="flex flex-col items-center gap-4 md:gap-6">
