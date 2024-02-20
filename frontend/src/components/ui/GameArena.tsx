@@ -1,16 +1,9 @@
 'use client'
 
-import AppRoullete from '../../components/ui/AppRoullete'
+import AppRoullete from '@/components/ui/AppRoullete'
 import LeaderBoard from './Leaderboard'
 
 const GameArena = () => {
-  // const dispatch = useDispatch()
-
-  // const handleIncrement = useCallback(() => {
-  //   dispatch(updateTest('justin'));
-  // }, [dispatch]);
-
-  // const participants = useSelector((state: any) => state.leaderboard.participants);
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">

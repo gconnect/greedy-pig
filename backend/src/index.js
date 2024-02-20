@@ -1,6 +1,10 @@
 
 const viem = require('viem')
 const { 
+  noticeHandler,
+  reportHandler
+ } = require('./utils/helpers')
+const { 
   games, 
   addParticipant, 
   addGame 
@@ -9,18 +13,18 @@ const {
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 console.log('HTTP rollup_server url is ' + rollup_server)
 
-const noticeHandler = async (data) => {
-  const result = JSON.stringify(data)
-  const hexresult = viem.stringToHex(result)
+// const noticeHandler = async (data) => {
+//   const result = JSON.stringify(data)
+//   const hexresult = viem.stringToHex(result)
 
-  return await fetch(rollup_server + '/notice', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ payload: hexresult })
-  });
-}
+//   return await fetch(rollup_server + '/notice', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({ payload: hexresult })
+//   });
+// }
 
 async function handle_advance(data) {
   console.log('Received advance request data ' + JSON.stringify(data));
@@ -37,36 +41,31 @@ async function handle_advance(data) {
 
   let advance_req;
 
-  if (JSONpayload.method === 'createGame') {
-    if (JSONpayload.data == '' || null) {
-      console.log('Result cannot be empty');
-      const result = JSON.stringify({
-        error: String('Message:' + JSONpayload.data),
-      });
+  try {
 
-      const hexresult = viem.stringToHex(result);
-
-      await fetch(rollup_server + '/report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-
-        body: JSON.stringify({
-          payload: hexresult,
-        }),
-      });
+    if (JSONpayload.method === 'createGame') {
+      if (JSONpayload.data == '' || null) {
+        console.log('Result cannot be empty');
+        await reportHandler(message)
+      }
+  
+      console.log('creating game...');
+      addGame(JSONpayload.data);
+      advance_req = await noticeHandler(games);
+  
+  
+    } else if (JSONpayload.method === 'addParticipant') {
+      console.log('adding participant ...', JSONpayload.data);
+      addParticipant(JSONpayload.data)
+      advance_req = await noticeHandler(games)
+    } else {
+      console.log('invalid request');
+      const message = `method undefined: ${JSONpayload.method}`
+      await reportHandler(message)
     }
-
-    console.log('creating game...');
-    addGame(JSONpayload.data);
-    advance_req = await noticeHandler(games);
-
-
-  } else if (JSONpayload.method === 'addParticipant') {
-    console.log('adding participant ...', JSONpayload.data);
-    addParticipant(JSONpayload.data)
-    advance_req = await noticeHandler(games)
+  } catch (error) {
+    await reportHandler(error)
+    return 'reject'
   }
 
   const json = await advance_req?.json();

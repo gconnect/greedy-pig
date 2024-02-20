@@ -73,7 +73,7 @@ const CreateGameModal = () => {
           method: 'createGame',
           data: { ...game, id: res }
         })
-
+debugger
         const tx = await addInput(
           JSON.stringify(jsonPayload),
           dappAddress,

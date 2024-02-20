@@ -20,6 +20,8 @@ export const addParticipant = ({gameId, playerAddress}) => {
     throw new Error('Game not found')
   }
 
+  console.log('adding participant ', game)
+
   game.participants.push({
     address: playerAddress,
     playerInfo: {

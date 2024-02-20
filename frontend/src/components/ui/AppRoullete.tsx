@@ -210,7 +210,7 @@ export default function AppRoullete() {
 
         const tx = await addInput(
           JSON.stringify(jsonPayload),
-          dappAddress,
+          '0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C',
           rollups
         )
 
