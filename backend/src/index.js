@@ -7,24 +7,13 @@ const {
 const { 
   games, 
   addParticipant, 
-  addGame 
+  addGame, 
+  updateParticipant
 } = require('./games')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 console.log('HTTP rollup_server url is ' + rollup_server)
 
-// const noticeHandler = async (data) => {
-//   const result = JSON.stringify(data)
-//   const hexresult = viem.stringToHex(result)
-
-//   return await fetch(rollup_server + '/notice', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({ payload: hexresult })
-//   });
-// }
 
 async function handle_advance(data) {
   console.log('Received advance request data ' + JSON.stringify(data));
@@ -55,9 +44,17 @@ async function handle_advance(data) {
   
   
     } else if (JSONpayload.method === 'addParticipant') {
+
       console.log('adding participant ...', JSONpayload.data);
       addParticipant(JSONpayload.data)
       advance_req = await noticeHandler(games)
+
+    } else if (JSONpayload.method === 'updateParticipant') {
+      
+      console.log('updating participant ...', JSONpayload.data)
+      updateParticipant(JSONpayload.data)
+      advance_req = await noticeHandler(games)
+
     } else {
       console.log('invalid request');
       const message = `method undefined: ${JSONpayload.method}`

@@ -1,27 +1,66 @@
 import { useSelector } from 'react-redux'
-import { useMutation, useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-import {
-  selectParticipants,
-  Participant,
-  // selectActivePlayer,
-} from '@/features/leaderboard/leaderboardSlice'
+
+
 import { EmptyPage } from '../shared/EmptyPage'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GameStatus } from '@/interfaces'
 import { selectSelectedGame } from '@/features/games/gamesSlice'
+import { useRollups } from '@/hooks/useRollups'
+import { dappAddress } from '@/lib/utils'
+import { useNotices } from '@/hooks/useNotices'
 
-// import { useState } from 'react'
 
 const LeaderBoard = () => {
 
+  const { notices } = useNotices()
+  const rollups = useRollups(dappAddress)
   const game = useSelector((state: any) =>
     selectSelectedGame(state.games)
   )
+  
+  console.log('notices from leasdboard', notices)
 
-  // const [status, setStatus] = useState<any>('');
+
   const [status, setStatus] = useState<GameStatus>(GameStatus.New);
 
+
+
+  useEffect(() => {
+        // Subscribe to the event here
+        
+        const subscription = rollups?.inputContract.on('InputAdded', (
+          dappAddress, 
+          inboxInputIndex,
+          sender,
+          input
+          ) => {
+            // Define your callback function to handle the event
+            handleEvent(dappAddress, 
+          inboxInputIndex,
+          sender,
+          input);
+        });
+
+        console.log('subscription ', subscription)
+
+
+        // return () => {
+        //     subscription;
+        // };
+    }, [rollups]);
+
+    // Define the callback function to handle the event
+    const handleEvent = (dappAddress: string, 
+          inboxInputIndex: string,
+          sender: string,
+          input: string) => {
+        // Perform the action based on the emitted event
+        console.log('Received event:', dappAddress, 
+          inboxInputIndex,
+          sender,
+          input);
+
+    };
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">

@@ -5,6 +5,11 @@ export type OutputFunction = (
   message: string,
   playerInfo?: PlayerInfo[]
 ) => void
+export type UpdatePlayerInfo = (
+  user: string,
+  property: keyof PlayerInfo,
+  value: number
+) => void
 export type PlayerInfo = {
   turn: number
   turnScore: number
@@ -12,40 +17,30 @@ export type PlayerInfo = {
 }
 
 export async function playGame(
-  usernames: string[],
+  addresses: string[],
   getInput: InputFunction,
   getRoll: RollFunction,
   numTurns: number,
   output: OutputFunction,
-  dispatchCallbacks: {
-    updatePlayerInfo: (action: {
-      username: string
-      property: keyof PlayerInfo
-      value: any
-    }) => void
-  }
+  updatePlayerInfo: UpdatePlayerInfo
 ): Promise<string> {
   let result
 
   const playerScores: { [key: string]: number } = {}
-  for (const username of usernames) {
-    playerScores[username] = 0
+  for (const address of addresses) {
+    playerScores[address] = 0
   }
 
   for (let turn = 0; turn < numTurns; turn++) {
-    for (let i = 0; i < usernames.length; i++) {
+    for (let i = 0; i < addresses.length; i++) {
       let playerTurn: number = 1
-      const username = usernames[i]
+      const address = addresses[i]
       let turnScore: number = 0
       let continueRolling: boolean = true
 
-      await output(username, `${username} turn score is ${turnScore}.`)
+      await output(address, `${address} turn score is ${turnScore}.`)
 
-      dispatchCallbacks.updatePlayerInfo({
-        username,
-        property: 'turn',
-        value: 1,
-      })
+      updatePlayerInfo(address, 'turn', 1)
 
       while (continueRolling) {
         const roll: number = await getRoll()
@@ -53,24 +48,17 @@ export async function playGame(
         if (roll === 1) {
           turnScore = 0
 
-          dispatchCallbacks.updatePlayerInfo({
-            username,
-            property: 'turnScore',
-            value: turnScore,
-          })
-          await output(username, `Bust! Your turn score is 0.`)
+          updatePlayerInfo(address, 'turnScore', turnScore)
+
+          await output(address, `Bust! Your turn score is 0.`)
           await new Promise((resolve) => setTimeout(resolve, 2000))
           continueRolling = false
         } else {
           turnScore += roll
 
-          dispatchCallbacks.updatePlayerInfo({
-            username,
-            property: 'turnScore',
-            value: turnScore,
-          })
+          updatePlayerInfo(address, 'turnScore', turnScore)
 
-          await output(username, `Your turn score is ${turnScore}.`)
+          await output(address, `Your turn score is ${turnScore}.`)
           const answer: string = await getInput(
             `Your current score is ${turnScore}. Roll again? (y/n): `
           )
@@ -81,28 +69,20 @@ export async function playGame(
         }
       }
 
-      if (i === usernames.length - 1) {
+      if (i === addresses.length - 1) {
         playerTurn++
       }
 
-      playerScores[username] += turnScore
+      playerScores[address] += turnScore
 
-      dispatchCallbacks.updatePlayerInfo({
-        username,
-        property: 'turnScore',
-        value: playerScores[username],
-      })
-      dispatchCallbacks.updatePlayerInfo({
-        username,
-        property: 'totalScore',
-        value: playerScores[username],
-      })
+      updatePlayerInfo(address, 'turnScore', playerScores[address])
+      updatePlayerInfo(address, 'totalScore', playerScores[address])
     }
   }
 
   const highestScore: number = Math.max(...Object.values(playerScores))
   const winningPlayers: string[] = Object.keys(playerScores).filter(
-    (username) => playerScores[username] === highestScore
+    (address) => playerScores[address] === highestScore
   )
 
   console.log('\nGame over!')
@@ -121,9 +101,24 @@ export async function playGame(
   }
 
   console.log("\nSummary of Participants' Scores:")
-  for (const username of usernames) {
-    console.log(`${username}: ${playerScores[username]}`)
+  for (const address of addresses) {
+    console.log(`${address}: ${playerScores[address]}`)
   }
   await output('', result)
   return result
 }
+
+
+export const getParticipantsForGame = (gameId: string, notices: any[]) => {
+
+  const gameNotice = notices.find((notice) => notice.id === gameId);
+
+  if (!gameNotice) {
+    return [];
+  }
+
+  const gameData = JSON.parse(gameNotice.payload)
+
+  return gameData.participants || [];
+};
+

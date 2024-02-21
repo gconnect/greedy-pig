@@ -9,33 +9,36 @@ import {
   RollFunction,
   OutputFunction,
   playGame,
+  UpdatePlayerInfo,
 } from '@/lib/utils'
 import { Roulette, useRoulette } from 'react-hook-roulette'
 import { UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { addInput } from '@/lib/cartesi'
-// import { useRollups } from '@/hooks/useRollups'
-import { dappAddress } from '@/lib/utils'
+import { useRollups } from '@/hooks/useRollups'
+import { dappAddress, getParticipantsForGame } from '@/lib/utils'
 import ConfirmModal from './ConfirmModal'
 import toast from 'react-hot-toast'
 import { selectParticipantAddresses } from '@/features/games/gamesSlice'
 import { api } from '@/convex/_generated/api'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 import Button from '../shared/Button'
+import { useNotices } from '@/hooks/useNotices'
 
 
-export default function AppRoullete({rollups}: any) {
+export default function AppRoullete() {
 
+  const { notices } = useNotices()
   const { wallet } = useConnectContext()
   const addParticipant = useMutation(api.games.addParticipant)
-  // const updateParticipant = useMutation(api.games.updateParticipants)
   const searchParams = useSearchParams()
-  // const rollups = useRollups(dappAddress)
-  const players = useSelector((state: any) =>
-    selectParticipantAddresses(state.games)
-  )
+  const rollups = useRollups(dappAddress)
+  // const players = useSelector((state: any) =>
+  //   selectParticipantAddresses(state.games)
+  // )
   const dispatch = useDispatch()
 
+  const [gameId, setGameId] = useState<string>('')
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [modalQuestion, setModalQuestion] = useState('')
@@ -144,6 +147,7 @@ export default function AppRoullete({rollups}: any) {
 
   const startGame = async () => {
     setGameInProgress(true)
+    const players = await getParticipantsForGame(gameId, notices)
     try {
       debugger
       const result = await playGame(
@@ -152,12 +156,7 @@ export default function AppRoullete({rollups}: any) {
         getRoll,
         2,
         getOutput,
-        {
-          updatePlayerInfo: (action: UpdatePlayerInfoPayload) => {
-            // updateParticipant({data: {id: action.id, playerAddress: action.playerAddress, score: action.score}})
-            // dispatch({ type: 'leaderboard/updatePlayerInfo', payload: action })
-          },
-        }
+        updatePlayerInfo
       )
 
 
@@ -171,17 +170,32 @@ export default function AppRoullete({rollups}: any) {
     }
   }
 
+  const updatePlayerInfo: UpdatePlayerInfo = async (player: string, key: string, value: number ) => {
 
-  // const test = async () => { 
-  
-  //       await updateParticipant({data: {id: 'kjk', playerAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', key: 'turn', value: 22}})
-  //     }
+    const jsonPayload = JSON.stringify({
+        method: 'updateParticipant',
+        data: {player, key, value}
+      })
 
-  const addParticipantsHandler = async (id: any) => {
+       const tx = await addInput(
+          JSON.stringify(jsonPayload),
+          dappAddress,
+          rollups
+        )
+
+        console.log('txxx ', tx)
+        const result = await tx.wait(1)
+        if (result) {
+          console.log(result)
+          // listen/emit event to update the leaderboardSlice. no mmore convex
+        }
+
+  }
+
+
+  const joinGame = async (id: any) => {
     const addr: string = wallet?.accounts[0].address
-    await addParticipant({data: {id, playerAddress: addr}})
-    debugger
-    // if (res) {
+
       const jsonPayload = JSON.stringify({
         method: 'addParticipant',
         data: {gameId: id, playerAddress: addr}
@@ -195,9 +209,11 @@ export default function AppRoullete({rollups}: any) {
         )
 
         console.log('txxx ', tx)
-        // const result = await tx.wait(1)
-        // console.log(result)
-      // }
+        const result = await tx.wait(1)
+        if (result) {
+           await addParticipant({data: {id, playerAddress: addr}})
+        }
+
   }
 
   useEffect(() => {
@@ -207,7 +223,9 @@ export default function AppRoullete({rollups}: any) {
       if (action === 'join') {
         const id = window.location.pathname.split('/').pop()
 
-        addParticipantsHandler(id)
+        if (id) {
+          setGameId(id)
+        }
        
       }
     }
@@ -222,6 +240,9 @@ export default function AppRoullete({rollups}: any) {
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
 
       {/* <Button className="mb-10" onClick={test} type="button"> */}
+      <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
+        Join Game
+      </Button>
       <Button onClick={startGame} className="mb-10" type="button">
         Start Game
       </Button>
