@@ -1,73 +1,59 @@
-import { useSelector } from 'react-redux'
-
-
 import { EmptyPage } from '../shared/EmptyPage'
-import { useEffect, useState } from 'react'
-import { GameStatus } from '@/interfaces'
-import { selectSelectedGame } from '@/features/games/gamesSlice'
+import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
 
-
 const LeaderBoard = () => {
-
-  const { notices } = useNotices()
+  const searchParams = useSearchParams()
+  const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
-  const game = useSelector((state: any) =>
-    selectSelectedGame(state.games)
-  )
-  
+
+  const [game, setGame] = useState<any>(null)
+
   console.log('notices from leasdboard', notices)
 
+  const handleEvent = async (
+    dappAddress: string,
+    inboxInputIndex: string,
+    sender: string,
+    input: string
+  ) => {
+    console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
 
-  const [status, setStatus] = useState<GameStatus>(GameStatus.New);
+    await refetch()
+  }
 
+  useEffect(() => {
+    rollups?.inputContract.on(
+      'InputAdded',
+      (dappAddress, inboxInputIndex, sender, input) => {
+        handleEvent(dappAddress, inboxInputIndex, sender, input)
+      }
+    )
+  }, [rollups, refetch])
 
 
   useEffect(() => {
-        // Subscribe to the event here
-        
-        const subscription = rollups?.inputContract.on('InputAdded', (
-          dappAddress, 
-          inboxInputIndex,
-          sender,
-          input
-          ) => {
-            // Define your callback function to handle the event
-            handleEvent(dappAddress, 
-          inboxInputIndex,
-          sender,
-          input);
-        });
+   
+    const id = window.location.pathname.split('/').pop()
 
-        console.log('subscription ', subscription)
+      const selectedGame = JSON.parse(notices?.reverse()[0].payload).find( (game: any) => game.id === id )
 
+      if (selectedGame) {
+        // Set the selected game state
+        setGame(selectedGame)
+      }
 
-        // return () => {
-        //     subscription;
-        // };
-    }, [rollups]);
-
-    // Define the callback function to handle the event
-    const handleEvent = (dappAddress: string, 
-          inboxInputIndex: string,
-          sender: string,
-          input: string) => {
-        // Perform the action based on the emitted event
-        console.log('Received event:', dappAddress, 
-          inboxInputIndex,
-          sender,
-          input);
-
-    };
+  }, [searchParams])
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">
       <div className="p-6 pb-0 mb-0 rounded-t-2xl">
         <h1 className="font-bold text-2xl mb-10">Leaderboard</h1>
       </div>
-      
+
       {game && game.participants?.length ? (
         <div className="flex-auto px-0 pt-0 pb-2">
           <div className="p-0 overflow-x-auto">

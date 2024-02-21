@@ -1,7 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
 import { selectGameModal } from '@/features/modal/modalSlice'
 import { useConnectContext } from '../providers/ConnectProvider'
 import Button from '../shared/Button'
@@ -13,7 +11,6 @@ import { dappAddress } from '@/lib/utils'
 
 const CreateGameModal = () => {
 
-  const createGame = useMutation(api.games.create)
   const { wallet } = useConnectContext()
   const dispatch = useDispatch()
   const createGameForm = useSelector((state: any) =>
@@ -27,66 +24,55 @@ const CreateGameModal = () => {
   const [loading, setLoading] = useState<boolean>(false)
 
   const game = {
-        creator,
-        activePlayer: '',
-        gameName,
-        participants: [],
-        gameSettings: {
-          turnTimeLimit: 0,
-          winningScore: 0,
-          mode: 'turn',
-          apparatus: 'roulette',
-          bet: true,
-          maxPlayer: 10,
-          limitNumberOfPlayer: true,
-        },
-        status: GameStatus.New,
-        startTime
-      }
-  
+    creator,
+    activePlayer: '',
+    gameName,
+    participants: [],
+    gameSettings: {
+      turnTimeLimit: 0,
+      winningScore: 0,
+      mode: 'turn',
+      apparatus: 'roulette',
+      bet: true,
+      maxPlayer: 10,
+      limitNumberOfPlayer: true,
+    },
+    status: GameStatus.New,
+    startTime,
+  }
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
-    
-        setLoading(true)
-        try {
-        
-          setLoading(true)
-         await createGameHandler()
-         reset()
-         setLoading(false)
-         toast.success('Game created successfully')
- 
-         } catch (error) {
-           console.log('send game error: ', error)
-           setLoading(false)  
-         }
+    e.preventDefault()
+
+    setLoading(true)
+    try {
+      setLoading(true)
+      await createGameHandler()
+      reset()
+      setLoading(false)
+      toast.success('Game created successfully')
+    } catch (error) {
+      console.log('send game error: ', error)
+      setLoading(false)
     }
+  }
 
+  const createGameHandler = async () => {
 
-    const createGameHandler = async () => {
+    const jsonPayload = JSON.stringify({
+      method: 'createGame',
+      data: game,
+    })
+    debugger
+    const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
 
-      const res = await createGame({ game })
-      
-      if (res) {
-        const jsonPayload = JSON.stringify({
-          method: 'createGame',
-          data: { ...game, id: res }
-        })
-debugger
-        const tx = await addInput(
-          JSON.stringify(jsonPayload),
-          dappAddress,
-          rollups
-        )
-
-        console.log(tx)
-        const result = await tx.wait(1)
-        console.log(result)
-      }
-    }
+    console.log(tx)
+    const result = await tx.wait(1)
+    console.log(result)
+  }
 
   const cancelHandler = () => {
+    debugger
     dispatch({ type: 'modal/toggleGameModal' })
     reset()
   }
@@ -106,7 +92,6 @@ debugger
   }, [])
 
   useEffect(() => {
-
     setCreator(wallet?.accounts[0].address)
   }, [wallet])
 
@@ -123,7 +108,7 @@ debugger
         <button
           onClick={cancelHandler}
           type="button"
-          className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none absolute right-6"
+          className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none absolute right-6 z-50"
           data-te-modal-dismiss
           aria-label="Close"
         >
@@ -150,14 +135,14 @@ debugger
             Title
           </label>
           <input
-            onChange={e => setGameName(e.target.value)}
+            onChange={(e) => setGameName(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="name"
             type="text"
             placeholder="Ohio Meet & Greet Game"
           />
         </div>
-    
+
         <div className="my-4">
           <label
             className="block text-gray-400 text-sm font-bold mb-2"
@@ -166,13 +151,12 @@ debugger
             Start Time
           </label>
           <input
-            onChange={e => setStartTime(e.target.value)}
+            onChange={(e) => setStartTime(e.target.value)}
             type="datetime-local"
             className="appearance-none bg-gray-100 border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
           />
-      
         </div>
-      
+
         <div className="mb-4">
           <span className="block">Bet Game?</span>
           <label className="inline-flex items-center">
@@ -246,10 +230,7 @@ debugger
         </div>
 
         <div className="flex items-center justify-between">
-          <Button
-            className="w-[200px]"
-            type="submit"
-          >
+          <Button className="w-[200px]" type="submit">
             {loading ? 'Creating ...' : 'Create Game'}
           </Button>
         </div>

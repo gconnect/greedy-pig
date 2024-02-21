@@ -1,9 +1,9 @@
- export interface IGame {
+export interface IGame {
   id: string
   gameName: string
   gameSettings: {
     bet: boolean
-    betAmount: number,
+    betAmount: number
     apparatus: string
   }
 }

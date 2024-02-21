@@ -8,7 +8,6 @@ import Socials from '@/components/ui/Socials'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 
 const Header = () => {
-
   const dispatch = useDispatch()
   const { wallet } = useConnectContext()
   const modalHandler = () => {

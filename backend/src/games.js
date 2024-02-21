@@ -1,15 +1,15 @@
-
+const { v4: uuidv4 } = require('uuid')
 
 export const games = []
 
 export const addGame = (game) => {
-  const gameFound = games.find(g => g.id === game.id)
+  const gameFound = games.length ? games.find(g => g.id === game.id) : null
 
   if (gameFound) {
     throw new Error('Game already exists')
   }
 
-  games.push(game)
+  games.push({ ...game, id: uuidv4()}) // line 12
 }
 
 export const addParticipant = ({gameId, playerAddress}) => {

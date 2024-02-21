@@ -7,7 +7,7 @@ const store = configureStore({
   reducer: {
     leaderboard: leaderboardReducer,
     modal: modalReducer,
-    games: gamesSlice
+    games: gamesSlice,
   },
 })
 

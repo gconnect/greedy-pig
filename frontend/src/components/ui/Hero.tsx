@@ -7,7 +7,6 @@ import toast from 'react-hot-toast'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 
 const Hero = () => {
-  
   const dispatch = useDispatch()
   const { wallet } = useConnectContext()
   const modalHandler = () => {

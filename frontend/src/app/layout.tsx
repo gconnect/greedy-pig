@@ -14,7 +14,6 @@ import store from '@/store'
 
 import './globals.css'
 
-
 const inter = Inter({ subsets: ['latin'] })
 
 const config: any = configFile
@@ -58,13 +57,11 @@ export default function RootLayout({
           <ApolloProvider client={client}>
             <ConnectProvider>
               {/* <section className="md:px-custom p-custom-sm text-gray-500"> */}
-                {/* <Header /> */}
-                {/* <div className="text-gray-500"> */}
-                  <ConvexClientProvider>
-                    {children}
-                    </ConvexClientProvider>
-                {/* </div> */}
-                <Toaster />
+              {/* <Header /> */}
+              {/* <div className="text-gray-500"> */}
+              <ConvexClientProvider>{children}</ConvexClientProvider>
+              {/* </div> */}
+              <Toaster />
               {/* </section> */}
             </ConnectProvider>
           </ApolloProvider>

@@ -108,17 +108,14 @@ export async function playGame(
   return result
 }
 
-
 export const getParticipantsForGame = (gameId: string, notices: any[]) => {
-
-  const gameNotice = notices.find((notice) => notice.id === gameId);
+  const gameNotice = notices.find((notice) => notice.id === gameId)
 
   if (!gameNotice) {
-    return [];
+    return []
   }
 
   const gameData = JSON.parse(gameNotice.payload)
 
-  return gameData.participants || [];
-};
-
+  return gameData.participants || []
+}

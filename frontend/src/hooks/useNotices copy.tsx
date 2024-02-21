@@ -35,7 +35,7 @@ export const GET_NOTICES = gql`
 export const useNotices = () => {
   const [cursor, setCursor] = useState(null)
   // debugger
-  const { loading, error, data, refetch } = useQuery(GET_NOTICES, {
+  const { loading, error, data } = useQuery(GET_NOTICES, {
     variables: { cursor },
     pollInterval: 500,
   })
@@ -78,5 +78,5 @@ export const useNotices = () => {
       }
     })
 
-  return { loading, error, data, notices, refetch }
+  return { loading, error, data, notices }
 }

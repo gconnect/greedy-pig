@@ -4,7 +4,6 @@ import AppRoullete from '@/components/ui/AppRoullete'
 import LeaderBoard from './Leaderboard'
 
 const GameArena = () => {
-
   return (
     <div className="py-6 sm:py-8 lg:py-12">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8">

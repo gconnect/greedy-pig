@@ -19,11 +19,12 @@ export default defineSchema({
     participants: v.array(
       v.object({
         address: v.optional(v.string()),
-        playerInfo: v.optional(v.object({
-          totalScore: v.float64(),
-          turn: v.float64(),
-          turnScore: v.float64(),
-        })
+        playerInfo: v.optional(
+          v.object({
+            totalScore: v.float64(),
+            turn: v.float64(),
+            turnScore: v.float64(),
+          })
         ),
       })
     ),
@@ -33,11 +34,9 @@ export default defineSchema({
       v.literal(GameStatus.Ended),
       v.literal(GameStatus.Cancelled)
     ),
-    startTime: v.string()
-  })
-  .index('by_status', ['status'])
+    startTime: v.string(),
+  }).index('by_status', ['status']),
 })
-
 
 // [
 //   {

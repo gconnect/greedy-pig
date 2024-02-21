@@ -12,30 +12,22 @@ import {
   UpdatePlayerInfo,
 } from '@/lib/utils'
 import { Roulette, useRoulette } from 'react-hook-roulette'
-import { UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { addInput } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, getParticipantsForGame } from '@/lib/utils'
 import ConfirmModal from './ConfirmModal'
 import toast from 'react-hot-toast'
-import { selectParticipantAddresses } from '@/features/games/gamesSlice'
-import { api } from '@/convex/_generated/api'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 import Button from '../shared/Button'
 import { useNotices } from '@/hooks/useNotices'
 
-
 export default function AppRoullete() {
-
   const { notices } = useNotices()
   const { wallet } = useConnectContext()
-  const addParticipant = useMutation(api.games.addParticipant)
   const searchParams = useSearchParams()
   const rollups = useRollups(dappAddress)
-  // const players = useSelector((state: any) =>
-  //   selectParticipantAddresses(state.games)
-  // )
+
   const dispatch = useDispatch()
 
   const [gameId, setGameId] = useState<string>('')
@@ -97,7 +89,7 @@ export default function AppRoullete() {
         duration: 6000,
       })
       dispatch({ type: 'leaderboard/updateActivePlayer', payload: user })
-   
+
       const socket = getSocket()
       if (socket) {
         socket.emit('activePlayer', user)
@@ -159,7 +151,6 @@ export default function AppRoullete() {
         updatePlayerInfo
       )
 
-
       setGameInProgress(false)
       toast.success(`Game finished!. ${result}`, {
         duration: 6000,
@@ -170,73 +161,53 @@ export default function AppRoullete() {
     }
   }
 
-  const updatePlayerInfo: UpdatePlayerInfo = async (player: string, key: string, value: number ) => {
-
+  const updatePlayerInfo: UpdatePlayerInfo = async (
+    player: string,
+    key: string,
+    value: number
+  ) => {
     const jsonPayload = JSON.stringify({
-        method: 'updateParticipant',
-        data: {player, key, value}
-      })
+      method: 'updateParticipant',
+      data: { player, key, value },
+    })
 
-       const tx = await addInput(
-          JSON.stringify(jsonPayload),
-          dappAddress,
-          rollups
-        )
+    const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
 
-        console.log('txxx ', tx)
-        const result = await tx.wait(1)
-        if (result) {
-          console.log(result)
-          // listen/emit event to update the leaderboardSlice. no mmore convex
-        }
-
+    console.log('txxx ', tx)
+    const result = await tx.wait(1)
+    if (result) {
+      console.log(result)
+      // listen/emit event to update the leaderboardSlice. no mmore convex
+    }
   }
-
 
   const joinGame = async (id: any) => {
     const addr: string = wallet?.accounts[0].address
 
-      const jsonPayload = JSON.stringify({
-        method: 'addParticipant',
-        data: {gameId: id, playerAddress: addr}
-      })
-      
+    const jsonPayload = JSON.stringify({
+      method: 'addParticipant',
+      data: { gameId: id, playerAddress: addr },
+    })
 
-        const tx = await addInput(
-          JSON.stringify(jsonPayload),
-          dappAddress,
-          rollups
-        )
+    const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
 
-        console.log('txxx ', tx)
-        const result = await tx.wait(1)
-        if (result) {
-           await addParticipant({data: {id, playerAddress: addr}})
-        }
-
+    console.log('txxx ', tx)
+    const result = await tx.wait(1)
+   
   }
 
   useEffect(() => {
+   
+    const id = window.location.pathname.split('/').pop()
 
-    if (searchParams) {
-      const action = searchParams.get('action')
-      if (action === 'join') {
-        const id = window.location.pathname.split('/').pop()
-
-        if (id) {
-          setGameId(id)
-        }
-       
-      }
+    if (id) {
+      setGameId(id)
     }
-  }, [searchParams])
+ 
+  }, [])
 
   return (
-
-
     <div>
-  
-
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
 
       {/* <Button className="mb-10" onClick={test} type="button"> */}
