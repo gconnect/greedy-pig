@@ -1,9 +1,6 @@
 // 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { useMutation } from 'convex/react'
-import { getSocket } from '@/lib/socket'
 import {
   InputFunction,
   RollFunction,
@@ -25,7 +22,6 @@ import { useNotices } from '@/hooks/useNotices'
 export default function AppRoullete() {
   const { notices } = useNotices()
   const { wallet } = useConnectContext()
-  const searchParams = useSearchParams()
   const rollups = useRollups(dappAddress)
 
   const dispatch = useDispatch()
@@ -90,10 +86,10 @@ export default function AppRoullete() {
       })
       dispatch({ type: 'leaderboard/updateActivePlayer', payload: user })
 
-      const socket = getSocket()
-      if (socket) {
-        socket.emit('activePlayer', user)
-      }
+      // const socket = getSocket()
+      // if (socket) {
+      //   socket.emit('activePlayer', user)
+      // }
       resolve(message)
     })
   }
@@ -140,24 +136,28 @@ export default function AppRoullete() {
   const startGame = async () => {
     setGameInProgress(true)
     const players = await getParticipantsForGame(gameId, notices)
-    try {
-      debugger
-      const result = await playGame(
-        players,
-        getInput,
-        getRoll,
-        2,
-        getOutput,
-        updatePlayerInfo
-      )
 
-      setGameInProgress(false)
-      toast.success(`Game finished!. ${result}`, {
-        duration: 6000,
-      })
-      dispatch({ type: 'leaderboard/resetLeaderboard' })
-    } catch (error) {
-      console.error('Error during game:', error)
+    if (players.length >= 2) {
+      try {
+        const result = await playGame(
+          players,
+          getInput,
+          getRoll,
+          2,
+          getOutput,
+          updatePlayerInfo
+        )
+  
+        setGameInProgress(false)
+        toast.success(`Game finished!. ${result}`, {
+          duration: 6000,
+        })
+        dispatch({ type: 'leaderboard/resetLeaderboard' })
+      } catch (error) {
+        console.error('Error during game:', error)
+      }
+    } else {
+      toast.error('Not enough players to start the game!')
     }
   }
 
@@ -166,6 +166,7 @@ export default function AppRoullete() {
     key: string,
     value: number
   ) => {
+
     const jsonPayload = JSON.stringify({
       method: 'updateParticipant',
       data: { player, key, value },
@@ -175,10 +176,7 @@ export default function AppRoullete() {
 
     console.log('txxx ', tx)
     const result = await tx.wait(1)
-    if (result) {
-      console.log(result)
-      // listen/emit event to update the leaderboardSlice. no mmore convex
-    }
+    console.log(result)
   }
 
   const joinGame = async (id: any) => {
@@ -210,7 +208,6 @@ export default function AppRoullete() {
     <div>
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
 
-      {/* <Button className="mb-10" onClick={test} type="button"> */}
       <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
         Join Game
       </Button>
@@ -219,7 +216,6 @@ export default function AppRoullete() {
       </Button>
 
       <Roulette roulette={roulette} />
-      {/* <RouletteWrapper onStart={onStart} onStop={onStop} /> */}
 
       <div className="hidden" id="roll-result">
         {rollResult}

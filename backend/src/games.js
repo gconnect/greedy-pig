@@ -20,6 +20,12 @@ export const addParticipant = ({gameId, playerAddress}) => {
     throw new Error('Game not found')
   }
 
+  const participant = game.participants.find(p => p.address === playerAddress)
+
+  if (participant) {
+    throw new Error('Participant already exists')
+  }
+
   console.log('adding participant ', JSON.stringify(game))
 
   game.participants.push({

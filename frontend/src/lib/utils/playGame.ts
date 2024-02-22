@@ -40,7 +40,7 @@ export async function playGame(
 
       await output(address, `${address} turn score is ${turnScore}.`)
 
-      updatePlayerInfo(address, 'turn', 1)
+      await updatePlayerInfo(address, 'turn', 1)
 
       while (continueRolling) {
         const roll: number = await getRoll()
@@ -48,7 +48,7 @@ export async function playGame(
         if (roll === 1) {
           turnScore = 0
 
-          updatePlayerInfo(address, 'turnScore', turnScore)
+          await updatePlayerInfo(address, 'turnScore', turnScore)
 
           await output(address, `Bust! Your turn score is 0.`)
           await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -56,7 +56,7 @@ export async function playGame(
         } else {
           turnScore += roll
 
-          updatePlayerInfo(address, 'turnScore', turnScore)
+          await updatePlayerInfo(address, 'turnScore', turnScore)
 
           await output(address, `Your turn score is ${turnScore}.`)
           const answer: string = await getInput(
@@ -75,8 +75,8 @@ export async function playGame(
 
       playerScores[address] += turnScore
 
-      updatePlayerInfo(address, 'turnScore', playerScores[address])
-      updatePlayerInfo(address, 'totalScore', playerScores[address])
+      await updatePlayerInfo(address, 'turnScore', playerScores[address])
+      await updatePlayerInfo(address, 'totalScore', playerScores[address])
     }
   }
 
@@ -108,14 +108,14 @@ export async function playGame(
   return result
 }
 
-export const getParticipantsForGame = (gameId: string, notices: any[]) => {
-  const gameNotice = notices.find((notice) => notice.id === gameId)
+export const getParticipantsForGame = (gameId: string, notices: any[]) => {  // get the last notice
 
-  if (!gameNotice) {
+  const game = JSON.parse(notices?.reverse()[0].payload).find((notice: any) => notice.id === gameId)
+
+  if (!game) {
     return []
   }
 
-  const gameData = JSON.parse(gameNotice.payload)
-
-  return gameData.participants || []
+  return game.participants.map((participant: any) => participant.address)
+  
 }

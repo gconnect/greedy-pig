@@ -3,50 +3,50 @@ import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
-import { useNotices } from '@/hooks/useNotices'
 
-const LeaderBoard = () => {
+const LeaderBoard = ({ notices }:any) => {
   const searchParams = useSearchParams()
-  const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
 
   const [game, setGame] = useState<any>(null)
 
   console.log('notices from leasdboard', notices)
 
-  const handleEvent = async (
-    dappAddress: string,
-    inboxInputIndex: string,
-    sender: string,
-    input: string
-  ) => {
-    console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
+  // const handleEvent = async (
+  //   dappAddress: string,
+  //   inboxInputIndex: string,
+  //   sender: string,
+  //   input: string
+  // ) => {
+  //   console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
 
-    await refetch()
-  }
+  //   await refetch()
+  // }
 
-  useEffect(() => {
-    rollups?.inputContract.on(
-      'InputAdded',
-      (dappAddress, inboxInputIndex, sender, input) => {
-        handleEvent(dappAddress, inboxInputIndex, sender, input)
-      }
-    )
-  }, [rollups, refetch])
+  // useEffect(() => {
+  //   rollups?.inputContract.on(
+  //     'InputAdded',
+  //     (dappAddress, inboxInputIndex, sender, input) => {
+  //       handleEvent(dappAddress, inboxInputIndex, sender, input)
+  //     }
+  //   )
+  // }, [rollups, refetch])
 
 
   useEffect(() => {
    
     const id = window.location.pathname.split('/').pop()
 
-      const selectedGame = JSON.parse(notices?.reverse()[0].payload).find( (game: any) => game.id === id )
+    setTimeout(() => {
 
+      const selectedGame = JSON.parse(notices?.reverse()[0].payload).find( (game: any) => game.id === id )
       if (selectedGame) {
-        // Set the selected game state
         setGame(selectedGame)
       }
+    }, 5000)
 
-  }, [searchParams])
+
+  }, [searchParams, notices])
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">

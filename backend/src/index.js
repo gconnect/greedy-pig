@@ -54,6 +54,7 @@ async function handle_advance(data) {
       console.log('updating participant ...', JSONpayload.data)
       updateParticipant(JSONpayload.data)
       advance_req = await noticeHandler(games)
+      console.log(games)
 
     } else {
       console.log('invalid request');
