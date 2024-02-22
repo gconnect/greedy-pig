@@ -3,6 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roulette Game</title>
+  <style>
+    #roulette-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    #roulette {
+      width: 400px; /* Adjust as per your image size */
+      height: 400px; /* Adjust as per your image size */
+    }
+
+    #pointer {
+      position: absolute;
+      width: 2px;
+      height: 200px; /* Length of the pointer */
+      background-color: red; /* Color of the pointer */
+      left: 200px; /* Position it at the center */
+      top: 0;
+      transform-origin: 50% 100%; /* Rotate around the bottom center */
+      transition: transform 5s ease-out; /* Same duration as roulette spin */
+    }
+  </style>
+  <script src="index.js" defer></script>
+</head>
+<body>
+  <h4 onclick="spinRoulette()">Spin</h4>
+  <div id="roulette-container">
+    <img id="roulette" src="roulette.png" alt="Roulette Wheel">
+    <div id="pointer"></div>
+  </div>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="style.css">
   <script src="index.js" defer></script>
@@ -22,4 +61,4 @@
 
   <h4 onclick="spinRoulette()">Spin</h4>
 </body>
-</html>
+</html> -->
