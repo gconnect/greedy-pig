@@ -1,12 +1,18 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
+import * as Ably from 'ably'
+import { AblyProvider, useChannel, useConnectionStateListener } from 'ably/react'
 import Logo from '@/assets/img/logo.png'
 
-export default function GameLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function GameLayout({ children, }: { children: React.ReactNode }) {
+
+  
+const client = new Ably.Realtime.Promise({ key: process.env.NEXT_PUBLIC_ABLY_KEY! as string });
+
+
+
   return (
     <section className={`h-screen game-bg`}>
       <div className="md:px-custom p-custom-sm text-gray-500">
@@ -26,7 +32,9 @@ export default function GameLayout({
           />
           GreedyPig
         </Link>
-        {children}
+        <AblyProvider client={client}>
+          {children}
+        </AblyProvider>
       </div>
     </section>
   )

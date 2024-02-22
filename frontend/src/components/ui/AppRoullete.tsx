@@ -18,14 +18,37 @@ import toast from 'react-hot-toast'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 import Button from '../shared/Button'
 import { useNotices } from '@/hooks/useNotices'
+import { useChannel, useConnectionStateListener, useAbly } from 'ably/react'
 
 export default function AppRoullete() {
+
+  useConnectionStateListener('connected', () => {
+    console.log('Connected to Ably!');
+  });
+
+
+   const { channel: rollChannel } = useChannel('game-channel', 'rollRoulette', (message) => {
+    console.log('Received message:', message);
+    startRouletteSpin();
+  });
+
+  const { channel: stopChannel } = useChannel('game-channel', 'stopRoulette', (message) => {
+    console.log('Received message:', message);
+    if (stopButtonRef.current) {
+      stopButtonRef.current.click();
+    } 
+  });
+
+ console.log('channenlstart ', rollChannel)
+ console.log('channenlstop ', stopChannel)
+
   const { notices } = useNotices()
   const { wallet } = useConnectContext()
   const rollups = useRollups(dappAddress)
 
   const dispatch = useDispatch()
 
+  const [messages, setMessages] = useState<any[]>([]);
   const [gameId, setGameId] = useState<string>('')
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -115,11 +138,14 @@ export default function AppRoullete() {
 
   const getRoll: RollFunction = async () => {
     return new Promise((resolve) => {
-      startRouletteSpin()
+      // startRouletteSpin()
+
+      rollChannel.publish('rollRoulette', 'roll roulette age!')
 
       setTimeout(() => {
         if (stopButtonRef.current) {
-          stopButtonRef.current.click()
+          stopChannel.publish('roullRoulette', 'stioooop roulette')
+          // stopButtonRef.current.click()
 
           setTimeout(() => {
             const rollResultElement = document.getElementById('roll-result')
@@ -207,7 +233,9 @@ export default function AppRoullete() {
   return (
     <div>
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
-
+<button onClick={() => { rollChannel.publish('rollRoulette', 'Here is my first message!') }}>
+        Publish
+      </button>
       <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
         Join Game
       </Button>
