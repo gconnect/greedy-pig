@@ -120,41 +120,41 @@ export const gamePlay = async (gameId, playerAddress) => {
 
   const numberOfTurn = game.gameSettings.numberOfTurn
 
-  for (let turn = 0; turn < numberOfTurn; turn++) {
-    for (let i = 0; i < particpants.length; i++) {
-      let playerTurn = 1
-      const address = particpants[i]
-      let turnScore = 0
-      let continueRolling = true
+  // for (let turn = 0; turn < numberOfTurn; turn++) {
+  //   for (let i = 0; i < particpants.length; i++) {
+  //     let playerTurn = 1
+  //     const address = particpants[i]
+  //     let turnScore = 0
+  //     let continueRolling = true
 
-      await updateParticipant({gameId, address, property: 'turn', value: 1})
+  //     await updateParticipant({gameId, address, property: 'turn', value: 1})
     
-      while (continueRolling) {
-        const roll = Math.floor(Math.random() * 6)
+  //     while (continueRolling) {
+  //       const roll = Math.floor(Math.random() * 6)
 
-        if (roll === 1) {
-          turnScore = 0
+  //       if (roll === 1) {
+  //         turnScore = 0
 
-          await updateParticipant({gameId, address, property: 'turnScore', value: turnScore})
+  //         await updateParticipant({gameId, address, property: 'turnScore', value: turnScore})
 
-          continueRolling = false
-        } else {
+  //         continueRolling = false
+  //       } else {
 
-          turnScore += roll
+  //         turnScore += roll
 
-          await updateParticipant({gameId, address, property: 'turnScore', value: turnScore})
+  //         await updateParticipant({gameId, address, property: 'turnScore', value: turnScore})
 
-          const answer = await getInput(
-            `Your current score is ${turnScore}. Roll again? (y/n): `
-          )
+  //         const answer = await getInput(
+  //           `Your current score is ${turnScore}. Roll again? (y/n): `
+  //         )
 
-          if (answer.toLowerCase() !== 'y') {
-            continueRolling = false
-          }
-        }
-      }
-    }
-  }
+  //         if (answer.toLowerCase() !== 'y') {
+  //           continueRolling = false
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 

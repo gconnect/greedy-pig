@@ -1,10 +1,27 @@
 import React, { useEffect, useRef } from 'react';
+import Button from '@/components/shared/Button';
+import { useConnectContext } from '../providers/ConnectProvider';
+import toast from 'react-hot-toast';
+import { addInput } from '@/lib/cartesi';
+import { dappAddress } from '@/lib/utils';
+import { useRollups } from '@/hooks/useRollups';
+
 
 interface RouletteProps {
-  onSpinResult: (value: number) => void; // Define a prop for the callback function
+  gameId: string
+  onSpinResult: (value: number) => void
+  players: string[]
 }
 
-const Roulette: React.FC<RouletteProps> = ({ onSpinResult }) => {
+const Roulette: React.FC<RouletteProps> = ({ 
+  gameId,
+  onSpinResult,
+  players
+}) => {
+
+  const { wallet } = useConnectContext()
+  const rollups = useRollups(dappAddress)
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const options = [1, 2, 3, 4, 5, 6];
@@ -55,7 +72,7 @@ const Roulette: React.FC<RouletteProps> = ({ onSpinResult }) => {
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 2;
 
-        ctx.font = 'bold 12px Helvetica, Arial';
+        ctx.font = 'bold 36px Helvetica, Arial';
 
         for (let i = 0; i < options.length; i++) {
           const angle = startAngle + i * arc;
@@ -97,11 +114,42 @@ const Roulette: React.FC<RouletteProps> = ({ onSpinResult }) => {
     }
   };
 
-  const spin = () => {
+  const spin = async () => {
+    const playerAddress = wallet.accounts[0].address
+    if (!playerAddress) return toast.error('Player not connected')
+
+
+    if (players.length >= 2) {
+
+       const playerAddress = wallet.accounts[0].address
+  
+
+      try {
+
+        const jsonPayload = JSON.stringify({
+        method: 'playGame',
+        data: { gameId, playerAddress }
+      })
+
+        const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+
+        console.log('txxx ', tx)
+        const result = await tx.wait(1)
+        console.log(result)
+
+
+      } catch (error) {
+        console.error('Error during game:', error)
+      }
+
     startAngle = Math.random() * 10 + 10; // 10 to 19.999
     spinTime = 0;
     spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
-    rotateWheel();
+    rotateWheel()
+
+    } else {
+      toast.error('Not enough players to play')
+    }
   };
 
   const rotateWheel = () => {
@@ -123,7 +171,7 @@ const Roulette: React.FC<RouletteProps> = ({ onSpinResult }) => {
     const arcd = arc * 180 / Math.PI;
     const index = Math.floor((360 - degrees % 360) / arcd);
     ctx.save();
-    ctx.font = 'bold 30px Helvetica, Arial';
+    ctx.font = 'bold 90px Helvetica, Arial';
     ctx.fillStyle = 'blue'
     const text = options[index]
     onSpinResult(text)
@@ -137,9 +185,16 @@ const Roulette: React.FC<RouletteProps> = ({ onSpinResult }) => {
     return b + c * (tc + -3 * ts + 3 * t);
   };
 
+  useEffect(() => {
+    drawRouletteWheel();
+    return () => {
+      if (spinTimeout) clearTimeout(spinTimeout);
+    };
+  })
+
   return (
     <div>
-      <input type="button" value="Spin" style={{ float: 'left' }} id="spin" onClick={spin} />
+      <Button type="button"  id="spin" onClick={spin}>Play Game</Button>
       <canvas id="canvas" width="500" height="500" ref={canvasRef}></canvas>
     </div>
   );

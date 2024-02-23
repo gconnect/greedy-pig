@@ -2,37 +2,12 @@
 
 import RoulleteGame from '@/components/ui/RoulleteGame'
 import LeaderBoard from './Leaderboard'
-import { useNotices } from '@/hooks/useNotices'
-import { useEffect } from 'react'
 import { dappAddress } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
 
 const GameArena = () => {
 
-  const { notices, refetch } = useNotices()
-  const rollups = useRollups(dappAddress)
-
-  console.log('notices from leasdboard', notices)
-
-  const handleEvent = async (
-    dappAddress: string,
-    inboxInputIndex: string,
-    sender: string,
-    input: string
-  ) => {
-    console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
-
-    await refetch()
-  }
-
-  useEffect(() => {
-    rollups?.inputContract.on(
-      'InputAdded',
-      (dappAddress, inboxInputIndex, sender, input) => {
-        handleEvent(dappAddress, inboxInputIndex, sender, input)
-      }
-    )
-  }, [rollups, refetch])
+  // const rollups = useRollups(dappAddress)
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">
@@ -42,7 +17,7 @@ const GameArena = () => {
         </div>
 
         <div className="flex flex-col items-center gap-4 md:gap-6">
-          <LeaderBoard notices={notices} />
+          <LeaderBoard />
         </div>
       </div>
 
