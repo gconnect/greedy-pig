@@ -108,7 +108,7 @@ export async function playGame(
   return result
 }
 
-export const getParticipantsForGame = (gameId: string, notices: any[]) => {  // get the last notice
+export const getParticipantsForGame = (gameId: string, notices: any[]) => {
 
   const game = JSON.parse(notices?.reverse()[0].payload).find((notice: any) => notice.id === gameId)
 
@@ -119,3 +119,15 @@ export const getParticipantsForGame = (gameId: string, notices: any[]) => {  // 
   return game.participants.map((participant: any) => participant.address)
   
 }
+
+export const isActivePlayer = (connectedUser: string, gameId: string, notices: any[]): boolean => {
+
+  const game = JSON.parse(notices?.reverse()[0].payload).find((notice: any) => notice.id === gameId);
+
+  if (!game) {
+    return false; // Return false if game not found
+  }
+
+  return game.participants.some((participant: any) => participant.activePlayer === connectedUser);
+};
+

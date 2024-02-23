@@ -13,7 +13,7 @@ export default defineSchema({
       limitNumberOfPlayer: v.boolean(),
       maxPlayer: v.float64(),
       mode: v.string(),
-      turnTimeLimit: v.float64(),
+      numbersOfTurn: v.float64(),
       winningScore: v.float64(),
     }),
     participants: v.array(
@@ -49,7 +49,7 @@ export default defineSchema({
 //       limitNumberOfPlayer: false,
 //       maxPlayer: 0,
 //       mode: "",
-//       turnTimeLimit: 0,
+//       numbersOfTurn: 0,
 //       winningScore: 0,
 //     },
 //     participants: undefined,

@@ -36,6 +36,10 @@ export const addParticipant = ({gameId, playerAddress}) => {
       totalScore: 0
     }
   })
+
+  if (!game.activePlayer) {
+    game.activePlayer = game.participants[0].address;
+  }
 }
 
 
@@ -77,9 +81,81 @@ export const updateParticipant = ({ gameId, address, property, value }) => {
       }
     }
   }
+}
 
+export const getParticipantsForGame = gameId => {
+
+  const game = games.find(game => game.id === gameId)
+
+  if (!game) {
+    return []
+  }
+
+  return game.participants.map(participant => participant.address)
   
-};
+}
+
+export const gamePlay = async (gameId, playerAddress) => {
+  const game = games.find(game => game.id === gameId)
+
+  if (!game) {
+    throw new Error('Game not found')
+  }
+
+  const particpants = getParticipantsForGame(gameId)
+
+  if (particpants.length < 2) {
+    throw new Error('Not enough players')
+  }
+
+  const participant = game.participants.find(p => p.address === playerAddress)
+
+  if (!participant) {
+    throw new Error('Participant not found')
+  }
+
+  if (game.activePlayer !== playerAddress) {
+    throw new Error('It is not your turn')
+  }
+
+  const numberOfTurn = game.gameSettings.numberOfTurn
+
+  for (let turn = 0; turn < numberOfTurn; turn++) {
+    for (let i = 0; i < particpants.length; i++) {
+      let playerTurn = 1
+      const address = particpants[i]
+      let turnScore = 0
+      let continueRolling = true
+
+      await updateParticipant({gameId, address, property: 'turn', value: 1})
+    
+      while (continueRolling) {
+        const roll = Math.floor(Math.random() * 6)
+
+        if (roll === 1) {
+          turnScore = 0
+
+          await updateParticipant({gameId, address, property: 'turnScore', value: turnScore})
+
+          continueRolling = false
+        } else {
+
+          turnScore += roll
+
+          await updateParticipant({gameId, address, property: 'turnScore', value: turnScore})
+
+          const answer = await getInput(
+            `Your current score is ${turnScore}. Roll again? (y/n): `
+          )
+
+          if (answer.toLowerCase() !== 'y') {
+            continueRolling = false
+          }
+        }
+      }
+    }
+  }
+}
 
 
 
@@ -117,7 +193,7 @@ const gameStructure = () => {
      }
    ],
    gameSettings: {
-     turnTimeLimit: 0,
+     numbersOfTurn: 2,
      winningScore: 0,
      mode: 'turn',
      apparatus: 'roulette',

@@ -8,7 +8,8 @@ const {
   games, 
   addParticipant, 
   addGame, 
-  updateParticipant
+  updateParticipant,
+  gamePlay
 } = require('./games')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
@@ -56,6 +57,13 @@ async function handle_advance(data) {
       advance_req = await noticeHandler(games)
       console.log(games)
 
+    } else if (JSONpayload.method === 'playGame') {
+      
+      console.log('game play ...', JSONpayload.data)
+      gamePlay(JSONpayload.data)
+      advance_req = await noticeHandler(games)
+      console.log(games)
+    
     } else {
       console.log('invalid request');
       const message = `method undefined: ${JSONpayload.method}`

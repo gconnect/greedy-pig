@@ -11,7 +11,7 @@ export const vCreateGame = v.object({
     limitNumberOfPlayer: v.boolean(),
     maxPlayer: v.float64(),
     mode: v.string(),
-    turnTimeLimit: v.float64(),
+    numbersOfTurn: v.float64(),
     winningScore: v.float64(),
   }),
   participants: v.array(

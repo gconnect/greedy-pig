@@ -29,7 +29,7 @@ const CreateGameModal = () => {
     gameName,
     participants: [],
     gameSettings: {
-      turnTimeLimit: 0,
+      numbersOfTurn: 2,
       winningScore: 0,
       mode: 'turn',
       apparatus: 'roulette',

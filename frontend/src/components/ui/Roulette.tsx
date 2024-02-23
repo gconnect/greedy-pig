@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 
-const RouletteGame: React.FC = () => {
+interface RouletteProps {
+  onSpinResult: (value: number) => void; // Define a prop for the callback function
+}
+
+const Roulette: React.FC<RouletteProps> = ({ onSpinResult }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const options = [1, 2, 3, 4, 5, 6];
@@ -120,7 +124,9 @@ const RouletteGame: React.FC = () => {
     const index = Math.floor((360 - degrees % 360) / arcd);
     ctx.save();
     ctx.font = 'bold 30px Helvetica, Arial';
-    const text = options[index];
+    ctx.fillStyle = 'blue'
+    const text = options[index]
+    onSpinResult(text)
     ctx.fillText(text.toString(), 250 - ctx.measureText(text.toString()).width / 2, 250 + 10);
     ctx.restore();
   };
@@ -139,4 +145,4 @@ const RouletteGame: React.FC = () => {
   );
 };
 
-export default RouletteGame;
+export default Roulette;

@@ -1,6 +1,7 @@
 // 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { hexToString } from 'viem'
 import {
   InputFunction,
   RollFunction,
@@ -8,9 +9,10 @@ import {
   playGame,
   UpdatePlayerInfo,
 } from '@/lib/utils'
-import { Roulette, useRoulette } from 'react-hook-roulette'
+
 import { useDispatch } from 'react-redux'
 import { addInput } from '@/lib/cartesi'
+import { useChannel, useConnectionStateListener, useAbly } from 'ably/react'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, getParticipantsForGame } from '@/lib/utils'
 import ConfirmModal from './ConfirmModal'
@@ -18,30 +20,30 @@ import toast from 'react-hot-toast'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 import Button from '../shared/Button'
 import { useNotices } from '@/hooks/useNotices'
-import { useChannel, useConnectionStateListener, useAbly } from 'ably/react'
+import Roulette from './Roulette'
 
-export default function AppRoullete() {
+export default function RoulleteGame() {
 
-  useConnectionStateListener('connected', () => {
-    console.log('Connected to Ably!');
-  });
+  // useConnectionStateListener('connected', () => {
+  //   console.log('Connected to Ably!');
+  // });
 
 
-   const { channel: rollChannel } = useChannel('game-channel', 'rollRoulette', (message) => {
-    console.log('Received message:', message);
-    startRouletteSpin();
-  });
+  //  const { channel: rollChannel } = useChannel('game-channel', 'rollRoulette', (message) => {
+  //   console.log('Received message:', message);
+  //   // startRouletteSpin();
+  // });
 
-  const { channel: stopChannel } = useChannel('game-channel', 'stopRoulette', (message) => {
-    console.log('Received message:', message);
-    if (stopButtonRef.current) {
-      stopButtonRef.current.click();
-    } 
-  });
+  // const { channel: stopChannel } = useChannel('game-channel', 'stopRoulette', (message) => {
+  //   console.log('Received message:', message);
+  //   if (stopButtonRef.current) {
+  //     stopButtonRef.current.click();
+  //   } 
+  // });
 
- console.log('channenlstart ', rollChannel)
- console.log('channenlstop ', stopChannel)
-
+//  console.log('channenlstart ', rollChannel)
+//  console.log('channenlstop ', stopChannel)
+  
   const { notices } = useNotices()
   const { wallet } = useConnectContext()
   const rollups = useRollups(dappAddress)
@@ -59,48 +61,12 @@ export default function AppRoullete() {
   const [rollResult, setRollResult] = useState<number | null>(null)
   const [isGameStarted, setIsGameStarted] = useState(false)
   const stopButtonRef = useRef<HTMLButtonElement | null>(null)
-  const { roulette, onStart, onStop } = useRoulette({
-    items: [
-      { name: '1', bg: '#b26527', color: '#ffffff' },
-      { name: '2', bg: '#ce9729', color: '#ffffff' },
-      { name: '3', bg: '#e7c02b', color: '#ffffff' },
-      { name: '4' },
-      { name: '5' },
-      { name: '6' },
-    ],
-    onSpinEnd: (res) => {
-      setRollResult(Number(res))
-    },
-    options: {
-      maxSpeed: 20,
-      acceleration: 8,
-      determineAngle: 90,
-      style: {
-        canvas: {
-          bg: 'transparent',
-        },
-        arrow: {
-          bg: '#000',
-          size: 26,
-        },
-        label: {
-          font: '28px Arial',
-          align: 'right',
-          baseline: 'middle',
-          offset: 0.65,
-          defaultColor: '#000',
-        },
-      },
-    },
-  })
+ 
 
   const openModal = () => setModalIsOpen(true)
   const closeModal = () => setModalIsOpen(false)
 
-  const handleStopGame = () => {
-    setIsGameStarted(false)
-    onStop()
-  }
+
 
   const getOutput: OutputFunction = (user: string, message: string) => {
     return new Promise(async (resolve) => {
@@ -131,20 +97,17 @@ export default function AppRoullete() {
     })
   }
 
-  const startRouletteSpin = async () => {
-    setIsGameStarted(true)
-    onStart() // Start the roulette spinning
-  }
+
 
   const getRoll: RollFunction = async () => {
     return new Promise((resolve) => {
       // startRouletteSpin()
 
-      rollChannel.publish('rollRoulette', 'roll roulette age!')
+      // rollChannel.publish('rollRoulette', 'roll roulette age!')
 
       setTimeout(() => {
         if (stopButtonRef.current) {
-          stopChannel.publish('roullRoulette', 'stioooop roulette')
+          // stopChannel.publish('roullRoulette', 'stioooop roulette')
           // stopButtonRef.current.click()
 
           setTimeout(() => {
@@ -159,26 +122,44 @@ export default function AppRoullete() {
     })
   }
 
-  const startGame = async () => {
+  const playGame = async () => {
+
+    const playerAddress = wallet.accounts[0].address
+    if (!playerAddress) return toast.error('Player not connected')
+
     setGameInProgress(true)
     const players = await getParticipantsForGame(gameId, notices)
 
     if (players.length >= 2) {
+
       try {
-        const result = await playGame(
-          players,
-          getInput,
-          getRoll,
-          2,
-          getOutput,
-          updatePlayerInfo
-        )
+        const jsonPayload = JSON.stringify({
+        method: 'playGame',
+        data: { gameId, playerAddress },
+    })
+
+    const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+
+    console.log('txxx ', tx)
+    const result = await tx.wait(1)
+    console.log(result)
+
+
+
+        // const result = await playGame(
+        //   players,
+        //   getInput,
+        //   getRoll,
+        //   2,
+        //   getOutput,
+        //   updatePlayerInfo
+        // )
   
         setGameInProgress(false)
-        toast.success(`Game finished!. ${result}`, {
-          duration: 6000,
-        })
-        dispatch({ type: 'leaderboard/resetLeaderboard' })
+        // toast.success(`Game finished!. ${result}`, {
+        //   duration: 6000,
+        // })
+        // dispatch({ type: 'leaderboard/resetLeaderboard' })
       } catch (error) {
         console.error('Error during game:', error)
       }
@@ -223,38 +204,51 @@ export default function AppRoullete() {
   useEffect(() => {
    
     const id = window.location.pathname.split('/').pop()
-
     if (id) {
       setGameId(id)
     }
- 
   }, [])
+
+  const handleEvent = async (
+    dappAddress: string,
+    inboxInputIndex: string,
+    sender: string,
+    input: string
+  ) => {
+    console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
+    console.log(hexToString(`0x${input}`))
+
+  }
+
+   const handleSpinResult = (value: number) => {
+    console.log('Result of the spinn:', value);
+    // Do something with the spin result
+  };
+
+  useEffect(() => {
+    rollups?.inputContract.on(
+      'InputAdded',
+      (dappAddress, inboxInputIndex, sender, input) => {
+        handleEvent(dappAddress, inboxInputIndex, sender, input)
+      }
+    )
+  }, [rollups])
 
   return (
     <div>
-      <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
-<button onClick={() => { rollChannel.publish('rollRoulette', 'Here is my first message!') }}>
+{/* <button onClick={() => { rollChannel.publish('rollRoulette', 'Here is my first message!') }}>
         Publish
-      </button>
-      <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
+      </button> */}
+      {/* <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
         Join Game
       </Button>
-      <Button onClick={startGame} className="mb-10" type="button">
+      <Button onClick={playGame} className="mb-10" type="button">
         Start Game
-      </Button>
+      </Button> */}
 
-      <Roulette roulette={roulette} />
+      <Roulette onSpinResult={handleSpinResult} />
+      <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
 
-      <div className="hidden" id="roll-result">
-        {rollResult}
-      </div>
-      <button
-        className="hidden"
-        ref={stopButtonRef}
-        type="button"
-        onClick={handleStopGame}
-        disabled={!isGameStarted}
-      />
     </div>
   )
 }

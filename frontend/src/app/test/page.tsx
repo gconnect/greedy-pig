@@ -17,7 +17,7 @@ export default function Home() {
       //   activePlayer: '',
       //   participants: [],
       //   gameSettings: {
-      //     turnTimeLimit: 0,
+      //     numbersOfTurn: 0,
       //     winningScore: 0,
       //     mode: 'turn',
       //     apparatus: 'roulette',

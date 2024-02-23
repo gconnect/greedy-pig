@@ -19,7 +19,7 @@ interface GameState {
     limitNumberOfPlayer: boolean
     maxPlayer: number // Use number instead of float64
     mode: string
-    turnTimeLimit: number // Use number instead of float64
+    numbersOfTurn: number // Use number instead of float64
     winningScore: number // Use number instead of float64
   }
   participants: {
