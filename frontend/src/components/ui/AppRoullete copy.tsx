@@ -1,41 +1,55 @@
 // 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { useMutation } from 'convex/react'
-import { getSocket } from '@/lib/socket'
 import {
   InputFunction,
   RollFunction,
   OutputFunction,
   playGame,
+  UpdatePlayerInfo,
 } from '@/lib/utils'
 import { Roulette, useRoulette } from 'react-hook-roulette'
-import { UpdatePlayerInfoPayload } from '@/features/leaderboard/leaderboardSlice'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { addInput } from '@/lib/cartesi'
-// import { useRollups } from '@/hooks/useRollups'
-import { dappAddress } from '@/lib/utils'
+import { useRollups } from '@/hooks/useRollups'
+import { dappAddress, getParticipantsForGame } from '@/lib/utils'
 import ConfirmModal from './ConfirmModal'
 import toast from 'react-hot-toast'
-import { selectParticipantAddresses } from '@/features/games/gamesSlice'
-import { api } from '@/convex/_generated/api'
 import { useConnectContext } from '@/components/providers/ConnectProvider'
 import Button from '../shared/Button'
+import { useNotices } from '@/hooks/useNotices'
+import { useChannel, useConnectionStateListener, useAbly } from 'ably/react'
+
+export default function AppRoullete() {
+
+  useConnectionStateListener('connected', () => {
+    console.log('Connected to Ably!');
+  });
 
 
-export default function AppRoullete({rollups}: any) {
+   const { channel: rollChannel } = useChannel('game-channel', 'rollRoulette', (message) => {
+    console.log('Received message:', message);
+    startRouletteSpin();
+  });
 
+  const { channel: stopChannel } = useChannel('game-channel', 'stopRoulette', (message) => {
+    console.log('Received message:', message);
+    if (stopButtonRef.current) {
+      stopButtonRef.current.click();
+    } 
+  });
+
+ console.log('channenlstart ', rollChannel)
+ console.log('channenlstop ', stopChannel)
+
+  const { notices } = useNotices()
   const { wallet } = useConnectContext()
-  const addParticipant = useMutation(api.games.addParticipant)
-  // const updateParticipant = useMutation(api.games.updateParticipants)
-  const searchParams = useSearchParams()
-  // const rollups = useRollups(dappAddress)
-  const players = useSelector((state: any) =>
-    selectParticipantAddresses(state.games)
-  )
+  const rollups = useRollups(dappAddress)
+
   const dispatch = useDispatch()
 
+  const [messages, setMessages] = useState<any[]>([]);
+  const [gameId, setGameId] = useState<string>('')
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [modalQuestion, setModalQuestion] = useState('')
@@ -94,11 +108,11 @@ export default function AppRoullete({rollups}: any) {
         duration: 6000,
       })
       dispatch({ type: 'leaderboard/updateActivePlayer', payload: user })
-   
-      const socket = getSocket()
-      if (socket) {
-        socket.emit('activePlayer', user)
-      }
+
+      // const socket = getSocket()
+      // if (socket) {
+      //   socket.emit('activePlayer', user)
+      // }
       resolve(message)
     })
   }
@@ -124,11 +138,14 @@ export default function AppRoullete({rollups}: any) {
 
   const getRoll: RollFunction = async () => {
     return new Promise((resolve) => {
-      startRouletteSpin()
+      // startRouletteSpin()
+
+      rollChannel.publish('rollRoulette', 'roll roulette age!')
 
       setTimeout(() => {
         if (stopButtonRef.current) {
-          stopButtonRef.current.click()
+          stopChannel.publish('roullRoulette', 'stioooop roulette')
+          // stopButtonRef.current.click()
 
           setTimeout(() => {
             const rollResultElement = document.getElementById('roll-result')
@@ -144,90 +161,89 @@ export default function AppRoullete({rollups}: any) {
 
   const startGame = async () => {
     setGameInProgress(true)
-    try {
-      debugger
-      const result = await playGame(
-        players,
-        getInput,
-        getRoll,
-        2,
-        getOutput,
-        {
-          updatePlayerInfo: (action: UpdatePlayerInfoPayload) => {
-            // updateParticipant({data: {id: action.id, playerAddress: action.playerAddress, score: action.score}})
-            // dispatch({ type: 'leaderboard/updatePlayerInfo', payload: action })
-          },
-        }
-      )
+    const players = await getParticipantsForGame(gameId, notices)
 
-
-      setGameInProgress(false)
-      toast.success(`Game finished!. ${result}`, {
-        duration: 6000,
-      })
-      dispatch({ type: 'leaderboard/resetLeaderboard' })
-    } catch (error) {
-      console.error('Error during game:', error)
+    if (players.length >= 2) {
+      try {
+        const result = await playGame(
+          players,
+          getInput,
+          getRoll,
+          2,
+          getOutput,
+          updatePlayerInfo
+        )
+  
+        setGameInProgress(false)
+        toast.success(`Game finished!. ${result}`, {
+          duration: 6000,
+        })
+        dispatch({ type: 'leaderboard/resetLeaderboard' })
+      } catch (error) {
+        console.error('Error during game:', error)
+      }
+    } else {
+      toast.error('Not enough players to start the game!')
     }
   }
 
+  const updatePlayerInfo: UpdatePlayerInfo = async (
+    player: string,
+    key: string,
+    value: number
+  ) => {
 
-  // const test = async () => { 
-  
-  //       await updateParticipant({data: {id: 'kjk', playerAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', key: 'turn', value: 22}})
-  //     }
+    const jsonPayload = JSON.stringify({
+      method: 'updateParticipant',
+      data: { player, key, value },
+    })
 
-  const addParticipantsHandler = async (id: any) => {
+    const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+
+    console.log('txxx ', tx)
+    const result = await tx.wait(1)
+    console.log(result)
+  }
+
+  const joinGame = async (id: any) => {
     const addr: string = wallet?.accounts[0].address
-    await addParticipant({data: {id, playerAddress: addr}})
-    debugger
-    // if (res) {
-      const jsonPayload = JSON.stringify({
-        method: 'addParticipant',
-        data: {gameId: id, playerAddress: addr}
-      })
-      
 
-        const tx = await addInput(
-          JSON.stringify(jsonPayload),
-          dappAddress,
-          rollups
-        )
+    const jsonPayload = JSON.stringify({
+      method: 'addParticipant',
+      data: { gameId: id, playerAddress: addr },
+    })
 
-        console.log('txxx ', tx)
-        // const result = await tx.wait(1)
-        // console.log(result)
-      // }
+    const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+
+    console.log('txxx ', tx)
+    const result = await tx.wait(1)
+   
   }
 
   useEffect(() => {
+   
+    const id = window.location.pathname.split('/').pop()
 
-    if (searchParams) {
-      const action = searchParams.get('action')
-      if (action === 'join') {
-        const id = window.location.pathname.split('/').pop()
-
-        addParticipantsHandler(id)
-       
-      }
+    if (id) {
+      setGameId(id)
     }
-  }, [searchParams])
+ 
+  }, [])
 
   return (
-
-
     <div>
-  
-
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
-
-      {/* <Button className="mb-10" onClick={test} type="button"> */}
+<button onClick={() => { rollChannel.publish('rollRoulette', 'Here is my first message!') }}>
+        Publish
+      </button>
+      <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
+        Join Game
+      </Button>
       <Button onClick={startGame} className="mb-10" type="button">
         Start Game
       </Button>
 
       <Roulette roulette={roulette} />
-      {/* <RouletteWrapper onStart={onStart} onStop={onStop} /> */}
 
       <div className="hidden" id="roll-result">
         {rollResult}
