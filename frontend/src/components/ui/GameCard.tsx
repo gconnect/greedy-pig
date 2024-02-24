@@ -1,15 +1,15 @@
 import { capitalize } from '@/lib/utils'
 import toast from 'react-hot-toast'
-import { useConnectContext } from '../providers/ConnectProvider'
 import { useRouter } from 'next/navigation'
 import { IGame } from '@/interfaces'
+import { useConnectWallet } from '@web3-onboard/react'
 
 interface GameCardProps {
   game: IGame
 }
 
 const GameCard = ({ game }: GameCardProps) => {
-  const { wallet } = useConnectContext()
+  const [{ wallet }] = useConnectWallet()
   const router = useRouter()
 
   const handleNavigate = (id: string, action: string) => {

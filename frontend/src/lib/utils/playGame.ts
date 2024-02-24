@@ -109,7 +109,8 @@ export async function playGame(
 }
 
 export const getParticipantsForGame = async (gameId: string, notices: any[]) => {
-
+console.log('gggg',notices)
+console.log('hhhh',gameId)
   const game = JSON.parse(notices?.reverse()[0].payload).find((notice: any) => notice.id === gameId)
 
   if (!game) {

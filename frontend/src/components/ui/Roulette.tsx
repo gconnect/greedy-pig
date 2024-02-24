@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { addInput } from '@/lib/cartesi';
 import { dappAddress } from '@/lib/utils';
 import { useRollups } from '@/hooks/useRollups';
+import { useConnectWallet } from '@web3-onboard/react';
 
 
 interface RouletteProps {
@@ -19,7 +20,7 @@ const Roulette: React.FC<RouletteProps> = ({
   players
 }) => {
 
-  const { wallet } = useConnectContext()
+   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -115,13 +116,13 @@ const Roulette: React.FC<RouletteProps> = ({
   };
 
   const spin = async () => {
-    const playerAddress = wallet.accounts[0].address
+    const playerAddress = wallet?.accounts[0].address
     if (!playerAddress) return toast.error('Player not connected')
-
+alert(JSON.stringify(players))
 
     if (players.length >= 2) {
 
-       const playerAddress = wallet.accounts[0].address
+       const playerAddress = wallet?.accounts[0].address
   
 
       try {

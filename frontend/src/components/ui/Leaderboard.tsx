@@ -3,37 +3,17 @@ import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
-import { useNotices } from '@/hooks/useNotices'
+// import { useNotices } from '@/hooks/useNotices'
 
-const LeaderBoard = () => {
+const LeaderBoard = ({notices}: any) => {
 
-  const { notices, refetch } = useNotices()
+  // const { notices, refetch } = useNotices()
   const searchParams = useSearchParams()
-  const rollups = useRollups(dappAddress)
+  // const rollups = useRollups(dappAddress)
 
   const [game, setGame] = useState<any>(null)
 
-  console.log('notices from leasdboard', notices)
-
-  const handleEvent = async (
-    dappAddress: string,
-    inboxInputIndex: string,
-    sender: string,
-    input: string
-  ) => {
-    console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
-
-    await refetch()
-  }
-
-  useEffect(() => {
-    rollups?.inputContract.on(
-      'InputAdded',
-      (dappAddress, inboxInputIndex, sender, input) => {
-        handleEvent(dappAddress, inboxInputIndex, sender, input)
-      }
-    )
-  }, [rollups, refetch])
+  console.log('notices from leadboard', notices)
 
 
   useEffect(() => {

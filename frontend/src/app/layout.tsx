@@ -55,7 +55,7 @@ export default function RootLayout({
       <body className={`${inter.className}`}>
         <Provider store={store}>
           <ApolloProvider client={client}>
-            <ConnectProvider>
+            {/* <ConnectProvider> */}
               {/* <section className="md:px-custom p-custom-sm text-gray-500"> */}
               {/* <Header /> */}
               {/* <div className="text-gray-500"> */}
@@ -63,7 +63,7 @@ export default function RootLayout({
               {/* </div> */}
               <Toaster />
               {/* </section> */}
-            </ConnectProvider>
+            {/* </ConnectProvider> */}
           </ApolloProvider>
         </Provider>
       </body>

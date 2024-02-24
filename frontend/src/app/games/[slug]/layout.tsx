@@ -9,7 +9,7 @@ import Logo from '@/assets/img/logo.png'
 export default function GameLayout({ children, }: { children: React.ReactNode }) {
 
   
-const client = new Ably.Realtime.Promise({ key: process.env.NEXT_PUBLIC_ABLY_KEY! as string });
+// const client = new Ably.Realtime.Promise({ key: process.env.NEXT_PUBLIC_ABLY_KEY! as string });
 
 
 
@@ -32,9 +32,9 @@ const client = new Ably.Realtime.Promise({ key: process.env.NEXT_PUBLIC_ABLY_KEY
           />
           GreedyPig
         </Link>
-        <AblyProvider client={client}>
+        {/* <AblyProvider client={client}> */}
           {children}
-        </AblyProvider>
+        {/* </AblyProvider> */}
       </div>
     </section>
   )

@@ -1,19 +1,19 @@
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Roulette from '@/components/ui/Roulette'
 import { hexToString } from 'viem'
 import toast from 'react-hot-toast'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, getParticipantsForGame } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
-import { useConnectContext } from '@/components/providers/ConnectProvider'
 import { addInput } from '@/lib/cartesi'
 import Button from '../shared/Button'
+import { useConnectWallet } from '@web3-onboard/react'
 
-export default function RoulleteGame() {
+export default function RoulleteGame({notices}: any) {
 
-  const { notices } = useNotices()
-  const { wallet } = useConnectContext()
+  // const { notices } = useNotices()
+   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
 
   const [gameId, setGameId] = useState<string>('')
@@ -26,8 +26,8 @@ export default function RoulleteGame() {
   }
 
   const joinGame = async (id: any) => {
-    const addr: string = wallet?.accounts[0].address
-
+    const addr: string | undefined = wallet?.accounts[0].address
+alert(addr)
     const jsonPayload = JSON.stringify({
       method: 'addParticipant',
       data: { gameId: id, playerAddress: addr },
@@ -37,19 +37,28 @@ export default function RoulleteGame() {
 
     console.log('txxx ', tx)
     const result = await tx.wait(1)
+    console.log(result)
    
   }
+
+  const noticesRef = useRef(notices); // Initialize useRef with initial value of notices
+
+  useEffect(() => {
+    noticesRef.current = notices; // Update the ref value whenever notices changes
+  }, [notices]);
 
     useEffect(() => {
    
     const id = window.location.pathname.split('/').pop()
     if (id) {
       setGameId(id)
-      getParticipantsForGame(gameId, notices).then((fetchedPlayers) => {
-        setPlayers(fetchedPlayers);
-      });
+      setTimeout(() => {
+        getParticipantsForGame(gameId, notices).then((fetchedPlayers) => {
+          setPlayers(fetchedPlayers);
+        })
+       }, 5000)
     }
-  }, [])
+  }, [gameId, notices])
 
   const handleEvent = async (
     dappAddress: string,
@@ -58,7 +67,7 @@ export default function RoulleteGame() {
     input: string
   ) => {
     console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
-    console.log(hexToString(`0x${input}`))
+    // console.log(hexToString(`${input}`))
 
   }
 
@@ -82,11 +91,11 @@ export default function RoulleteGame() {
       {/* <Button onClick={playGame} className="mb-10" type="button">
         Play Game
       </Button> */}
-      {/* <Roulette
+      <Roulette
         gameId={gameId}
         onSpinResult={handleSpinResult} 
         players={players} 
-      /> */}
+      />
     </div>
   )
 }

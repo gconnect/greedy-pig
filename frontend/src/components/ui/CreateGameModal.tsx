@@ -8,10 +8,11 @@ import { GameStatus } from '@/interfaces'
 import { addInput } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
+import { useConnectWallet } from '@web3-onboard/react'
 
 const CreateGameModal = () => {
 
-  const { wallet } = useConnectContext()
+  const [{ wallet }] = useConnectWallet()
   const dispatch = useDispatch()
   const createGameForm = useSelector((state: any) =>
     selectGameModal(state.modal)
@@ -63,7 +64,7 @@ const CreateGameModal = () => {
       method: 'createGame',
       data: game,
     })
-    debugger
+   
     const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
 
     console.log(tx)
@@ -72,7 +73,7 @@ const CreateGameModal = () => {
   }
 
   const cancelHandler = () => {
-    debugger
+
     dispatch({ type: 'modal/toggleGameModal' })
     reset()
   }

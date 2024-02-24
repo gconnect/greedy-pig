@@ -4,11 +4,11 @@ import { useDispatch } from 'react-redux'
 import GreedyHero from '@/assets/img/greedypig-hero.png'
 import Button from '../shared/Button'
 import toast from 'react-hot-toast'
-import { useConnectContext } from '@/components/providers/ConnectProvider'
+import { useConnectWallet } from '@web3-onboard/react'
 
 const Hero = () => {
   const dispatch = useDispatch()
-  const { wallet } = useConnectContext()
+  const [{ wallet }] = useConnectWallet()
   const modalHandler = () => {
     if (!wallet) return toast.error('Connect Wallet to continue')
     dispatch({ type: 'modal/toggleGameModal' })

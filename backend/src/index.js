@@ -48,6 +48,7 @@ async function handle_advance(data) {
 
       console.log('adding participant ...', JSONpayload.data);
       addParticipant(JSONpayload.data)
+      console.log('added participant ...', games);
       advance_req = await noticeHandler(games)
 
     } else if (JSONpayload.method === 'updateParticipant') {

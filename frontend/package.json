@@ -3,8 +3,8 @@
     "version": "0.3.0",
     "private": true,
     "scripts": {
-        "dev": "npm-run-all dev:init --parallel dev:backend dev:frontend",
-        "dev:frontend": "next dev",
+        "dev:all": "npm-run-all dev:init --parallel dev:backend dev:frontend",
+        "dev": "next dev",
         "dev:backend": "convex dev",
         "dev:init": "convex dev --until-success",
         "build": "next build",
