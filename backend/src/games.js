@@ -1,16 +1,18 @@
 const { v4: uuidv4 } = require('uuid')
 
-
 export const games = []
 
 export const addGame = (game) => {
   const gameFound = games.length ? games.find(g => g.id === game.id) : null
 
   if (gameFound) {
-    throw new Error('Game already exists')
+    if (gameFound) {
+      return errorResponse(true, 'Game already exist')
+    }
   }
 
-  games.push({ ...game, id: uuidv4()}) // line 12
+  games.push({ ...game, id: uuidv4()})
+  return errorResponse(false)
 }
 
 export const addParticipant = ({gameId, playerAddress}) => {
@@ -18,16 +20,19 @@ export const addParticipant = ({gameId, playerAddress}) => {
   const game = games.find(game => game.id === gameId)
 
   if (!game) {
-    throw new Error('Game not found')
+    if (gameFound) {
+      return errorResponse(true, 'Game not found')
+    }
   }
 
   const participant = game.participants.find(p => p.address === playerAddress)
 
   if (participant) {
-    throw new Error('Participant already exists')
+    if (gameFound) {
+      return errorResponse(true, 'Participant already exist')
+    }
   }
 
-  console.log('adding participant ', JSON.stringify(game))
 
   game.participants.push({
     address: playerAddress,
@@ -41,19 +46,7 @@ export const addParticipant = ({gameId, playerAddress}) => {
   if (!game.activePlayer) {
     game.activePlayer = game.participants[0].address;
   }
-}
-
-
-const getParticipantsForGame = gameId => {
-
-  const game = games.find(game => game.id === gameId)
-
-  if (!game) {
-    return []
-  }
-
-  return game.participants.map(participant => participant.address)
-  
+  return errorResponse(false)
 }
 
 const gamePlay = async (gameId, playerAddress) => {
@@ -87,30 +80,30 @@ export const gamePlayHandler = (gameId, playerAddress, response) => {
   const game = games.find(game => game.id === gameId)
 
   if (!game) {
-    throw new Error('Game not found')
+    return errorResponse(true, 'Game not found')
   }
 
   const particpants = getParticipantsForGame(gameId)
 
   if (particpants.length < 2) {
-    throw new Error('Not enough players')
+    return errorResponse(true, 'Not enough players')
   }
 
   const activePlayer = game.activePlayer === playerAddress
 
   if (!activePlayer) {
-    throw new Error('It is not your turn')
+    return errorResponse(true, `It is not ${playerAddress}'s turn`)
   }
 
   const activeParticipant = game.participants.find(p => p.address === playerAddress)
 
   if (!activeParticipant) {
-    throw new Error('Participant not found')
+    return errorResponse(true, 'Participant not found')
   }
 
    // if he has exhausted all his turn.
   if (game.gameSettings.mode === 'turn' && activeParticipant.playerInfo.turn === game.gameSettings.numbersOfTurn) {
-    throw new Error('You have exhausted your turn')
+    return errorResponse(true, 'You have exhausted your turn')
   }
 
   activeParticipant.playerInfo.turn += 1;
@@ -121,7 +114,7 @@ export const gamePlayHandler = (gameId, playerAddress, response) => {
 
   if (allPlayersFinished) {
     endGame(game)
-    return
+    return errorResponse(false)
   }
  
   if (response === 'yes') {
@@ -138,8 +131,20 @@ export const gamePlayHandler = (gameId, playerAddress, response) => {
     // Update active player
     game.activePlayer = game.participants[nextPlayerIndex].address;
   }
+  return errorResponse(false)
+}
 
-};
+const getParticipantsForGame = gameId => {
+
+  const game = games.find(game => game.id === gameId)
+
+  if (!game) {
+    return []
+  }
+
+  return game.participants.map(participant => participant.address)
+  
+}
 
 const calculateWinner = game => {
   let highestScore = 0;
@@ -159,16 +164,17 @@ const calculateWinner = game => {
 
 const endGame = game => {
   // Calculate winner based on game settings and player scores
-  const winner = calculateWinner(game);
+  const winner = calculateWinner(game)
 
   // Update game status and winner information
-  game.status = 'Finished';
-  game.winner = winner;
-
+  game.status = 'Finished'
+  game.winner = winner
  
 };
 
-
+function errorResponse(error, message = '') {
+  return { error, message }
+}
 
 
 ///////////////////////

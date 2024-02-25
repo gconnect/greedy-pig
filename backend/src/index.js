@@ -40,20 +40,32 @@ async function handle_advance(data) {
       }
   
       console.log('creating game...');
-      addGame(JSONpayload.data);
+      const res = addGame(JSONpayload.data);
+      if (res.error) {
+        await reportHandler(res.message);
+        return 'reject';
+      }
       advance_req = await noticeHandler(games);
   
   
     } else if (JSONpayload.method === 'addParticipant') {
 
       console.log('adding participant ...', JSONpayload.data);
-      addParticipant(JSONpayload.data)
+      const res = addParticipant(JSONpayload.data)
+      if (res.error) {
+        await reportHandler(res.message);
+        return 'reject';
+      }
       advance_req = await noticeHandler(games)
 
     } else if (JSONpayload.method === 'playGame') {
       
       console.log('game play ...', JSONpayload.data)
-      gamePlayHandler(JSONpayload.data)
+      const res = gamePlayHandler(JSONpayload.data)
+      if (res.error) {
+        await reportHandler(res.message);
+        return 'reject';
+      }
       advance_req = await noticeHandler(games)
     
     } else {
