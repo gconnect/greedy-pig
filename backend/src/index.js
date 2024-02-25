@@ -8,7 +8,6 @@ const {
   games, 
   addParticipant, 
   addGame, 
-  updateParticipant,
   gamePlayHandler
 } = require('./games')
 
@@ -37,6 +36,7 @@ async function handle_advance(data) {
       if (JSONpayload.data == '' || null) {
         console.log('Result cannot be empty');
         await reportHandler(message)
+        return 'reject'
       }
   
       console.log('creating game...');
@@ -50,12 +50,6 @@ async function handle_advance(data) {
       addParticipant(JSONpayload.data)
       advance_req = await noticeHandler(games)
 
-    // } else if (JSONpayload.method === 'updateParticipant') {
-      
-    //   console.log('updating participant ...', JSONpayload.data)
-    //   updateParticipant(JSONpayload.data)
-    //   advance_req = await noticeHandler(games)
-
     } else if (JSONpayload.method === 'playGame') {
       
       console.log('game play ...', JSONpayload.data)
@@ -66,6 +60,7 @@ async function handle_advance(data) {
       console.log('invalid request');
       const message = `method undefined: ${JSONpayload.method}`
       await reportHandler(message)
+      return 'reject'
     }
   } catch (error) {
     await reportHandler(error)

@@ -165,8 +165,7 @@ const endGame = game => {
   game.status = 'Finished';
   game.winner = winner;
 
-  // Store game results or perform other actions based on your game rules
-  // ... (e.g., save game data, notify players)
+ 
 };
 
 

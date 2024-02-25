@@ -1,6 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import Button from '@/components/shared/Button';
-import { useConnectContext } from '../providers/ConnectProvider';
 import toast from 'react-hot-toast';
 import { addInput } from '@/lib/cartesi';
 import { dappAddress } from '@/lib/utils';
@@ -12,30 +11,29 @@ interface RouletteProps {
   gameId: string
   onSpinResult: (value: number) => void
   players: string[]
+  notices: any
 }
 
-const Roulette: React.FC<RouletteProps> = ({ 
+const Roulette: FC<RouletteProps> = ({ 
   gameId,
   onSpinResult,
-  players
+  players,
+  notices
 }) => {
 
-   const [{ wallet }] = useConnectWallet()
+  const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [startAngle, setStartAngle] = useState(0)
+
   const options = [1, 2, 3, 4, 5, 6];
-  let startAngle = 0;
+  // let startAngle = 0;
   const arc = Math.PI / (options.length / 2);
   let spinTimeout: NodeJS.Timeout | null = null;
   let spinTime = 0;
   let spinTimeTotal = 0;
   let ctx: CanvasRenderingContext2D | null = null;
-
-  // useEffect(() => {
-  //   drawRouletteWheel();
-  // }, []);
 
   const byte2Hex = (n: number): string => {
     const nybHexString = '0123456789ABCDEF';
@@ -116,9 +114,9 @@ const Roulette: React.FC<RouletteProps> = ({
   };
 
   const playGame = async () => {
+
     const playerAddress = wallet?.accounts[0].address
     if (!playerAddress) return toast.error('Player not connected')
-alert(JSON.stringify(players))
 
     if (players.length >= 2) {
 
@@ -155,7 +153,8 @@ alert(JSON.stringify(players))
 
   const spinHandler = async () => {
     // startAngle = Math.random() * 10 + 10; // 10 to 19.999
-    startAngle = 15 // 10 to 19.999
+    // startAngle = 15 // 10 to 19.999
+
     spinTime = 0;
     spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
     rotateWheel()
@@ -168,7 +167,9 @@ alert(JSON.stringify(players))
       return;
     }
     const spinAngle = startAngle - easeOut(spinTime, 0, startAngle, spinTimeTotal);
-    startAngle += (spinAngle * Math.PI / 180);
+    // startAngle += (spinAngle * Math.PI / 180);
+    setStartAngle(startAngle + (spinAngle * Math.PI / 180))
+    // startAngle += (spinAngle * Math.PI / 180);
     drawRouletteWheel();
     spinTimeout = setTimeout(rotateWheel, 30);
   };
@@ -209,6 +210,21 @@ alert(JSON.stringify(players))
       }
     )
   }, [rollups])
+
+  useEffect(() => {
+  if (notices && notices.length > 0) {
+    const game = JSON.parse(notices[notices.length - 1].payload).find((game: any) => game.id === gameId);
+    if (game) {
+      setStartAngle(game.rollOutcome);
+    }
+  }
+}, [notices, gameId]);
+
+
+  // useEffect(() => {
+  //   const game = JSON.parse(notices?.reverse()[0].payload).find( (game: any) => game.id === gameId)
+  //   setStartAngle(game.rollOutcome)
+  // }, [notices]);
 
   return (
     <div>

@@ -40,7 +40,7 @@ const CreateGameModal = () => {
     },
     status: GameStatus.New,
     startTime,
-    rollOut: 0,
+    rollOutcome: 0,
     winner: ''
   }
 
