@@ -9,7 +9,7 @@ const {
   addParticipant, 
   addGame, 
   updateParticipant,
-  gamePlay
+  gamePlayHandler
 } = require('./games')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
@@ -48,22 +48,19 @@ async function handle_advance(data) {
 
       console.log('adding participant ...', JSONpayload.data);
       addParticipant(JSONpayload.data)
-      console.log('added participant ...', games);
       advance_req = await noticeHandler(games)
 
-    } else if (JSONpayload.method === 'updateParticipant') {
+    // } else if (JSONpayload.method === 'updateParticipant') {
       
-      console.log('updating participant ...', JSONpayload.data)
-      updateParticipant(JSONpayload.data)
-      advance_req = await noticeHandler(games)
-      console.log(games)
+    //   console.log('updating participant ...', JSONpayload.data)
+    //   updateParticipant(JSONpayload.data)
+    //   advance_req = await noticeHandler(games)
 
     } else if (JSONpayload.method === 'playGame') {
       
       console.log('game play ...', JSONpayload.data)
-      gamePlay(JSONpayload.data)
+      gamePlayHandler(JSONpayload.data)
       advance_req = await noticeHandler(games)
-      console.log(games)
     
     } else {
       console.log('invalid request');
@@ -78,7 +75,7 @@ async function handle_advance(data) {
   const json = await advance_req?.json();
   
   console.log(`Received status ${advance_req?.status} with body ${JSON.stringify(json)}`)
-
+  console.log('Game status ', games)
 
   return 'accept';
 }

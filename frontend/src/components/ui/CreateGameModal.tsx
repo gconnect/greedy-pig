@@ -40,6 +40,8 @@ const CreateGameModal = () => {
     },
     status: GameStatus.New,
     startTime,
+    rollOut: 0,
+    winner: ''
   }
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {

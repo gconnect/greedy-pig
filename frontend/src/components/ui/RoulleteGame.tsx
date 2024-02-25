@@ -52,11 +52,11 @@ alert(addr)
     const id = window.location.pathname.split('/').pop()
     if (id) {
       setGameId(id)
-      setTimeout(() => {
+      // setTimeout(() => {
         getParticipantsForGame(gameId, notices).then((fetchedPlayers) => {
           setPlayers(fetchedPlayers);
         })
-       }, 5000)
+      //  }, 5000)
     }
   }, [gameId, notices])
 

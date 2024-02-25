@@ -33,9 +33,9 @@ const Roulette: React.FC<RouletteProps> = ({
   let spinTimeTotal = 0;
   let ctx: CanvasRenderingContext2D | null = null;
 
-  useEffect(() => {
-    drawRouletteWheel();
-  }, []);
+  // useEffect(() => {
+  //   drawRouletteWheel();
+  // }, []);
 
   const byte2Hex = (n: number): string => {
     const nybHexString = '0123456789ABCDEF';
@@ -115,7 +115,7 @@ const Roulette: React.FC<RouletteProps> = ({
     }
   };
 
-  const spin = async () => {
+  const playGame = async () => {
     const playerAddress = wallet?.accounts[0].address
     if (!playerAddress) return toast.error('Player not connected')
 alert(JSON.stringify(players))
@@ -143,15 +143,23 @@ alert(JSON.stringify(players))
         console.error('Error during game:', error)
       }
 
-    startAngle = Math.random() * 10 + 10; // 10 to 19.999
-    spinTime = 0;
-    spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
-    rotateWheel()
+    // startAngle = Math.random() * 10 + 10; // 10 to 19.999
+    // spinTime = 0;
+    // spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
+    // rotateWheel()
 
     } else {
       toast.error('Not enough players to play')
     }
   };
+
+  const spinHandler = async () => {
+    // startAngle = Math.random() * 10 + 10; // 10 to 19.999
+    startAngle = 15 // 10 to 19.999
+    spinTime = 0;
+    spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
+    rotateWheel()
+  }
 
   const rotateWheel = () => {
     spinTime += 30;
@@ -193,9 +201,18 @@ alert(JSON.stringify(players))
     };
   })
 
+  useEffect(() => {
+    rollups?.inputContract.on(
+      'InputAdded',
+      (dappAddress, inboxInputIndex, sender, input) => {
+        spinHandler()
+      }
+    )
+  }, [rollups])
+
   return (
     <div>
-      <Button type="button"  id="spin" onClick={spin}>Play Game</Button>
+      <Button type="button"  id="spin" onClick={playGame}>Play Game</Button>
       <canvas id="canvas" width="500" height="500" ref={canvasRef}></canvas>
     </div>
   );
