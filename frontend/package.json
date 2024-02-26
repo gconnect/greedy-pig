@@ -62,7 +62,6 @@
         "tw-elements": "^1.1.0",
         "typescript": "^4.6.4",
         "urql": "^2.2.0",
-        "viem": "^2.7.13",
         "web-vitals": "^2.1.0",
         "web3": "^1.7.3",
         "webpack": "^5.76.0",
