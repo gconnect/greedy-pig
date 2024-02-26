@@ -6,7 +6,6 @@ import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
 import { useNotices } from '@/hooks/useNotices'
 import { useEffect } from 'react'
-import { hexToString } from 'viem'
 
 const GameArena = () => {
   const { notices, refetch } = useNotices()
