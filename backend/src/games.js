@@ -55,7 +55,7 @@ const gamePlay = async (gameId, playerAddress) => {
 
   const participant = game.participants.find(p => p.address === playerAddress)
 
-  const rollOutcome = Math.random() * 10 + 10; // 10 to 19.999
+  const rollOutcome = Math.floor(Math.random() * 10 + 10); // 10 to 19.999
 
   if (rollOutcome === 1) {
 
@@ -68,14 +68,14 @@ const gamePlay = async (gameId, playerAddress) => {
   } else {
 
     game.rollOutcome = rollOutcome; // Update the roll outcome
-    game.turnScore += rollOutcome
+    participant.playerInfo.turnScore += +rollOutcome
   }
 
 }
 
 
 // Define a function to handle player responses
-export const gamePlayHandler = (gameId, playerAddress, response) => {
+export const gamePlayHandler = ({gameId, playerAddress, response}) => {
   
   const game = games.find(game => game.id === gameId)
 
@@ -118,7 +118,11 @@ export const gamePlayHandler = (gameId, playerAddress, response) => {
   }
  
   if (response === 'yes') {
-    gamePlay(gameId, playerAddress)
+    try {
+      gamePlay(gameId, playerAddress)
+    } catch (error) {
+      return errorResponse(true, error)
+    }
   } else if (response === 'no') {
     // End the player's turn and move to the next player or finish the game
     activeParticipant.playerInfo.totalScore += activeParticipant.playerInfo.turnScore; // Add turn score to total score

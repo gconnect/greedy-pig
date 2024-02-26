@@ -5,6 +5,7 @@ import { addInput } from '@/lib/cartesi';
 import { dappAddress } from '@/lib/utils';
 import { useRollups } from '@/hooks/useRollups';
 import { useConnectWallet } from '@web3-onboard/react';
+import ConfirmModal from './ConfirmModal';
 
 
 interface RouletteProps {
@@ -25,7 +26,8 @@ const Roulette: FC<RouletteProps> = ({
   const rollups = useRollups(dappAddress)
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [startAngle, setStartAngle] = useState(0)
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false)
+  const [startAngle, setStartAngle] = useState<number>(0)
 
   const options = [1, 2, 3, 4, 5, 6];
   // let startAngle = 0;
@@ -113,7 +115,11 @@ const Roulette: FC<RouletteProps> = ({
     }
   };
 
-  const playGame = async () => {
+  const handleResponse = (response: string) => {
+    playGame(response)
+  }
+
+  const playGame = async (response: string) => {
 
     const playerAddress = wallet?.accounts[0].address
     if (!playerAddress) return toast.error('Player not connected')
@@ -127,11 +133,11 @@ const Roulette: FC<RouletteProps> = ({
 
         const jsonPayload = JSON.stringify({
         method: 'playGame',
-        data: { gameId, playerAddress }
+        data: { gameId, playerAddress, response } // line 132
       })
 
         const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
-
+        setModalIsOpen(false)
         console.log('txxx ', tx)
         const result = await tx.wait(1)
         console.log(result)
@@ -215,21 +221,18 @@ const Roulette: FC<RouletteProps> = ({
   if (notices && notices.length > 0) {
     const game = JSON.parse(notices[notices.length - 1].payload).find((game: any) => game.id === gameId);
     if (game) {
+      debugger
       setStartAngle(game.rollOutcome);
     }
   }
 }, [notices, gameId]);
 
 
-  // useEffect(() => {
-  //   const game = JSON.parse(notices?.reverse()[0].payload).find( (game: any) => game.id === gameId)
-  //   setStartAngle(game.rollOutcome)
-  // }, [notices]);
-
   return (
     <div>
-      <Button type="button"  id="spin" onClick={playGame}>Play Game</Button>
+      <Button type="button"  id="spin" onClick={() => setModalIsOpen(true)}>Play Game</Button>
       <canvas id="canvas" width="500" height="500" ref={canvasRef}></canvas>
+      <ConfirmModal onSubmit={handleResponse} showModal={modalIsOpen} />
     </div>
   );
 };

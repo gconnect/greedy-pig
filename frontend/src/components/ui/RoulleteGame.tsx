@@ -27,9 +27,7 @@ export default function RoulleteGame({notices}: any) {
 
   const joinGame = async (id: any) => {
     const addr: string | undefined = wallet?.accounts[0].address
-alert(addr)
-//0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-//0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
     const jsonPayload = JSON.stringify({
       method: 'addParticipant',
       data: { gameId: id, playerAddress: addr },
