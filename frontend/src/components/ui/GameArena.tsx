@@ -2,24 +2,18 @@
 
 import RoulleteGame from '@/components/ui/RoulleteGame'
 import LeaderBoard from './Leaderboard'
-import { dappAddress } from '@/lib/utils'
+import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
 import { useNotices } from '@/hooks/useNotices'
 import { useEffect } from 'react'
 import { hexToString } from 'viem'
 
 const GameArena = () => {
-
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
 
-  const handleEvent = async (
-    dappAddress: string,
-    inboxInputIndex: string,
-    sender: string,
-    input: string
-  ) => {
-    console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
+  const handleEvent = async (sender: string, input: string) => {
+    console.log('Received event:', sender, input)
     // console.log(hexToString(input))
     await refetch()
   }
@@ -28,7 +22,7 @@ const GameArena = () => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        handleEvent(dappAddress, inboxInputIndex, sender, input)
+        handleEvent(sender, input)
       }
     )
   }, [rollups, refetch])

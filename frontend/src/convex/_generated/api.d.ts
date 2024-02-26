@@ -13,10 +13,10 @@ import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
-} from "convex/server";
-import type * as games from "../games.js";
-import type * as utils from "../utils.js";
-import type * as validators from "../validators.js";
+} from 'convex/server'
+import type * as games from '../games.js'
+import type * as utils from '../utils.js'
+import type * as validators from '../validators.js'
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -27,15 +27,15 @@ import type * as validators from "../validators.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  games: typeof games;
-  utils: typeof utils;
-  validators: typeof validators;
-}>;
+  games: typeof games
+  utils: typeof utils
+  validators: typeof validators
+}>
 export declare const api: FilterApi<
   typeof fullApi,
-  FunctionReference<any, "public">
->;
+  FunctionReference<any, 'public'>
+>
 export declare const internal: FilterApi<
   typeof fullApi,
-  FunctionReference<any, "internal">
->;
+  FunctionReference<any, 'internal'>
+>

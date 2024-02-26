@@ -55,20 +55,21 @@ const gamePlay = async (gameId, playerAddress) => {
 
   const participant = game.participants.find(p => p.address === playerAddress)
 
-  const rollOutcome = Math.floor(Math.random() * 10 + 10); // 10 to 19.999
+  const startAngle = Math.floor(Math.random() * 10 + 10) // 10 to 19.999
+  const rollOutcome = calcScore(startAngle)
 
   if (rollOutcome === 1) {
 
     // cancel all acumulated point for the turn
     participant.playerInfo.turnScore = 0; // Reset turn score for the next turn
     game.activePlayer = game.participants[(game.participants.findIndex(p => p.address === playerAddress) + 1) % game.participants.length].address; // Move to the next player's turn or end the game
-    game.rollOutcome = rollOutcome; // Update the roll outcome
-    return; // Exit the function early
+    game.startAngle = 0; // Reset the roll outcome
+    return;
 
   } else {
 
-    game.rollOutcome = rollOutcome; // Update the roll outcome
-    participant.playerInfo.turnScore += +rollOutcome
+    game.startAngle = startAngle; // Update the roll outcome
+    participant.playerInfo.turnScore += rollOutcome
   }
 
 }
@@ -135,6 +136,16 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     // Update active player
     game.activePlayer = game.participants[nextPlayerIndex].address;
   }
+
+  // const allPlayersFinished = game.participants.every(
+  //   (participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn
+  // );
+
+  // if (allPlayersFinished) {
+  //   endGame(game)
+  //   return errorResponse(false)
+  // }
+
   return errorResponse(false)
 }
 
@@ -176,8 +187,17 @@ const endGame = game => {
  
 };
 
-function errorResponse(error, message = '') {
+const errorResponse = (error, message = '') => {
   return { error, message }
+}
+
+const calcScore = (startAngle) => {
+  const options = [1, 2, 3, 4, 5, 6]
+  const degrees = startAngle * 180 / Math.PI + 90;
+  const arc = Math.PI / (options.length / 2)
+  const arcd = arc * 180 / Math.PI
+  const index = Math.floor((360 - degrees % 360) / arcd)
+  return options[index]
 }
 
 
@@ -227,7 +247,7 @@ const gameStructure = () => {
    status: 'New',
    startTime: '2024-02-20T11:28',
    id: 'j57c7p49x610z9q2s63xbz7rk56ktg8v',
-   rollOutcome: 0
+   startAngle: 0
  }
 }
 

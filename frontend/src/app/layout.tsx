@@ -56,13 +56,13 @@ export default function RootLayout({
         <Provider store={store}>
           <ApolloProvider client={client}>
             {/* <ConnectProvider> */}
-              {/* <section className="md:px-custom p-custom-sm text-gray-500"> */}
-              {/* <Header /> */}
-              {/* <div className="text-gray-500"> */}
-              <ConvexClientProvider>{children}</ConvexClientProvider>
-              {/* </div> */}
-              <Toaster />
-              {/* </section> */}
+            {/* <section className="md:px-custom p-custom-sm text-gray-500"> */}
+            {/* <Header /> */}
+            {/* <div className="text-gray-500"> */}
+            <ConvexClientProvider>{children}</ConvexClientProvider>
+            {/* </div> */}
+            <Toaster />
+            {/* </section> */}
             {/* </ConnectProvider> */}
           </ApolloProvider>
         </Provider>

@@ -1,21 +1,35 @@
+import { selectConfirmModal } from '@/features/modal/modalSlice'
+import { shortenAddress } from '@/lib/utils'
+import { useDispatch, useSelector } from 'react-redux'
+
 interface IModalProps {
-  showModal: boolean
   onSubmit: (answer: string) => void
+  activePlayer: string
 }
 
-const ConfirmModal = ({ onSubmit, showModal }: IModalProps) => {
+const ConfirmModal = ({ onSubmit, activePlayer }: IModalProps) => {
+  const dispatch = useDispatch()
+  const toggleModal = useSelector((state: any) =>
+    selectConfirmModal(state.modal)
+  )
+
+  const toggleModalHandler = () => {
+    dispatch({ type: 'modal/toggleConfirmModal' })
+  }
+
   return (
     <div>
       <div
         id="popup-modal"
         tabIndex={-1}
         className={`${
-          showModal ? '' : 'hidden'
+          toggleModal ? '' : 'hidden'
         } overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full`}
       >
         <div className="relative p-4 flex justify-center w-[100%]  max-h-full">
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <button
+              onClick={toggleModalHandler}
               type="button"
               className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
               data-modal-hide="popup-modal"
@@ -55,7 +69,9 @@ const ConfirmModal = ({ onSubmit, showModal }: IModalProps) => {
                 />
               </svg>
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                Take Another Roll?
+                <span>{shortenAddress(activePlayer)}</span>
+                <br />
+                Sure to Roll?
               </h3>
               <button
                 onClick={() => onSubmit('yes')}

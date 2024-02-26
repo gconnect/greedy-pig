@@ -3,15 +3,19 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import * as Ably from 'ably'
-import { AblyProvider, useChannel, useConnectionStateListener } from 'ably/react'
+import {
+  AblyProvider,
+  useChannel,
+  useConnectionStateListener,
+} from 'ably/react'
 import Logo from '@/assets/img/logo.png'
 
-export default function GameLayout({ children, }: { children: React.ReactNode }) {
-
-  
-// const client = new Ably.Realtime.Promise({ key: process.env.NEXT_PUBLIC_ABLY_KEY! as string });
-
-
+export default function GameLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  // const client = new Ably.Realtime.Promise({ key: process.env.NEXT_PUBLIC_ABLY_KEY! as string });
 
   return (
     <section className={`h-screen game-bg`}>
@@ -33,7 +37,7 @@ export default function GameLayout({ children, }: { children: React.ReactNode })
           GreedyPig
         </Link>
         {/* <AblyProvider client={client}> */}
-          {children}
+        {children}
         {/* </AblyProvider> */}
       </div>
     </section>

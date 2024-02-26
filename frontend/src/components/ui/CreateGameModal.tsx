@@ -11,7 +11,6 @@ import { dappAddress } from '@/lib/utils'
 import { useConnectWallet } from '@web3-onboard/react'
 
 const CreateGameModal = () => {
-
   const [{ wallet }] = useConnectWallet()
   const dispatch = useDispatch()
   const createGameForm = useSelector((state: any) =>
@@ -19,7 +18,7 @@ const CreateGameModal = () => {
   )
   const rollups = useRollups(dappAddress)
 
-  const [creator, setCreator] = useState<string>('')
+  const [creator, setCreator] = useState<string | undefined>('')
   const [gameName, setGameName] = useState<string>('')
   const [startTime, setStartTime] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
@@ -40,8 +39,8 @@ const CreateGameModal = () => {
     },
     status: GameStatus.New,
     startTime,
-    rollOutcome: 0,
-    winner: ''
+    startAngle: 0,
+    winner: '',
   }
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
@@ -61,12 +60,11 @@ const CreateGameModal = () => {
   }
 
   const createGameHandler = async () => {
-
     const jsonPayload = JSON.stringify({
       method: 'createGame',
       data: game,
     })
-   
+
     const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
 
     console.log(tx)
@@ -75,7 +73,6 @@ const CreateGameModal = () => {
   }
 
   const cancelHandler = () => {
-
     dispatch({ type: 'modal/toggleGameModal' })
     reset()
   }

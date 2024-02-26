@@ -10,7 +10,7 @@ import { useConnectWallet } from '@web3-onboard/react'
 
 const Header = () => {
   const dispatch = useDispatch()
-   const [{ wallet }] = useConnectWallet()
+  const [{ wallet }] = useConnectWallet()
   const modalHandler = () => {
     if (!wallet) return toast.error('Connect Wallet to continue')
     dispatch({ type: 'modal/toggleGameModal' })

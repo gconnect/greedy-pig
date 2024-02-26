@@ -23,11 +23,9 @@ import { useNotices } from '@/hooks/useNotices'
 import Roulette from './Roulette'
 
 export default function RoulleteGame() {
-
   // useConnectionStateListener('connected', () => {
   //   console.log('Connected to Ably!');
   // });
-
 
   //  const { channel: rollChannel } = useChannel('game-channel', 'rollRoulette', (message) => {
   //   console.log('Received message:', message);
@@ -38,19 +36,19 @@ export default function RoulleteGame() {
   //   console.log('Received message:', message);
   //   if (stopButtonRef.current) {
   //     stopButtonRef.current.click();
-  //   } 
+  //   }
   // });
 
-//  console.log('channenlstart ', rollChannel)
-//  console.log('channenlstop ', stopChannel)
-  
+  //  console.log('channenlstart ', rollChannel)
+  //  console.log('channenlstop ', stopChannel)
+
   const { notices } = useNotices()
   const { wallet } = useConnectContext()
   const rollups = useRollups(dappAddress)
 
   const dispatch = useDispatch()
 
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([])
   const [gameId, setGameId] = useState<string>('')
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -61,12 +59,9 @@ export default function RoulleteGame() {
   const [rollResult, setRollResult] = useState<number | null>(null)
   const [isGameStarted, setIsGameStarted] = useState(false)
   const stopButtonRef = useRef<HTMLButtonElement | null>(null)
- 
 
   const openModal = () => setModalIsOpen(true)
   const closeModal = () => setModalIsOpen(false)
-
-
 
   const getOutput: OutputFunction = (user: string, message: string) => {
     return new Promise(async (resolve) => {
@@ -97,8 +92,6 @@ export default function RoulleteGame() {
     })
   }
 
-
-
   const getRoll: RollFunction = async () => {
     return new Promise((resolve) => {
       // startRouletteSpin()
@@ -123,7 +116,6 @@ export default function RoulleteGame() {
   }
 
   const playGame = async () => {
-
     const playerAddress = wallet.accounts[0].address
     if (!playerAddress) return toast.error('Player not connected')
 
@@ -131,20 +123,21 @@ export default function RoulleteGame() {
     const players = await getParticipantsForGame(gameId, notices)
 
     if (players.length >= 2) {
-
       try {
         const jsonPayload = JSON.stringify({
-        method: 'playGame',
-        data: { gameId, playerAddress },
-    })
+          method: 'playGame',
+          data: { gameId, playerAddress },
+        })
 
-    const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+        const tx = await addInput(
+          JSON.stringify(jsonPayload),
+          dappAddress,
+          rollups
+        )
 
-    console.log('txxx ', tx)
-    const result = await tx.wait(1)
-    console.log(result)
-
-
+        console.log('txxx ', tx)
+        const result = await tx.wait(1)
+        console.log(result)
 
         // const result = await playGame(
         //   players,
@@ -154,7 +147,7 @@ export default function RoulleteGame() {
         //   getOutput,
         //   updatePlayerInfo
         // )
-  
+
         setGameInProgress(false)
         // toast.success(`Game finished!. ${result}`, {
         //   duration: 6000,
@@ -173,7 +166,6 @@ export default function RoulleteGame() {
     key: string,
     value: number
   ) => {
-
     const jsonPayload = JSON.stringify({
       method: 'updateParticipant',
       data: { player, key, value },
@@ -198,11 +190,9 @@ export default function RoulleteGame() {
 
     console.log('txxx ', tx)
     const result = await tx.wait(1)
-   
   }
 
   useEffect(() => {
-   
     const id = window.location.pathname.split('/').pop()
     if (id) {
       setGameId(id)
@@ -217,13 +207,12 @@ export default function RoulleteGame() {
   ) => {
     console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
     console.log(hexToString(`0x${input}`))
-
   }
 
-   const handleSpinResult = (value: number) => {
-    console.log('Result of the spinn:', value);
+  const handleSpinResult = (value: number) => {
+    console.log('Result of the spinn:', value)
     // Do something with the spin result
-  };
+  }
 
   useEffect(() => {
     rollups?.inputContract.on(
@@ -236,7 +225,7 @@ export default function RoulleteGame() {
 
   return (
     <div>
-{/* <button onClick={() => { rollChannel.publish('rollRoulette', 'Here is my first message!') }}>
+      {/* <button onClick={() => { rollChannel.publish('rollRoulette', 'Here is my first message!') }}>
         Publish
       </button> */}
       {/* <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
@@ -248,7 +237,6 @@ export default function RoulleteGame() {
 
       <Roulette onSpinResult={handleSpinResult} />
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
-
     </div>
   )
 }

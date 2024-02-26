@@ -3,7 +3,7 @@ import { GameStatus } from '@/interfaces'
 import GameCard from './GameCard'
 import { useNotices } from '@/hooks/useNotices'
 import { IGame } from '@/interfaces'
-import { dappAddress } from '@/lib/utils'
+import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
 
 const Games = () => {
@@ -16,20 +16,17 @@ const Games = () => {
     setStatus(event.target.value as GameStatus)
   }
 
-  const handleEvent = (
-    dappAddress: string,
-    inboxInputIndex: string,
-    sender: string,
-    input: string
-  ) => {
-    console.log('Received event:', dappAddress, inboxInputIndex, sender, input)
+  const handleEvent = (sender: string, input: string) => {
+    console.log('Received event for createGame:', sender, input)
   }
 
   useEffect(() => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        handleEvent(dappAddress, inboxInputIndex, sender, input)
+        if (parseInputEvent(input).method === 'createGame') {
+          handleEvent(sender, input)
+        }
       }
     )
   }, [rollups])

@@ -21,26 +21,32 @@ import { useNotices } from '@/hooks/useNotices'
 import { useChannel, useConnectionStateListener, useAbly } from 'ably/react'
 
 export default function AppRoullete() {
-
   useConnectionStateListener('connected', () => {
-    console.log('Connected to Ably!');
-  });
+    console.log('Connected to Ably!')
+  })
 
+  const { channel: rollChannel } = useChannel(
+    'game-channel',
+    'rollRoulette',
+    (message) => {
+      console.log('Received message:', message)
+      startRouletteSpin()
+    }
+  )
 
-   const { channel: rollChannel } = useChannel('game-channel', 'rollRoulette', (message) => {
-    console.log('Received message:', message);
-    startRouletteSpin();
-  });
+  const { channel: stopChannel } = useChannel(
+    'game-channel',
+    'stopRoulette',
+    (message) => {
+      console.log('Received message:', message)
+      if (stopButtonRef.current) {
+        stopButtonRef.current.click()
+      }
+    }
+  )
 
-  const { channel: stopChannel } = useChannel('game-channel', 'stopRoulette', (message) => {
-    console.log('Received message:', message);
-    if (stopButtonRef.current) {
-      stopButtonRef.current.click();
-    } 
-  });
-
- console.log('channenlstart ', rollChannel)
- console.log('channenlstop ', stopChannel)
+  console.log('channenlstart ', rollChannel)
+  console.log('channenlstop ', stopChannel)
 
   const { notices } = useNotices()
   const { wallet } = useConnectContext()
@@ -48,7 +54,7 @@ export default function AppRoullete() {
 
   const dispatch = useDispatch()
 
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([])
   const [gameId, setGameId] = useState<string>('')
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -173,7 +179,7 @@ export default function AppRoullete() {
           getOutput,
           updatePlayerInfo
         )
-  
+
         setGameInProgress(false)
         toast.success(`Game finished!. ${result}`, {
           duration: 6000,
@@ -192,7 +198,6 @@ export default function AppRoullete() {
     key: string,
     value: number
   ) => {
-
     const jsonPayload = JSON.stringify({
       method: 'updateParticipant',
       data: { player, key, value },
@@ -217,23 +222,24 @@ export default function AppRoullete() {
 
     console.log('txxx ', tx)
     const result = await tx.wait(1)
-   
   }
 
   useEffect(() => {
-   
     const id = window.location.pathname.split('/').pop()
 
     if (id) {
       setGameId(id)
     }
- 
   }, [])
 
   return (
     <div>
       <ConfirmModal onSubmit={handleUserInput} showModal={modalIsOpen} />
-<button onClick={() => { rollChannel.publish('rollRoulette', 'Here is my first message!') }}>
+      <button
+        onClick={() => {
+          rollChannel.publish('rollRoulette', 'Here is my first message!')
+        }}
+      >
         Publish
       </button>
       <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">

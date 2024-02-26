@@ -5,8 +5,7 @@ import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
 // import { useNotices } from '@/hooks/useNotices'
 
-const LeaderBoard = ({notices}: any) => {
-
+const LeaderBoard = ({ notices }: any) => {
   // const { notices, refetch } = useNotices()
   const searchParams = useSearchParams()
   // const rollups = useRollups(dappAddress)
@@ -15,20 +14,17 @@ const LeaderBoard = ({notices}: any) => {
 
   console.log('notices from leadboard', notices)
 
-
   useEffect(() => {
-   
     const id = window.location.pathname.split('/').pop()
 
     setTimeout(() => {
-
-      const selectedGame = JSON.parse(notices?.reverse()[0].payload).find( (game: any) => game.id === id )
+      const selectedGame = JSON.parse(notices?.reverse()[0].payload).find(
+        (game: any) => game.id === id
+      )
       if (selectedGame) {
         setGame(selectedGame)
       }
     }, 5000)
-
-
   }, [searchParams, notices])
 
   return (
