@@ -8,7 +8,6 @@ import injectedModule from '@web3-onboard/injected-wallets'
 import { Toaster } from 'react-hot-toast'
 
 import configFile from '@/config/cartesi.json'
-import ConnectProvider from '@/components/providers/ConnectProvider'
 import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
 import store from '@/store'
 
@@ -55,15 +54,8 @@ export default function RootLayout({
       <body className={`${inter.className}`}>
         <Provider store={store}>
           <ApolloProvider client={client}>
-            {/* <ConnectProvider> */}
-            {/* <section className="md:px-custom p-custom-sm text-gray-500"> */}
-            {/* <Header /> */}
-            {/* <div className="text-gray-500"> */}
             <ConvexClientProvider>{children}</ConvexClientProvider>
-            {/* </div> */}
             <Toaster />
-            {/* </section> */}
-            {/* </ConnectProvider> */}
           </ApolloProvider>
         </Provider>
       </body>
