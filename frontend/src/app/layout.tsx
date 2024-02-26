@@ -54,7 +54,9 @@ export default function RootLayout({
       <body className={`${inter.className}`}>
         <Provider store={store}>
           <ApolloProvider client={client}>
-            <ConvexClientProvider>{children}</ConvexClientProvider>
+            {/* <ConvexClientProvider> */}
+              {children}
+            {/* </ConvexClientProvider> */}
             <Toaster />
           </ApolloProvider>
         </Provider>
