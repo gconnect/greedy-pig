@@ -59,7 +59,8 @@ const gamePlay = async (gameId, playerAddress) => {
   const rollOutcome = calcScore(startAngle)
 
   if (rollOutcome === 1) {
-
+    console.log('roll outcome is ', rollOutcome)
+    participant.playerInfo.turn += 1;
     // cancel all acumulated point for the turn
     participant.playerInfo.turnScore = 0; // Reset turn score for the next turn
     game.activePlayer = game.participants[(game.participants.findIndex(p => p.address === playerAddress) + 1) % game.participants.length].address; // Move to the next player's turn or end the game
@@ -67,9 +68,11 @@ const gamePlay = async (gameId, playerAddress) => {
     return;
 
   } else {
-
+    console.log('roll outcome is ', rollOutcome)
+    console.log('start angle ', startAngle)
     game.startAngle = startAngle; // Update the roll outcome
     participant.playerInfo.turnScore += rollOutcome
+    return
   }
 
 }
@@ -82,6 +85,10 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
 
   if (!game) {
     return errorResponse(true, 'Game not found')
+  }
+
+  if (game.statue === 'Ended') {
+    return errorResponse(true, 'Game ended')
   }
 
   const particpants = getParticipantsForGame(gameId)
@@ -107,16 +114,17 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     return errorResponse(true, 'You have exhausted your turn')
   }
 
-  activeParticipant.playerInfo.turn += 1;
+  // activeParticipant.playerInfo.turn += 1; // line 112
 
-  const allPlayersFinished = game.participants.every(
-    (participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn
-  );
+  // const allPlayersFinished = game.participants.every(
+  //   (participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn
+  // );
 
-  if (allPlayersFinished) {
-    endGame(game)
-    return errorResponse(false)
-  }
+  // if (allPlayersFinished) {
+  //   console.log('ending game ...')
+  //   endGame(game)
+  //   return errorResponse(false)
+  // }
  
   if (response === 'yes') {
     try {
@@ -128,6 +136,8 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     // End the player's turn and move to the next player or finish the game
     activeParticipant.playerInfo.totalScore += activeParticipant.playerInfo.turnScore; // Add turn score to total score
     activeParticipant.playerInfo.turnScore = 0; // Reset turn score for the next turn
+    activeParticipant.playerInfo.turn += 1; 
+
     // Move to the next player's turn or end the game
 
     const currentPlayerIndex = game.participants.findIndex(p => p.address === playerAddress);
@@ -137,14 +147,15 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     game.activePlayer = game.participants[nextPlayerIndex].address;
   }
 
-  // const allPlayersFinished = game.participants.every(
-  //   (participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn
-  // );
+  const allPlayersFinished = game.participants.every(
+    (participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn
+  );
 
-  // if (allPlayersFinished) {
-  //   endGame(game)
-  //   return errorResponse(false)
-  // }
+  if (allPlayersFinished) {
+    console.log('ending game ...')
+    endGame(game)
+    return errorResponse(false)
+  }
 
   return errorResponse(false)
 }
@@ -178,14 +189,16 @@ const calculateWinner = game => {
 
 
 const endGame = game => {
-  // Calculate winner based on game settings and player scores
+
   const winner = calculateWinner(game)
 
-  // Update game status and winner information
-  game.status = 'Finished'
+  game.activePlayer = ''
+  game.status = 'Ended'
+  game.startAngle = 0
   game.winner = winner
+  return
  
-};
+}
 
 const errorResponse = (error, message = '') => {
   return { error, message }

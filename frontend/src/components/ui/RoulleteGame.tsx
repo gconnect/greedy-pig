@@ -35,7 +35,7 @@ export default function RoulleteGame({ notices }: any) {
 
   useEffect(() => {
     const id = window.location.pathname.split('/').pop()
-    if (id) {
+    if (id && notices.length > 0) {
       setGameId(id)
       getParticipantsForGame(gameId, notices).then((fetchedPlayers) => {
         setPlayers(fetchedPlayers)

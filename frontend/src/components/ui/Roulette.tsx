@@ -138,7 +138,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       try {
         const jsonPayload = JSON.stringify({
           method: 'playGame',
-          data: { gameId, playerAddress, response }, // line 132
+          data: { gameId, playerAddress, response }
         })
 
         const tx = await addInput(
@@ -155,9 +155,9 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       }
 
       // startAngle = Math.random() * 10 + 10; // 10 to 19.999
-      // spinTime = 0;
-      // spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
-      // rotateWheel()
+      spinTime = 0;
+      spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
+      rotateWheel()
     } else {
       toast.error('Not enough players to play')
     }
@@ -222,8 +222,10 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
+        debugger
         if (parseInputEvent(input).method === 'playGame') {
-          spinHandler()
+          // spinHandler()
+          dispatch({ type: 'modal/toggleConfirmModal' })
         }
       }
     )
