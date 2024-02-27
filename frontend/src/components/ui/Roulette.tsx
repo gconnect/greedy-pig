@@ -23,6 +23,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
   const [activePlayer, selectActivePlayer] = useState<string>('')
   const [startAngle, setStartAngle] = useState<number>(0)
+  const [game, setGame] = useState<any>()
 
   const options = [1, 2, 3, 4, 5, 6]
   // let startAngle = 0;
@@ -135,6 +136,8 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     if (players.length >= 2) {
       const playerAddress = wallet?.accounts[0].address
 
+      game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
+
       try {
         const jsonPayload = JSON.stringify({
           method: 'playGame',
@@ -149,11 +152,15 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
         dispatch({ type: 'modal/toggleConfirmModal' })
         console.log('txxx ', tx)
         const result = await tx.wait(1)
-        console.log(result)
+
+        if (result) {
+
+        }
       } catch (error) {
         console.error('Error during game:', error)
       }
 
+      // alert(startAngle)
       // startAngle = Math.random() * 10 + 10; // 10 to 19.999
       spinTime = 0;
       spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
@@ -161,15 +168,6 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     } else {
       toast.error('Not enough players to play')
     }
-  }
-
-  const spinHandler = async () => {
-    // startAngle = Math.random() * 10 + 10; // 10 to 19.999
-    // startAngle = 15 // 10 to 19.999
-    alert(startAngle)
-    spinTime = 0
-    spinTimeTotal = Math.random() * 3 + 4 * 1000 // 4000 to 7999
-    rotateWheel()
   }
 
   const rotateWheel = () => {
@@ -242,9 +240,11 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           (game: any) => game.id === gameId
         )
         if (game) {
+          setGame(game)
           console.log(`game angle , ${game.startAngle}`)
           selectActivePlayer(game.activePlayer)
           setStartAngle(game.startAngle)
+          rotateWheel()
         }
       }
     }

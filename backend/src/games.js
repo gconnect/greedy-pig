@@ -87,8 +87,10 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     return errorResponse(true, 'Game not found')
   }
 
-  if (game.statue === 'Ended') {
+  if (game.status === getGameStatus('ended')) {
     return errorResponse(true, 'Game ended')
+  } else {
+    game.status = getGameStatus('inProgress')
   }
 
   const particpants = getParticipantsForGame(gameId)
@@ -113,18 +115,6 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
   if (game.gameSettings.mode === 'turn' && activeParticipant.playerInfo.turn === game.gameSettings.numbersOfTurn) {
     return errorResponse(true, 'You have exhausted your turn')
   }
-
-  // activeParticipant.playerInfo.turn += 1; // line 112
-
-  // const allPlayersFinished = game.participants.every(
-  //   (participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn
-  // );
-
-  // if (allPlayersFinished) {
-  //   console.log('ending game ...')
-  //   endGame(game)
-  //   return errorResponse(false)
-  // }
  
   if (response === 'yes') {
     try {
@@ -193,7 +183,7 @@ const endGame = game => {
   const winner = calculateWinner(game)
 
   game.activePlayer = ''
-  game.status = 'Ended'
+  game.status = getGameStatus('ended')
   game.startAngle = 0
   game.winner = winner
   return
@@ -211,6 +201,21 @@ const calcScore = (startAngle) => {
   const arcd = arc * 180 / Math.PI
   const index = Math.floor((360 - degrees % 360) / arcd)
   return options[index]
+}
+
+const getGameStatus = status => {
+  switch (status) {
+    case 'new':
+      return 'New'
+    case 'inProgress':
+      return 'In Progress'
+    case 'ended':
+      return 'Ended'
+    case 'cancel':
+      return 'Canceled'
+    default:
+      return 'New'
+  }
 }
 
 

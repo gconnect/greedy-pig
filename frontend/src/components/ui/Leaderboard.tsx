@@ -1,14 +1,15 @@
+import { selectTurnSync } from '@/features/leaderboard/leaderboardSlice'
 import { EmptyPage } from '../shared/EmptyPage'
 import { useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useRollups } from '@/hooks/useRollups'
-import { dappAddress } from '@/lib/utils'
-// import { useNotices } from '@/hooks/useNotices'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 const LeaderBoard = ({ notices }: any) => {
-  // const { notices, refetch } = useNotices()
+  
+  const syncTurn = useSelector((state: any) =>
+    selectTurnSync(state.leaderboard)
+  )
   const searchParams = useSearchParams()
-  // const rollups = useRollups(dappAddress)
 
   const [game, setGame] = useState<any>(null)
 
@@ -26,6 +27,12 @@ const LeaderBoard = ({ notices }: any) => {
       }
     }, 5000)
   }, [searchParams, notices])
+
+  useEffect(() => {
+    if (syncTurn) {
+      game.participants[0].turn = 1
+    }
+  }, [syncTurn, game])
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">

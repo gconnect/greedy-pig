@@ -14,6 +14,7 @@ export interface Participant {
 interface State {
   participants: Participant[]
   activePlayer: string | null
+  turnSync: boolean
 }
 
 export interface UpdatePlayerInfoPayload {
@@ -27,6 +28,7 @@ const leaderboardSlice = createSlice({
   initialState: {
     participants: [],
     activePlayer: '',
+    turnSync: false
   } as State,
   reducers: {
     initLeaderboard: (state, action: PayloadAction<string>) => {
@@ -68,6 +70,9 @@ const leaderboardSlice = createSlice({
     resetLeaderboard: (state) => {
       state.participants = []
     },
+    initTurnSync: (state, action: PayloadAction<boolean>) => {
+      state.turnSync = action.payload // Update the turnSync state with the new value
+    }
   },
 })
 
@@ -86,7 +91,9 @@ export const selectActivePlayer = createSelector(
 
 export const selectParticipants = (state: State) => state.participants
 
-export const { initLeaderboard, updatePlayerInfo, resetLeaderboard } =
+export const selectTurnSync = (state: State) => state.turnSync
+
+export const { initLeaderboard, updatePlayerInfo, resetLeaderboard, initTurnSync } =
   leaderboardSlice.actions
 
 export default leaderboardSlice.reducer

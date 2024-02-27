@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectGameModal } from '@/features/modal/modalSlice'
-import { useConnectContext } from '../providers/ConnectProvider'
 import Button from '../shared/Button'
 import toast from 'react-hot-toast'
 import { GameStatus } from '@/interfaces'

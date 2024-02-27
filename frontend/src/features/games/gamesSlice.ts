@@ -1,5 +1,4 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { vCreateGame } from '@/convex/validators'
 
 function extractParticipantAddresses(gameState: GameState): string[] {
   if (!gameState || !gameState.participants) {

@@ -35,7 +35,7 @@ export default function RoulleteGame({ notices }: any) {
 
   useEffect(() => {
     const id = window.location.pathname.split('/').pop()
-    if (id && notices.length > 0) {
+    if (id && notices && notices.length > 0) {
       setGameId(id)
       getParticipantsForGame(gameId, notices).then((fetchedPlayers) => {
         setPlayers(fetchedPlayers)
@@ -60,7 +60,11 @@ export default function RoulleteGame({ notices }: any) {
       {/* <Button onClick={playGame} className="mb-10" type="button">
         Play Game
       </Button> */}
-      <Roulette gameId={gameId} players={players} notices={notices} />
+      <Roulette 
+        gameId={gameId} 
+        players={players} 
+        notices={notices}
+        />
     </div>
   )
 }
