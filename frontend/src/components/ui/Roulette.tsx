@@ -127,6 +127,10 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
   const playGame = async (response: string) => {
     const playerAddress = wallet?.accounts[0].address
 
+    if (game.status === 'Ended') {
+      return toast.error('Game has ended')
+    }
+
     if (activePlayer !== playerAddress) {
       return toast.error('Not your turn')
     }
@@ -134,9 +138,12 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     if (!playerAddress) return toast.error('Player not connected')
 
     if (players.length >= 2) {
+      
       const playerAddress = wallet?.accounts[0].address
 
       game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
+
+      dispatch({ type: 'modal/toggleConfirmModal' })
 
       try {
         const jsonPayload = JSON.stringify({
@@ -149,13 +156,12 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           dappAddress,
           rollups
         )
-        dispatch({ type: 'modal/toggleConfirmModal' })
-        console.log('txxx ', tx)
+
+        // rotateWheel()
+        
+        console.log('roulette tx ', tx)
         const result = await tx.wait(1)
 
-        if (result) {
-
-        }
       } catch (error) {
         console.error('Error during game:', error)
       }
@@ -164,14 +170,15 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       // startAngle = Math.random() * 10 + 10; // 10 to 19.999
       spinTime = 0;
       spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
-      rotateWheel()
+
     } else {
       toast.error('Not enough players to play')
     }
   }
 
   const rotateWheel = () => {
-    spinTime += 30
+    spinTime += 4
+
     if (spinTime >= spinTimeTotal || !ctx) {
       stopRotateWheel()
       return
@@ -220,9 +227,8 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        debugger
         if (parseInputEvent(input).method === 'playGame') {
-          // spinHandler()
+          setStartAngle(game.startAngle)
           dispatch({ type: 'modal/toggleConfirmModal' })
         }
       }
@@ -243,8 +249,8 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           setGame(game)
           console.log(`game angle , ${game.startAngle}`)
           selectActivePlayer(game.activePlayer)
+          // rotateWheel()
           setStartAngle(game.startAngle)
-          rotateWheel()
         }
       }
     }

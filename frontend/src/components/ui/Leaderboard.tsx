@@ -1,10 +1,13 @@
-import { selectTurnSync } from '@/features/leaderboard/leaderboardSlice'
-import { EmptyPage } from '../shared/EmptyPage'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { selectTurnSync } from '@/features/leaderboard/leaderboardSlice'
+import { EmptyPage } from '@/components/shared/EmptyPage'
+import { shortenAddress } from '@/lib/utils'
 
 const LeaderBoard = ({ notices }: any) => {
+
+  const noticesRef = useRef(notices)
   
   const syncTurn = useSelector((state: any) =>
     selectTurnSync(state.leaderboard)
@@ -16,16 +19,22 @@ const LeaderBoard = ({ notices }: any) => {
   console.log('notices from leadboard', notices)
 
   useEffect(() => {
+    noticesRef.current = notices
+  }, [notices])
+
+  useEffect(() => {
     const id = window.location.pathname.split('/').pop()
 
-    setTimeout(() => {
+    if (notices && notices.length > 0) {
+    // setTimeout(() => {
       const selectedGame = JSON.parse(notices?.reverse()[0].payload).find(
         (game: any) => game.id === id
       )
       if (selectedGame) {
         setGame(selectedGame)
       }
-    }, 5000)
+    // }, 5000)
+  }
   }, [searchParams, notices])
 
   useEffect(() => {
@@ -76,7 +85,7 @@ const LeaderBoard = ({ notices }: any) => {
                           </div>
                           <div className="flex flex-col justify-center">
                             <h6 className="mb-0 leading-normal text-sm">
-                              {player.address}
+                              {shortenAddress(player.address)}
                             </h6>
                           </div>
                         </div>
