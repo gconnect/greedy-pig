@@ -183,8 +183,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       stopRotateWheel()
       return
     }
-    const spinAngle =
-      startAngle - easeOut(spinTime, 0, startAngle, spinTimeTotal)
+    const spinAngle = startAngle - easeOut(spinTime, 0, startAngle, spinTimeTotal)
     // startAngle += (spinAngle * Math.PI / 180);
     setStartAngle(startAngle + (spinAngle * Math.PI) / 180)
     // startAngle += (spinAngle * Math.PI / 180);
@@ -229,6 +228,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
           setStartAngle(game.startAngle)
+          rotateWheel()
           dispatch({ type: 'modal/toggleConfirmModal' })
         }
       }
