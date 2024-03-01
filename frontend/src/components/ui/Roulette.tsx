@@ -169,7 +169,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       // alert(startAngle)
       // startAngle = Math.random() * 10 + 10; // 10 to 19.999
       spinTime = 0;
-      spinTimeTotal = Math.random() * 3 + 4 * 1000;  // 4000 to 7999
+      spinTimeTotal = 20000 // Math.random() * 3 + 4 * 1000;
 
     } else {
       toast.error('Not enough players to play')
@@ -207,6 +207,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       250 + 10
     )
     ctx.restore()
+    dispatch({ type: 'modal/toggleConfirmModal' });
   }
 
   const easeOut = (t: number, b: number, c: number, d: number) => {
