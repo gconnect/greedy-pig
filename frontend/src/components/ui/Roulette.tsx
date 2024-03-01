@@ -22,11 +22,11 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
   const noticesRef = useRef(notices)
 
   const [activePlayer, selectActivePlayer] = useState<string>('')
-  const [startAngle, setStartAngle] = useState<number>(0)
+  // const [startAngle, setStartAngle] = useState<number>(12)
   const [game, setGame] = useState<any>()
 
   const options = [1, 2, 3, 4, 5, 6]
-  // let startAngle = 0;
+  let startAngle = 0;
   const arc = Math.PI / (options.length / 2)
   let spinTimeout: NodeJS.Timeout | null = null
   let spinTime = 0
@@ -176,17 +176,27 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     }
   }
 
+
+ const spin = () => {
+    startAngle = Math.random() * 10 + 10; // 10 to 19.999
+    spinTime = 0;
+    spinTimeTotal = 20000  // 4000 to 7999
+    rotateWheel();
+  };
+
   const rotateWheel = () => {
-    spinTime += 4
+    spinTime += 30
 
     if (spinTime >= spinTimeTotal || !ctx) {
       stopRotateWheel()
       return
     }
     const spinAngle = startAngle - easeOut(spinTime, 0, startAngle, spinTimeTotal)
-    // startAngle += (spinAngle * Math.PI / 180);
-    setStartAngle(startAngle + (spinAngle * Math.PI) / 180)
-    // startAngle += (spinAngle * Math.PI / 180);
+    startAngle += (spinAngle * Math.PI / 180);
+    // setStartAngle(prevStartAngle => prevStartAngle + (spinAngle * Math.PI / 180)); // line 215
+
+
+
     drawRouletteWheel()
     spinTimeout = setTimeout(rotateWheel, 30)
   }
@@ -207,7 +217,8 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       250 + 10
     )
     ctx.restore()
-    dispatch({ type: 'modal/toggleConfirmModal' });
+    startAngle = 0
+    // dispatch({ type: 'modal/toggleConfirmModal' });
   }
 
   const easeOut = (t: number, b: number, c: number, d: number) => {
@@ -228,9 +239,20 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
-          setStartAngle(game.startAngle)
-          rotateWheel()
-          dispatch({ type: 'modal/toggleConfirmModal' })
+          console.log('playgame')
+          const newGame = JSON.parse(
+          notices[notices.length - 1].payload
+        ).find((game: any) => game.id === gameId);
+        if (newGame) {
+          setGame(newGame);
+          console.log(`game angle , ${newGame.startAngle}`);
+          selectActivePlayer(newGame.activePlayer);
+          startAngle = newGame.startAngle // Update start angle using state setter
+          console.log(`start anglexxaa ${startAngle}`);
+          spin()
+        }
+          // rotateWheel()
+          // dispatch({ type: 'modal/toggleConfirmModal' })
         }
       }
     )
@@ -251,7 +273,8 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           console.log(`game angle , ${game.startAngle}`)
           selectActivePlayer(game.activePlayer)
           // rotateWheel()
-          setStartAngle(game.startAngle)
+          console.log(`start angle ${game.startAngle}`)
+          // setStartAngle(game.startAngle)
         }
       }
     }
@@ -262,6 +285,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       <Button
         type="button"
         id="spin"
+        // onClick={spin}
         onClick={() => dispatch({ type: 'modal/toggleConfirmModal' })}
       >
         Play Game
