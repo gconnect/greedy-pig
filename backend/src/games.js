@@ -56,6 +56,7 @@ const gamePlay = async (gameId, playerAddress) => {
   const participant = game.participants.find(p => p.address === playerAddress)
 
   const startAngle = Math.floor(Math.random() * 10 + 10) // 10 to 19.999
+  console.log('startAngle ', startAngle)
   const rollOutcome = calcScore(startAngle)
 
   if (rollOutcome === 1) {

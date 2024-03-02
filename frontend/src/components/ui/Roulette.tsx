@@ -156,8 +156,6 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           dappAddress,
           rollups
         )
-
-        // rotateWheel()
         
         console.log('roulette tx ', tx)
         const result = await tx.wait(1)
@@ -166,8 +164,6 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
         console.error('Error during game:', error)
       }
 
-      // alert(startAngle)
-      // startAngle = Math.random() * 10 + 10; // 10 to 19.999
       spinTime = 0;
       spinTimeTotal = 20000 // Math.random() * 3 + 4 * 1000;
 
@@ -178,7 +174,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
 
  const spin = () => {
-    startAngle = Math.random() * 10 + 10; // 10 to 19.999
+    startAngle = game.startAngle // 10 to 19.999
     spinTime = 0;
     spinTimeTotal = 20000  // 4000 to 7999
     rotateWheel();
@@ -192,11 +188,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       return
     }
     const spinAngle = startAngle - easeOut(spinTime, 0, startAngle, spinTimeTotal)
-    startAngle += (spinAngle * Math.PI / 180);
-    // setStartAngle(prevStartAngle => prevStartAngle + (spinAngle * Math.PI / 180)); // line 215
-
-
-
+    startAngle += (spinAngle * Math.PI / 180)
     drawRouletteWheel()
     spinTimeout = setTimeout(rotateWheel, 30)
   }
@@ -240,23 +232,11 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
           console.log('playgame')
-          const newGame = JSON.parse(
-          notices[notices.length - 1].payload
-        ).find((game: any) => game.id === gameId);
-        if (newGame) {
-          setGame(newGame);
-          console.log(`game angle , ${newGame.startAngle}`);
-          selectActivePlayer(newGame.activePlayer);
-          startAngle = newGame.startAngle // Update start angle using state setter
-          console.log(`start anglexxaa ${startAngle}`);
           spin()
-        }
-          // rotateWheel()
-          // dispatch({ type: 'modal/toggleConfirmModal' })
         }
       }
     )
-  }, [rollups])
+  }, [rollups, spin])
 
   useEffect(() => {
     noticesRef.current = notices
@@ -272,9 +252,8 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           setGame(game)
           console.log(`game angle , ${game.startAngle}`)
           selectActivePlayer(game.activePlayer)
-          // rotateWheel()
+  
           console.log(`start angle ${game.startAngle}`)
-          // setStartAngle(game.startAngle)
         }
       }
     }
@@ -285,7 +264,6 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       <Button
         type="button"
         id="spin"
-        // onClick={spin}
         onClick={() => dispatch({ type: 'modal/toggleConfirmModal' })}
       >
         Play Game
