@@ -13,6 +13,7 @@ export default function RoulleteGame({ notices }: any) {
 
   const [gameId, setGameId] = useState<string>('')
   const [players, setPlayers] = useState<string[]>([])
+   const [game, setGame] = useState<any>(null)
 
   const joinGame = async (id: any) => {
     const addr: string | undefined = wallet?.accounts[0].address
@@ -40,6 +41,10 @@ export default function RoulleteGame({ notices }: any) {
       getParticipantsForGame(gameId, notices).then((fetchedPlayers) => {
         setPlayers(fetchedPlayers)
       })
+      const game = JSON.parse(notices[notices.length - 1].payload).find(
+          (game: any) => game.id === gameId
+        )
+        setGame(game)
     }
   }, [gameId, notices])
 
@@ -54,9 +59,9 @@ export default function RoulleteGame({ notices }: any) {
 
   return (
     <div>
-      <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
+      {game && game.status === 'New' && <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
         Join Game
-      </Button>
+      </Button>}
       {/* <Button onClick={playGame} className="mb-10" type="button">
         Play Game
       </Button> */}

@@ -209,7 +209,6 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       250 + 10
     )
     ctx.restore()
-    startAngle = 0
     // dispatch({ type: 'modal/toggleConfirmModal' });
   }
 
@@ -261,13 +260,13 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
   return (
     <div>
-      <Button
+      {game && game.status !== 'Ended' && <Button
         type="button"
         id="spin"
         onClick={() => dispatch({ type: 'modal/toggleConfirmModal' })}
       >
         Play Game
-      </Button>
+      </Button>}
       <canvas id="canvas" width="500" height="500" ref={canvasRef}></canvas>
       <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} />
     </div>

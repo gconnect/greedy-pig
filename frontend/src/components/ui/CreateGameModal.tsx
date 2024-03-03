@@ -59,6 +59,8 @@ const CreateGameModal = () => {
   }
 
   const createGameHandler = async () => {
+    game.gameName = gameName
+    game.startTime = startTime
     const jsonPayload = JSON.stringify({
       method: 'createGame',
       data: game,
