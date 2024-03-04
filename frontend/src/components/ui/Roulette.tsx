@@ -7,6 +7,7 @@ import { useRollups } from '@/hooks/useRollups'
 import { useConnectWallet } from '@web3-onboard/react'
 import ConfirmModal from './ConfirmModal'
 import { useDispatch } from 'react-redux'
+// import gameOverSound from '/sounds/game-over.mp3'
 
 interface RouletteProps {
   gameId: string
@@ -21,6 +22,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const noticesRef = useRef(notices)
 
+  // const [audio] = useState(new Audio(gameOverSound));
   const [activePlayer, selectActivePlayer] = useState<string>('')
   // const [startAngle, setStartAngle] = useState<number>(12)
   const [game, setGame] = useState<any>()
@@ -209,6 +211,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       250 + 10
     )
     ctx.restore()
+
     // dispatch({ type: 'modal/toggleConfirmModal' });
   }
 
@@ -252,7 +255,11 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           console.log(`game angle , ${game.startAngle}`)
           selectActivePlayer(game.activePlayer)
   
-          console.log(`start angle ${game.startAngle}`)
+          if (game.status === 'Ended') {
+            // audio.play(); // Play the audio when the game is over
+            toast.success('Game has ended');
+          }
+        
         }
       }
     }
