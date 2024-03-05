@@ -37,11 +37,11 @@ const LeaderBoard = ({ notices }: any) => {
   }
   }, [searchParams, notices])
 
-  useEffect(() => {
-    if (syncTurn) {
-      game.participants[0].turn = 1
-    }
-  }, [syncTurn, game])
+  // useEffect(() => {
+  //   if (syncTurn) {
+  //     game.participants[0].turn = 1
+  //   }
+  // }, [syncTurn, game])
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">
@@ -58,9 +58,9 @@ const LeaderBoard = ({ notices }: any) => {
                   <th className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">
                     Player
                   </th>
-                  <th className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">
+                  {/* <th className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">
                     Round
-                  </th>
+                  </th> */}
                   <th className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70">
                     Turn Score
                   </th>
@@ -90,11 +90,11 @@ const LeaderBoard = ({ notices }: any) => {
                           </div>
                         </div>
                       </td>
-                      <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
+                      {/* <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                         <p className="mb-0 font-semibold leading-tight text-xs">
                           {player.playerInfo?.turn}
                         </p>
-                      </td>
+                      </td> */}
                       <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                         <span className="font-semibold leading-tight text-xs text-slate-400">
                           {player.playerInfo?.turnScore}

@@ -73,7 +73,7 @@ const gamePlay = async (gameId, playerAddress) => {
     // cancel all acumulated point for the turn
     participant.playerInfo.turnScore = 0; // Reset turn score for the next turn
     game.activePlayer = game.participants[(game.participants.findIndex(p => p.address === playerAddress) + 1) % game.participants.length].address; // Move to the next player's turn or end the game
-
+    game.rollOutcome = 0
     return;
 
   } else {
@@ -137,16 +137,21 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     activeParticipant.playerInfo.turnScore = 0; // Reset turn score for the next turn
     activeParticipant.playerInfo.turn += 1; 
 
-    // Move to the next player's turn or end the game
-
     const currentPlayerIndex = game.participants.findIndex(p => p.address === playerAddress);
     // Determine the index of the next player
     const nextPlayerIndex = (currentPlayerIndex + 1) % game.participants.length; // Circular iteration
     // Update active player
     game.activePlayer = game.participants[nextPlayerIndex].address;
+    game.rollOutcome = 0
   }
 
-  const allPlayersFinished = game.participants.every(
+  if (game.gameSettings.mode === 'score' && activeParticipant.playerInfo.totalScore >= game.gameSettings.winningScore) {
+    console.log('ending game ...')
+    endGame(game);
+    transferToWinner(game);
+    return errorResponse(false);
+  } else {
+    const allPlayersFinished = game.participants.every(
     (participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn
   );
 
@@ -156,6 +161,9 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     transferToWinner(game)
     return errorResponse(false)
   }
+  }
+
+  
 
   return errorResponse(false)
 }
@@ -284,7 +292,7 @@ const gameStructure = () => {
    gameSettings: {
      numbersOfTurn: 2,
      winningScore: 0,
-     mode: 'turn',
+     mode: 'turn', // turn || score
      apparatus: 'roulette',
      bet: true,
      maxPlayer: 10,

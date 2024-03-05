@@ -35,7 +35,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
   //   reactDice.current?.rollAll([3])
   // }
 
-    const handleResponse = (response: string) => {
+  const handleResponse = (response: string) => {
     playGame(response)
   }
 
@@ -58,7 +58,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
       game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
 
-      dispatch({ type: 'modal/toggleConfirmModal' })
+      // dispatch({ type: 'modal/toggleConfirmModal' })
 
       try {
         const jsonPayload = JSON.stringify({
@@ -74,6 +74,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
         
         console.log('dice tx ', tx)
         const result = await tx.wait(1)
+        console.log('result for the game ', result)
 
       } catch (error) {
         console.error('Error during game:', error)
@@ -92,7 +93,9 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
           console.log('playgame')
-          reactDice.current?.rollAll([game.rollOutcome])
+          if (game.rollOutcome !== 0) {
+            reactDice.current?.rollAll([game.rollOutcome])
+          }
         }
       }
     )
@@ -123,13 +126,22 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
   return (
     <div>
       {/* <h2 onClick={rollAll}>Rollll</h2> */}
-      {game && game.status !== 'Ended' && <Button
-        type="button"
-        id="spin"
-        onClick={() => dispatch({ type: 'modal/toggleConfirmModal' })}
-      >
-        Play Game
-      </Button>}
+      {game && game.status !== 'Ended' && <div>
+        <Button
+          type="button"
+          id="spin"
+          onClick={() => handleResponse('yes')}
+        >
+          Roll
+        </Button>
+        <Button
+          type="button"
+          id="spin"
+          onClick={() => handleResponse('no')}
+        >
+          Pass
+        </Button>
+      </div>}
       <ReactDice
         numDice={1}
         ref={reactDice}
@@ -137,7 +149,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
         disableIndividual={true}
         dieSize={140}
       />
-      <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} />
+      {/* <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} /> */}
     </div>
   )
 
