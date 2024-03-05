@@ -63,9 +63,9 @@ const gamePlay = async (gameId, playerAddress) => {
 
   const participant = game.participants.find(p => p.address === playerAddress)
 
-  const startAngle = Math.floor(Math.random() * 10 + 10) // 10 to 19.999
-  console.log('startAngle ', startAngle)
-  const rollOutcome = calcScore(startAngle)
+  const rollOutcome = Math.floor(Math.random() * 6) + 1
+  console.log('rollOutcome ', rollOutcome)
+
 
   if (rollOutcome === 1) {
     console.log('roll outcome is ', rollOutcome)
@@ -73,13 +73,13 @@ const gamePlay = async (gameId, playerAddress) => {
     // cancel all acumulated point for the turn
     participant.playerInfo.turnScore = 0; // Reset turn score for the next turn
     game.activePlayer = game.participants[(game.participants.findIndex(p => p.address === playerAddress) + 1) % game.participants.length].address; // Move to the next player's turn or end the game
-    game.startAngle = 0; // Reset the roll outcome
+
     return;
 
   } else {
     console.log('roll outcome is ', rollOutcome)
-    console.log('start angle ', startAngle)
-    game.startAngle = startAngle; // Update the roll outcome
+
+    game.rollOutcome = rollOutcome; // Update the roll outcome
     participant.playerInfo.turnScore += rollOutcome
     return
   }
@@ -194,7 +194,6 @@ const endGame = game => {
 
   game.activePlayer = ''
   game.status = getGameStatus('ended')
-  game.startAngle = 0
   game.winner = winner
   return
  

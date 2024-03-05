@@ -1,4 +1,4 @@
-
+'use client'
 import { FC, useState, useEffect, useRef } from 'react'
 import ReactDice, { ReactDiceRef } from 'react-dice-complete'
 import { useConnectWallet } from '@web3-onboard/react'
@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux'
 import toast from 'react-hot-toast'
 import Button from '@/components/shared/Button'
 import { useRollups } from '@/hooks/useRollups'
-import { dappAddress } from '@/lib/utils'
+import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { addInput } from '@/lib/cartesi'
 import ConfirmModal from './ConfirmModal'
 
@@ -31,9 +31,9 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
     console.log('total dice value:', totalValue)
   }
 
-  const rollAll = () => {
-    reactDice.current?.rollAll([3])
-  }
+  // const rollAll = () => {
+  //   reactDice.current?.rollAll([3])
+  // }
 
     const handleResponse = (response: string) => {
     playGame(response)
@@ -86,6 +86,18 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
     }
   }
 
+  useEffect(() => {
+    rollups?.inputContract.on(
+      'InputAdded',
+      (dappAddress, inboxInputIndex, sender, input) => {
+        if (parseInputEvent(input).method === 'playGame') {
+          console.log('playgame')
+          reactDice.current?.rollAll([game.rollOutcome])
+        }
+      }
+    )
+  }, [rollups, game])
+
     useEffect(() => {
     if (notices && notices.length > 0) {
       if (gameId) {
@@ -95,7 +107,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
         if (game) {
           setGame(game)
           console.log(`game angle , ${game.startAngle}`)
-
+// reactDice.current?.rollAll([3])
           setActivePlayer(game.activePlayer)
   
           if (game.status === 'Ended') {
@@ -110,7 +122,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
   return (
     <div>
-      <h2 onClick={rollAll}>Rollll</h2>
+      {/* <h2 onClick={rollAll}>Rollll</h2> */}
       {game && game.status !== 'Ended' && <Button
         type="button"
         id="spin"

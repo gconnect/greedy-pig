@@ -38,7 +38,7 @@ const CreateGameModal = () => {
     },
     status: GameStatus.New,
     startTime,
-    startAngle: 0,
+    rollOutcome: 0,
     winner: '',
     bettingAmount: 1, // in ether
     bettingFund: 0 // total fund transfered by players
@@ -190,7 +190,7 @@ const CreateGameModal = () => {
             <input
               type="radio"
               className="form-radio"
-              disabled
+              checked
               name="apparatus"
               value="die"
             />
@@ -200,7 +200,7 @@ const CreateGameModal = () => {
             <input
               type="radio"
               className="form-radio"
-              checked
+              disabled
               name="apparatus"
               value="roulette"
             />
