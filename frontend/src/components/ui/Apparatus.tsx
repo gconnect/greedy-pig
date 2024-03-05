@@ -6,8 +6,9 @@ import { addInput, sendEther } from '@/lib/cartesi'
 import Button from '../shared/Button'
 import { useConnectWallet } from '@web3-onboard/react'
 import toast from 'react-hot-toast'
+import Dice from './Dice'
 
-export default function RoulleteGame({ notices }: any) {
+export default function Apparatus({ notices }: any) {
   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
   const noticesRef = useRef(notices)
@@ -70,14 +71,15 @@ export default function RoulleteGame({ notices }: any) {
       {game && game.status === 'New' && <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
         Join Game
       </Button>}
+      <Dice />
       {/* <Button onClick={playGame} className="mb-10" type="button">
         Play Game
       </Button> */}
-      <Roulette 
+      {/* <Roulette 
         gameId={gameId} 
         players={players} 
         notices={notices}
-        />
+        /> */}
     </div>
   )
 }
