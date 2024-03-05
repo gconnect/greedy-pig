@@ -28,7 +28,7 @@ const CreateGameModal = () => {
     gameName,
     participants: [],
     gameSettings: {
-      numbersOfTurn: 2,
+      numbersOfTurn: 3,
       winningScore: 0,
       mode: 'turn',
       apparatus: 'roulette',

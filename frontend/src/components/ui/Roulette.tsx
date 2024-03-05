@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import Button from '@/components/shared/Button'
 import toast from 'react-hot-toast'
 import { addInput } from '@/lib/cartesi'
@@ -24,11 +24,12 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
   // const [audio] = useState(new Audio(gameOverSound));
   const [activePlayer, selectActivePlayer] = useState<string>('')
-  // const [startAngle, setStartAngle] = useState<number>(12)
+  const [startAngle, setStartAngle] = useState<number>(0)
+  const [spinAngleStart, setSpinAngleStart] = useState<number>(0)
   const [game, setGame] = useState<any>()
 
   const options = [1, 2, 3, 4, 5, 6]
-  let startAngle = 0;
+  // let startAngle = 0;
   const arc = Math.PI / (options.length / 2)
   let spinTimeout: NodeJS.Timeout | null = null
   let spinTime = 0
@@ -175,12 +176,13 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
   }
 
 
- const spin = () => {
-    startAngle = game?.startAngle // 10 to 19.999
+ const spin = useCallback(() => {
+
+    setSpinAngleStart(Math.random() * 10 + 10) // 10 to 19.999
     spinTime = 0;
     spinTimeTotal = 20000  // 4000 to 7999
     rotateWheel();
-  };
+  }, [game?.startAngle])
 
   const rotateWheel = () => {
     spinTime += 30
@@ -189,8 +191,10 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       stopRotateWheel()
       return
     }
-    const spinAngle = startAngle - easeOut(spinTime, 0, startAngle, spinTimeTotal)
-    startAngle += (spinAngle * Math.PI / 180)
+    const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal)
+    // startAngle += (spinAngle * Math.PI / 180)
+    const newStartAngle = startAngle + (spinAngle * Math.PI / 180);
+  setStartAngle(newStartAngle);
     drawRouletteWheel()
     spinTimeout = setTimeout(rotateWheel, 30)
   }
@@ -234,11 +238,12 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
           console.log('playgame')
+          setStartAngle(game.startAngle);
           spin()
         }
       }
     )
-  }, [rollups])
+  }, [rollups, spin])
 
   useEffect(() => {
     noticesRef.current = notices
