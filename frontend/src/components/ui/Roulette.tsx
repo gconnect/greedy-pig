@@ -176,7 +176,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
 
  const spin = () => {
-    startAngle = game.startAngle // 10 to 19.999
+    startAngle = game?.startAngle // 10 to 19.999
     spinTime = 0;
     spinTimeTotal = 20000  // 4000 to 7999
     rotateWheel();
@@ -206,13 +206,13 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     ctx.fillStyle = 'blue'
     const text = options[index]
     ctx.fillText(
-      text.toString(),
+      text?.toString(),
       250 - ctx.measureText(text.toString()).width / 2,
       250 + 10
     )
     ctx.restore()
 
-    // dispatch({ type: 'modal/toggleConfirmModal' });
+    dispatch({ type: 'modal/toggleConfirmModal' });
   }
 
   const easeOut = (t: number, b: number, c: number, d: number) => {
@@ -238,7 +238,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
         }
       }
     )
-  }, [rollups, spin])
+  }, [rollups])
 
   useEffect(() => {
     noticesRef.current = notices

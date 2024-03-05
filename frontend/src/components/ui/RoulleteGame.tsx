@@ -18,8 +18,8 @@ export default function RoulleteGame({ notices }: any) {
 
   const joinGame = async (id: any) => {
     const res = await sendEther(1, rollups)
-
-    // if (res) {
+    const txHash = await res.wait(1)
+    if (txHash) {
       const addr: string | undefined = wallet?.accounts[0].address
 
       const jsonPayload = JSON.stringify({
@@ -29,12 +29,11 @@ export default function RoulleteGame({ notices }: any) {
 
       const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
 
-      console.log('txxx ', tx)
       const result = await tx.wait(1)
       console.log(result)
-    // } else {
-    //   toast.error('Ether not sent')
-    // }
+    } else {
+      toast.error('Ether not sent')
+    }
 
     
   }

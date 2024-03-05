@@ -28,8 +28,8 @@ async function handle_advance(data) {
   const payload = data.payload;
   
 
-    const msg_sender = data.metadata.msg_sender;
-    console.log("msg sender is", msg_sender.toLowerCase());
+  const msg_sender = data.metadata.msg_sender;
+  console.log("msg sender is", msg_sender.toLowerCase());
 
 
     try {
@@ -100,7 +100,7 @@ async function handle_advance(data) {
   const json = await advance_req?.json();
   
   console.log(`Received status ${advance_req?.status} with body ${JSON.stringify(json)}`)
-  console.log('Game status ', games)
+  console.log('Game status ', JSON.stringify(games))
 
   return 'accept';
       }

@@ -40,6 +40,8 @@ const CreateGameModal = () => {
     startTime,
     startAngle: 0,
     winner: '',
+    bettingAmount: 1, // in ether
+    bettingFund: 0 // total fund transfered by players
   }
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {

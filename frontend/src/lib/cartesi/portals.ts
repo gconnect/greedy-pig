@@ -25,17 +25,12 @@ export const sendEther = async (
   console.log("Ether to deposit: ", tx);
 
    try {
-    alert(rollups.dappContract.address)
-    const res = rollups.etherPortalContract.depositEther(
+
+    return rollups.etherPortalContract.depositEther(
          rollups.dappContract.address,
          data,
          tx
-       );
-
-       if (res) {
-
-         return await res.wait(1)
-       }
+       )
    } catch (error) {
     console.log('error from sending ehther ', error)
    }

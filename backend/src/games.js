@@ -1,4 +1,8 @@
 const { v4: uuidv4 } = require('uuid')
+import { Wallet } from 'cartesi-wallet'
+
+const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
+const wallet = new Wallet(new Map())
 
 export const games = []
 
@@ -42,6 +46,10 @@ export const addParticipant = ({gameId, playerAddress}) => {
       totalScore: 0
     }
   })
+
+  if (game.gameSettings.bet) {
+    game.bettingFund += game.bettingAmount
+  }
 
   if (!game.activePlayer) {
     game.activePlayer = game.participants[0].address;
@@ -145,6 +153,7 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
   if (allPlayersFinished) {
     console.log('ending game ...')
     endGame(game)
+    transferToWinner(game)
     return errorResponse(false)
   }
 
@@ -189,6 +198,25 @@ const endGame = game => {
   game.winner = winner
   return
  
+}
+
+const transferToWinner = async (game) => {
+  // Transfer to the winner.
+  // ether_withdraw: (rollup_address: Address, account: Address, amount: bigint) => Voucher | Error_out;
+  if (game.gameSettings.bet && game.status === 'Ended') {
+    console.log('transfering to winner: ', game.winner)
+    const rollupAddr = '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044'
+     try {
+        let voucher = wallet.ether_withdraw(rollupAddr, game.winner, BigInt(game.bettingFund))
+        await fetch(rollup_server + "/voucher", {
+          method: "POST", headers: { "Content-Type": "application/json", },
+          body: JSON.stringify({ payload: voucher.payload, destination: voucher.destination }),
+        });
+      } catch (error) {
+        console.log(error)
+        return errorResponse(true, error)
+      }
+  }
 }
 
 const errorResponse = (error, message = '') => {
@@ -266,7 +294,10 @@ const gameStructure = () => {
    status: 'New',
    startTime: '2024-02-20T11:28',
    id: 'j57c7p49x610z9q2s63xbz7rk56ktg8v',
-   startAngle: 0
+   startAngle: 0,
+   bettingAmount: 0,
+   bettingFund: 0,
+   winner: ''
  }
 }
 
