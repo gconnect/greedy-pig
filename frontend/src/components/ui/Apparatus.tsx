@@ -71,7 +71,11 @@ export default function Apparatus({ notices }: any) {
       {game && game.status === 'New' && <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
         Join Game
       </Button>}
-      <Dice />
+      <Dice 
+        gameId={gameId}  
+        players={players} 
+        notices={notices}
+      />
       {/* <Button onClick={playGame} className="mb-10" type="button">
         Play Game
       </Button> */}

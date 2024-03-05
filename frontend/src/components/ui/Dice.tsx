@@ -7,6 +7,8 @@ import toast from 'react-hot-toast'
 import Button from '@/components/shared/Button'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress } from '@/lib/utils'
+import { addInput } from '@/lib/cartesi'
+import ConfirmModal from './ConfirmModal'
 
 interface RouletteProps {
   gameId: string
@@ -31,6 +33,57 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
   const rollAll = () => {
     reactDice.current?.rollAll([3])
+  }
+
+    const handleResponse = (response: string) => {
+    playGame(response)
+  }
+
+  const playGame = async (response: string) => {
+    const playerAddress = wallet?.accounts[0].address
+
+    if (game.status === 'Ended') {
+      return toast.error('Game has ended')
+    }
+
+    if (activePlayer !== playerAddress) {
+      return toast.error('Not your turn')
+    }
+
+    if (!playerAddress) return toast.error('Player not connected')
+
+    if (players.length >= 2) {
+      
+      const playerAddress = wallet?.accounts[0].address
+
+      game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
+
+      dispatch({ type: 'modal/toggleConfirmModal' })
+
+      try {
+        const jsonPayload = JSON.stringify({
+          method: 'playGame',
+          data: { gameId, playerAddress, response }
+        })
+
+        const tx = await addInput(
+          JSON.stringify(jsonPayload),
+          dappAddress,
+          rollups
+        )
+        
+        console.log('dice tx ', tx)
+        const result = await tx.wait(1)
+
+      } catch (error) {
+        console.error('Error during game:', error)
+      }
+
+   
+
+    } else {
+      toast.error('Not enough players to play')
+    }
   }
 
     useEffect(() => {
@@ -72,6 +125,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
         disableIndividual={true}
         dieSize={140}
       />
+      <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} />
     </div>
   )
 
