@@ -177,7 +177,8 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
 
  const spin = useCallback(() => {
-
+  console.log(game?.startAngle);
+setStartAngle(game?.startAngle);
     setSpinAngleStart(Math.random() * 10 + 10) // 10 to 19.999
     spinTime = 0;
     spinTimeTotal = 20000  // 4000 to 7999
@@ -192,11 +193,12 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       return
     }
     const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal)
-    // startAngle += (spinAngle * Math.PI / 180)
+
     const newStartAngle = startAngle + (spinAngle * Math.PI / 180);
   setStartAngle(newStartAngle);
     drawRouletteWheel()
-    spinTimeout = setTimeout(rotateWheel, 30)
+    // spinTimeout = setTimeout(rotateWheel, 30)
+     window.requestAnimationFrame(rotateWheel);
   }
 
   const stopRotateWheel = () => {
@@ -238,12 +240,10 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
           console.log('playgame')
-          setStartAngle(game.startAngle);
-          spin()
         }
       }
     )
-  }, [rollups, spin])
+  }, [rollups])
 
   useEffect(() => {
     noticesRef.current = notices
@@ -258,6 +258,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
         if (game) {
           setGame(game)
           console.log(`game angle , ${game.startAngle}`)
+          spin()
           selectActivePlayer(game.activePlayer)
   
           if (game.status === 'Ended') {
@@ -268,7 +269,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
         }
       }
     }
-  }, [notices, gameId])
+  }, [notices, gameId, spin])
 
   return (
     <div>
