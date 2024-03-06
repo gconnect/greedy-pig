@@ -51,7 +51,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
       
       const playerAddress = wallet?.accounts[0].address
 
-      game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
+      // game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
 
 
       try {
@@ -89,12 +89,14 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
           console.log('playgame')
           console.log('playgame rolloutcome ', game?.rollOutcome)
           if (game?.rollOutcome !== 0) {
+            console.log('the game ', game)
+            console.log('the notices ', notices)
             reactDice.current?.rollAll([game.rollOutcome])
           }
         }
       }
     )
-  }, [rollups, game?.rollOutcome])
+  }, [rollups, game, notices])
 
     useEffect(() => {
     if (notices && notices.length > 0) {
@@ -103,7 +105,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
           (game: any) => game.id === gameId
         )
         if (game) {
-          alert(game.rollOutcome)
+  
           setGame(game)
 
           setActivePlayer(game.activePlayer)

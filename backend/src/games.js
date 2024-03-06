@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
-import { Wallet } from 'cartesi-wallet'
+const { Wallet } = require('cartesi-wallet')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 const wallet = new Wallet(new Map())
@@ -28,7 +28,8 @@ export const addParticipant = async ({gameId, playerAddress}) => {
           method: "POST", headers: { "Content-Type": "application/json", },
           body: JSON.stringify({ payload: voucher.payload, destination: voucher.destination }),
         });
-        console.log('Received finish status rollup balance' + await res);
+        const x = await res
+        console.log('Received finish status rollup balance' + JSON.stringify(x));
       } catch (error) {
         console.log(error)
         return errorResponse(true, error)

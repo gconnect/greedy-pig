@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useSelector } from 'react-redux'
-import { selectTurnSync } from '@/features/leaderboard/leaderboardSlice'
 import { EmptyPage } from '@/components/shared/EmptyPage'
 import { shortenAddress } from '@/lib/utils'
 
@@ -9,14 +7,9 @@ const LeaderBoard = ({ notices }: any) => {
 
   const noticesRef = useRef(notices)
   
-  const syncTurn = useSelector((state: any) =>
-    selectTurnSync(state.leaderboard)
-  )
   const searchParams = useSearchParams()
 
   const [game, setGame] = useState<any>(null)
-
-  console.log('notices from leadboard', notices)
 
   useEffect(() => {
     noticesRef.current = notices
@@ -26,22 +19,16 @@ const LeaderBoard = ({ notices }: any) => {
     const id = window.location.pathname.split('/').pop()
 
     if (notices && notices.length > 0) {
-    // setTimeout(() => {
+ 
       const selectedGame = JSON.parse(notices?.reverse()[0].payload).find(
         (game: any) => game.id === id
       )
       if (selectedGame) {
         setGame(selectedGame)
       }
-    // }, 5000)
+
   }
   }, [searchParams, notices])
-
-  // useEffect(() => {
-  //   if (syncTurn) {
-  //     game.participants[0].turn = 1
-  //   }
-  // }, [syncTurn, game])
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">

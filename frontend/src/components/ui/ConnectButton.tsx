@@ -20,7 +20,7 @@ const config: any = configFile
 const ConnectButton: FC = () => {
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
   const [{ chains, connectedChain, settingChain }, setChain] = useSetChain()
-  console.log('heeee')
+
   return (
     <div>
       {!wallet && (
