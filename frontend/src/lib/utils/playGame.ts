@@ -112,7 +112,6 @@ export const getParticipantsForGame = async (
   gameId: string,
   notices: any[]
 ) => {
-
   const game = JSON.parse(notices?.reverse()[0].payload).find(
     (notice: any) => notice.id === gameId
   )

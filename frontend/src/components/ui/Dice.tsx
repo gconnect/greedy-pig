@@ -8,31 +8,29 @@ import Button from '@/components/shared/Button'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { addInput } from '@/lib/cartesi'
-import { selectParticipantAddresses, selectSelectedGame } from '@/features/games/gamesSlice'
+import {
+  selectParticipantAddresses,
+  selectSelectedGame,
+} from '@/features/games/gamesSlice'
 
 interface RouletteProps {
-
   notices: any
-
 }
 
 const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
-
   const dispatch = useDispatch()
   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
   const reactDice = useRef<ReactDiceRef>(null)
 
-  const game = useSelector((state: any) =>
-  selectSelectedGame(state.games)
-  )
+  const game = useSelector((state: any) => selectSelectedGame(state.games))
   const players = useSelector((state: any) =>
-  selectParticipantAddresses(state.games)
+    selectParticipantAddresses(state.games)
   )
 
   const [gameId, setGameId] = useState<string>()
 
-  const rollDone = (totalValue: number,) => {
+  const rollDone = (totalValue: number) => {
     console.log('total dice value:', totalValue)
   }
 
@@ -54,16 +52,14 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
     if (!playerAddress) return toast.error('Player not connected')
 
     if (players.length >= 2) {
-      
       const playerAddress = wallet?.accounts[0].address
 
       // game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
 
-
       try {
         const jsonPayload = JSON.stringify({
           method: 'playGame',
-          data: { gameId, playerAddress, response }
+          data: { gameId, playerAddress, response },
         })
 
         const tx = await addInput(
@@ -71,17 +67,13 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
           dappAddress,
           rollups
         )
-        
+
         console.log('dice tx ', tx)
         const result = await tx.wait(1)
         console.log('result for the game ', result)
-
       } catch (error) {
         console.error('Error during game:', error)
       }
-
-   
-
     } else {
       toast.error('Not enough players to play')
     }
@@ -92,35 +84,29 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
-
           if (notices && notices.length > 0) {
-        
             // const game = JSON.parse(notices[notices.length - 1].payload).find(
             //   (game: any) => game.id === gameId
             // )
             if (game) {
-      
               // setGame(game)
-    
+
               // setActivePlayer(game.activePlayer)
               // const gameParticipants = game.participants.map((participant: any) => participant.address);
-          // setPlayers(gameParticipants);
-      
-              if (game.status === 'Ended') return toast.success('Game has ended');
-                // audio.play(); // Play the audio when the game is over
-                
+              // setPlayers(gameParticipants);
+
+              if (game.status === 'Ended')
+                return toast.success('Game has ended')
+              // audio.play(); // Play the audio when the game is over
+
               console.log('playgame rolloutcome ', game.rollOutcome)
               if (game.rollOutcome !== 0) {
                 console.log('the game ', game)
                 console.log('the notices ', notices)
                 reactDice.current?.rollAll([game.rollOutcome])
               }
-            
             }
-       
           }
-        
-          
         }
       }
     )
@@ -129,22 +115,16 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
   return (
     <div>
       {/* <h2 onClick={rollAll}>Rollll</h2> */}
-      {game && game.status !== 'Ended' && <div>
-        <Button
-          type="button"
-          id="spin"
-          onClick={() => handleResponse('yes')}
-        >
-          Roll
-        </Button>
-        <Button
-          type="button"
-          id="spin"
-          onClick={() => handleResponse('no')}
-        >
-          Pass
-        </Button>
-      </div>}
+      {game && game.status !== 'Ended' && (
+        <div>
+          <Button type="button" id="spin" onClick={() => handleResponse('yes')}>
+            Roll
+          </Button>
+          <Button type="button" id="spin" onClick={() => handleResponse('no')}>
+            Pass
+          </Button>
+        </div>
+      )}
       <ReactDice
         numDice={1}
         ref={reactDice}
@@ -155,7 +135,6 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
       {/* <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} /> */}
     </div>
   )
-
 }
 
 export default MyDiceApp

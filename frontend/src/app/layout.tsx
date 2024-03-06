@@ -55,7 +55,7 @@ export default function RootLayout({
         <Provider store={store}>
           <ApolloProvider client={client}>
             {/* <ConvexClientProvider> */}
-              {children}
+            {children}
             {/* </ConvexClientProvider> */}
             <Toaster />
           </ApolloProvider>

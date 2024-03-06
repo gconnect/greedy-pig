@@ -7,19 +7,20 @@ import { useConnectWallet } from '@web3-onboard/react'
 import toast from 'react-hot-toast'
 import Dice from './Dice'
 import { useSelector } from 'react-redux'
-import { selectParticipantAddresses, selectSelectedGame } from '@/features/games/gamesSlice'
+import {
+  selectParticipantAddresses,
+  selectSelectedGame,
+} from '@/features/games/gamesSlice'
 
 export default function Apparatus({ notices }: any) {
   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
   const noticesRef = useRef(notices)
 
-  const game = useSelector((state: any) =>
-  selectSelectedGame(state.games)
-  )
+  const game = useSelector((state: any) => selectSelectedGame(state.games))
 
   const players = useSelector((state: any) =>
-  selectParticipantAddresses(state.games)
+    selectParticipantAddresses(state.games)
   )
 
   const [gameId, setGameId] = useState<string>('')
@@ -37,15 +38,17 @@ export default function Apparatus({ notices }: any) {
         data: { gameId: id, playerAddress: addr },
       })
 
-      const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+      const tx = await addInput(
+        JSON.stringify(jsonPayload),
+        dappAddress,
+        rollups
+      )
 
       const result = await tx.wait(1)
       console.log(result)
     } else {
       toast.error('Ether not sent')
     }
-
-    
   }
 
   // useEffect(() => {
@@ -73,17 +76,18 @@ export default function Apparatus({ notices }: any) {
     }
   }, [gameId])
 
-
   return (
     <div>
-      {game && game.status === 'New' && <Button onClick={() => joinGame(gameId)} className="mb-10" type="button">
-        Join Game
-      </Button>}
-      <Dice 
-
-        notices={notices}
-
-      />
+      {game && game.status === 'New' && (
+        <Button
+          onClick={() => joinGame(gameId)}
+          className="mb-10"
+          type="button"
+        >
+          Join Game
+        </Button>
+      )}
+      <Dice notices={notices} />
     </div>
   )
 }

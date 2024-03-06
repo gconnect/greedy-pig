@@ -11,13 +11,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectActivePlayer } from '@/features/leaderboard/leaderboardSlice'
 
 const GameArena = () => {
-
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
   const dispatch = useDispatch()
 
   const activePlayer = useSelector((state: any) =>
-  selectActivePlayer(state.leaderboard)
+    selectActivePlayer(state.leaderboard)
   )
 
   const handleEvent = useCallback(async () => {
@@ -28,24 +27,24 @@ const GameArena = () => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-          handleEvent()
+        handleEvent()
       }
     )
   }, [handleEvent, rollups])
 
-      useEffect(() => {
-
-        const gameId = window.location.pathname.split('/').pop()
+  useEffect(() => {
+    const gameId = window.location.pathname.split('/').pop()
     if (gameId && notices && notices.length > 0) {
- 
-        const game = JSON.parse(notices[notices.length - 1].payload).find(
-          (game: any) => game.id === gameId
-        )
-        if (game) {
-          dispatch({ type: 'games/setGame', payload: game})
-          dispatch({ type: 'leaderboard/updateActivePlayer', payload: game.activePlayer})
-        }
- 
+      const game = JSON.parse(notices[notices.length - 1].payload).find(
+        (game: any) => game.id === gameId
+      )
+      if (game) {
+        dispatch({ type: 'games/setGame', payload: game })
+        dispatch({
+          type: 'leaderboard/updateActivePlayer',
+          payload: game.activePlayer,
+        })
+      }
     }
   }, [notices, dispatch])
 

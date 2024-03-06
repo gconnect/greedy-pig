@@ -39,8 +39,6 @@ body {
   background-repeat: no-repeat;
 }
 
-
-
 /* dice */
 
 .dice-container {
@@ -69,7 +67,8 @@ body {
   position: absolute;
   top: var(--top);
   left: var(--left);
-  transform: translateX(calc(var(--left) * -1)) translateY(calc(var(--top) * -1));
+  transform: translateX(calc(var(--left) * -1))
+    translateY(calc(var(--top) * -1));
 }
 
 .btn-roll-dice {

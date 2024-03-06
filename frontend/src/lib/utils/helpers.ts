@@ -9,7 +9,7 @@ export const capitalize = (word: string) =>
 
 export const parseInputEvent = (input: `0x${string}`) => {
   if (input) {
-    const decodedString = utils.toUtf8String(input);
+    const decodedString = utils.toUtf8String(input)
     return JSON.parse(JSON.parse(decodedString))
   }
 }

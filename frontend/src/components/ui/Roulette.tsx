@@ -141,17 +141,18 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     if (!playerAddress) return toast.error('Player not connected')
 
     if (players.length >= 2) {
-      
       const playerAddress = wallet?.accounts[0].address
 
-      game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
+      game.status === 'New'
+        ? dispatch({ type: 'leaderboard/initTurnSync', payload: true })
+        : ''
 
       dispatch({ type: 'modal/toggleConfirmModal' })
 
       try {
         const jsonPayload = JSON.stringify({
           method: 'playGame',
-          data: { gameId, playerAddress, response }
+          data: { gameId, playerAddress, response },
         })
 
         const tx = await addInput(
@@ -159,30 +160,27 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           dappAddress,
           rollups
         )
-        
+
         console.log('roulette tx ', tx)
         const result = await tx.wait(1)
-
       } catch (error) {
         console.error('Error during game:', error)
       }
 
-      spinTime = 0;
+      spinTime = 0
       spinTimeTotal = 20000 // Math.random() * 3 + 4 * 1000;
-
     } else {
       toast.error('Not enough players to play')
     }
   }
 
-
- const spin = useCallback(() => {
-  console.log(game?.startAngle);
-setStartAngle(game?.startAngle);
+  const spin = useCallback(() => {
+    console.log(game?.startAngle)
+    setStartAngle(game?.startAngle)
     setSpinAngleStart(Math.random() * 10 + 10) // 10 to 19.999
-    spinTime = 0;
-    spinTimeTotal = 20000  // 4000 to 7999
-    rotateWheel();
+    spinTime = 0
+    spinTimeTotal = 20000 // 4000 to 7999
+    rotateWheel()
   }, [game?.startAngle])
 
   const rotateWheel = () => {
@@ -192,13 +190,14 @@ setStartAngle(game?.startAngle);
       stopRotateWheel()
       return
     }
-    const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal)
+    const spinAngle =
+      spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal)
 
-    const newStartAngle = startAngle + (spinAngle * Math.PI / 180);
-  setStartAngle(newStartAngle);
+    const newStartAngle = startAngle + (spinAngle * Math.PI) / 180
+    setStartAngle(newStartAngle)
     drawRouletteWheel()
     // spinTimeout = setTimeout(rotateWheel, 30)
-     window.requestAnimationFrame(rotateWheel);
+    window.requestAnimationFrame(rotateWheel)
   }
 
   const stopRotateWheel = () => {
@@ -218,7 +217,7 @@ setStartAngle(game?.startAngle);
     )
     ctx.restore()
 
-    dispatch({ type: 'modal/toggleConfirmModal' });
+    dispatch({ type: 'modal/toggleConfirmModal' })
   }
 
   const easeOut = (t: number, b: number, c: number, d: number) => {
@@ -260,12 +259,11 @@ setStartAngle(game?.startAngle);
           console.log(`game angle , ${game.startAngle}`)
           spin()
           selectActivePlayer(game.activePlayer)
-  
+
           if (game.status === 'Ended') {
             // audio.play(); // Play the audio when the game is over
-            toast.success('Game has ended');
+            toast.success('Game has ended')
           }
-        
         }
       }
     }
@@ -273,13 +271,15 @@ setStartAngle(game?.startAngle);
 
   return (
     <div>
-      {game && game.status !== 'Ended' && <Button
-        type="button"
-        id="spin"
-        onClick={() => dispatch({ type: 'modal/toggleConfirmModal' })}
-      >
-        Play Game
-      </Button>}
+      {game && game.status !== 'Ended' && (
+        <Button
+          type="button"
+          id="spin"
+          onClick={() => dispatch({ type: 'modal/toggleConfirmModal' })}
+        >
+          Play Game
+        </Button>
+      )}
       <canvas id="canvas" width="500" height="500" ref={canvasRef}></canvas>
       <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} />
     </div>

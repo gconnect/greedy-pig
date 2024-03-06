@@ -9,7 +9,6 @@ import { useRollups } from '@/hooks/useRollups'
 const Games = () => {
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
- 
 
   const [status, setStatus] = useState<GameStatus>(GameStatus.New)
   const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

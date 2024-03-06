@@ -31,10 +31,10 @@ interface GameState {
   }[]
   startTime: string
   status: 'New' | 'In Progress' | 'Ended' | 'Cancelled'
-  id: string,
-  startAngle: number,
-  bettingAmount: number,
-  bettingFund: number,
+  id: string
+  startAngle: number
+  bettingAmount: number
+  bettingFund: number
   winner: string
   rollOutcome: number
 }

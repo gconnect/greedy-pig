@@ -8,7 +8,6 @@ import Socials from '@/components/ui/Socials'
 import { useConnectWallet } from '@web3-onboard/react'
 
 const Header = () => {
-
   const dispatch = useDispatch()
   const [{ wallet }] = useConnectWallet()
 

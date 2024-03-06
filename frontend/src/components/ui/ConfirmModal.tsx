@@ -9,7 +9,6 @@ interface IModalProps {
 }
 
 const ConfirmModal = ({ onSubmit, activePlayer }: IModalProps) => {
-
   const [{ wallet }] = useConnectWallet()
   const dispatch = useDispatch()
   const toggleModal = useSelector((state: any) =>
@@ -26,7 +25,9 @@ const ConfirmModal = ({ onSubmit, activePlayer }: IModalProps) => {
         id="popup-modal"
         tabIndex={-1}
         className={`${
-          toggleModal && (activePlayer === wallet?.accounts[0].address) ? '' : 'hidden'
+          toggleModal && activePlayer === wallet?.accounts[0].address
+            ? ''
+            : 'hidden'
         } overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full`}
       >
         <div className="relative p-4 flex justify-center w-[100%]  max-h-full">

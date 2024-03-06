@@ -28,7 +28,7 @@ const leaderboardSlice = createSlice({
   initialState: {
     participants: [],
     activePlayer: '',
-    turnSync: false
+    turnSync: false,
   } as State,
   reducers: {
     initLeaderboard: (state, action: PayloadAction<string>) => {
@@ -47,9 +47,7 @@ const leaderboardSlice = createSlice({
       action: PayloadAction<UpdatePlayerInfoPayload>
     ) => {
       const { address, property, value } = action.payload
-      const participant = state.participants.find(
-        (p) => p.address === address
-      )
+      const participant = state.participants.find((p) => p.address === address)
       if (participant) {
         if (property === 'turn') {
           participant.playerInfo = {
@@ -72,7 +70,7 @@ const leaderboardSlice = createSlice({
     },
     initTurnSync: (state, action: PayloadAction<boolean>) => {
       state.turnSync = action.payload // Update the turnSync state with the new value
-    }
+    },
   },
 })
 
@@ -93,8 +91,12 @@ export const selectParticipants = (state: State) => state.participants
 
 export const selectTurnSync = (state: State) => state.turnSync
 
-export const { initLeaderboard, updatePlayerInfo, resetLeaderboard, initTurnSync } =
-  leaderboardSlice.actions
+export const {
+  initLeaderboard,
+  updatePlayerInfo,
+  resetLeaderboard,
+  initTurnSync,
+} = leaderboardSlice.actions
 
 export default leaderboardSlice.reducer
 
