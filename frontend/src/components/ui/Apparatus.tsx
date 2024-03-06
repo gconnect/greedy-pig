@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import Roulette from '@/components/ui/Roulette'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, getParticipantsForGame } from '@/lib/utils'
 import { addInput, sendEther } from '@/lib/cartesi'
@@ -57,14 +56,6 @@ export default function Apparatus({ notices }: any) {
     }
   }, [gameId, notices])
 
-  // useEffect(() => {
-  //   rollups?.inputContract.on(
-  //     'InputAdded',
-  //     (dappAddress, inboxInputIndex, sender, input) => {
-  //       handleEvent(dappAddress, inboxInputIndex, sender, input)
-  //     }
-  //   )
-  // }, [rollups])
 
   return (
     <div>
@@ -76,14 +67,6 @@ export default function Apparatus({ notices }: any) {
         players={players} 
         notices={notices}
       />
-      {/* <Button onClick={playGame} className="mb-10" type="button">
-        Play Game
-      </Button> */}
-      {/* <Roulette 
-        gameId={gameId} 
-        players={players} 
-        notices={notices}
-        /> */}
     </div>
   )
 }

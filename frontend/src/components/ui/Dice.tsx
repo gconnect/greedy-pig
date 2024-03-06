@@ -8,7 +8,6 @@ import Button from '@/components/shared/Button'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { addInput } from '@/lib/cartesi'
-import ConfirmModal from './ConfirmModal'
 
 interface RouletteProps {
   gameId: string
@@ -30,10 +29,6 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
     console.log('individual die values array:', values)
     console.log('total dice value:', totalValue)
   }
-
-  // const rollAll = () => {
-  //   reactDice.current?.rollAll([3])
-  // }
 
   const handleResponse = (response: string) => {
     playGame(response)
@@ -58,7 +53,6 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
 
       game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
 
-      // dispatch({ type: 'modal/toggleConfirmModal' })
 
       try {
         const jsonPayload = JSON.stringify({
@@ -93,13 +87,14 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
           console.log('playgame')
-          if (game.rollOutcome !== 0) {
+          console.log('playgame rolloutcome ', game?.rollOutcome)
+          if (game?.rollOutcome !== 0) {
             reactDice.current?.rollAll([game.rollOutcome])
           }
         }
       }
     )
-  }, [rollups, game])
+  }, [rollups, game?.rollOutcome])
 
     useEffect(() => {
     if (notices && notices.length > 0) {
@@ -108,9 +103,9 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
           (game: any) => game.id === gameId
         )
         if (game) {
+          alert(game.rollOutcome)
           setGame(game)
-          console.log(`game angle , ${game.startAngle}`)
-// reactDice.current?.rollAll([3])
+
           setActivePlayer(game.activePlayer)
   
           if (game.status === 'Ended') {
@@ -121,7 +116,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
         }
       }
     }
-  }, [notices, gameId])
+  }, [notices, gameId, activePlayer])
 
   return (
     <div>

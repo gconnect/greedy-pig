@@ -10,31 +10,40 @@ export const addGame = (game) => {
   const gameFound = games.length ? games.find(g => g.id === game.id) : null
 
   if (gameFound) {
-    if (gameFound) {
-      return errorResponse(true, 'Game already exist')
-    }
+    return errorResponse(true, 'Game already exist')
   }
+
 
   games.push({ ...game, id: uuidv4()})
   return errorResponse(false)
 }
 
-export const addParticipant = ({gameId, playerAddress}) => {
+export const addParticipant = async ({gameId, playerAddress}) => {
+
+
+  const rollupAddr = '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044'
+     try {
+        let voucher = wallet.balance_get(rollupAddr)
+        const res = fetch(rollup_server + "/voucher", {
+          method: "POST", headers: { "Content-Type": "application/json", },
+          body: JSON.stringify({ payload: voucher.payload, destination: voucher.destination }),
+        });
+        console.log('Received finish status rollup balance' + await res);
+      } catch (error) {
+        console.log(error)
+        return errorResponse(true, error)
+      }
 
   const game = games.find(game => game.id === gameId)
 
   if (!game) {
-    if (gameFound) {
-      return errorResponse(true, 'Game not found')
-    }
+    return errorResponse(true, 'Game not found')
   }
 
   const participant = game.participants.find(p => p.address === playerAddress)
 
   if (participant) {
-    if (gameFound) {
-      return errorResponse(true, 'Participant already exist')
-    }
+    return errorResponse(true, 'Participant already exist')
   }
 
 
@@ -68,6 +77,7 @@ const gamePlay = async (gameId, playerAddress) => {
 
 
   if (rollOutcome === 1) {
+
     console.log('roll outcome is ', rollOutcome)
     participant.playerInfo.turn += 1;
     // cancel all acumulated point for the turn
@@ -81,6 +91,25 @@ const gamePlay = async (gameId, playerAddress) => {
 
     game.rollOutcome = rollOutcome; // Update the roll outcome
     participant.playerInfo.turnScore += rollOutcome
+
+    if (game.gameSettings.mode === 'score' && participant.playerInfo.totalScore >= game.gameSettings.winningScore) {
+      
+      console.log('ending game ...')
+      endGame(game);
+      transferToWinner(game);
+      return errorResponse(false);
+
+    } else {
+
+      const allPlayersFinished = game.participants.every((participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn );
+
+      if (allPlayersFinished) {
+        console.log('ending game ...')
+        endGame(game)
+        transferToWinner(game)
+        return errorResponse(false)
+      }
+    }
     return
   }
 
@@ -145,26 +174,6 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     game.rollOutcome = 0
   }
 
-  if (game.gameSettings.mode === 'score' && activeParticipant.playerInfo.totalScore >= game.gameSettings.winningScore) {
-    console.log('ending game ...')
-    endGame(game);
-    transferToWinner(game);
-    return errorResponse(false);
-  } else {
-    const allPlayersFinished = game.participants.every(
-    (participant) => participant.playerInfo.turn >= game.gameSettings.numbersOfTurn
-  );
-
-  if (allPlayersFinished) {
-    console.log('ending game ...')
-    endGame(game)
-    transferToWinner(game)
-    return errorResponse(false)
-  }
-  }
-
-  
-
   return errorResponse(false)
 }
 
@@ -209,12 +218,12 @@ const endGame = game => {
 
 const transferToWinner = async (game) => {
   // Transfer to the winner.
-  // ether_withdraw: (rollup_address: Address, account: Address, amount: bigint) => Voucher | Error_out;
+// ether_transfer: (account: Address, to: Address, amount: bigint) => Notice | Error_out;
   if (game.gameSettings.bet && game.status === 'Ended') {
     console.log('transfering to winner: ', game.winner)
-    const rollupAddr = '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044'
+    const addr = '0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE'
      try {
-        let voucher = wallet.ether_withdraw(rollupAddr, game.winner, BigInt(game.bettingFund))
+        let voucher = wallet.ether_transfer(addr, game.winner, BigInt(game.bettingFund))
         await fetch(rollup_server + "/voucher", {
           method: "POST", headers: { "Content-Type": "application/json", },
           body: JSON.stringify({ payload: voucher.payload, destination: voucher.destination }),
