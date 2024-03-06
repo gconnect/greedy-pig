@@ -7,7 +7,7 @@ interface PlayerInfo {
 }
 
 export interface Participant {
-  username: string
+  address: string
   playerInfo: PlayerInfo
 }
 
@@ -18,7 +18,7 @@ interface State {
 }
 
 export interface UpdatePlayerInfoPayload {
-  username: string
+  address: string
   property: keyof PlayerInfo
   value: any
 }
@@ -33,7 +33,7 @@ const leaderboardSlice = createSlice({
   reducers: {
     initLeaderboard: (state, action: PayloadAction<string>) => {
       state.participants.push({
-        username: action.payload,
+        address: action.payload,
         playerInfo: {
           turn: 0,
           turnScore: 0,
@@ -46,9 +46,9 @@ const leaderboardSlice = createSlice({
       state,
       action: PayloadAction<UpdatePlayerInfoPayload>
     ) => {
-      const { username, property, value } = action.payload
+      const { address, property, value } = action.payload
       const participant = state.participants.find(
-        (p) => p.username === username
+        (p) => p.address === address
       )
       if (participant) {
         if (property === 'turn') {
@@ -76,11 +76,11 @@ const leaderboardSlice = createSlice({
   },
 })
 
-export const selectUsernames = createSelector(
+export const selectPlayers = createSelector(
   (state: State) => state.participants,
   (participants: Participant[] | undefined) => {
     if (!participants) return [] // Return an empty array if participants is undefined
-    return participants.map((participant) => participant.username)
+    return participants.map((participant) => participant.address)
   }
 )
 

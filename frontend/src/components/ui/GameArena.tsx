@@ -2,34 +2,36 @@
 
 import Apparatus from '@/components/ui/Apparatus'
 import LeaderBoard from './Leaderboard'
-import { dappAddress, parseInputEvent } from '@/lib/utils'
+import { dappAddress } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
 import { useNotices } from '@/hooks/useNotices'
-import { useEffect, useState } from 'react'
-import { Balance } from './Balance'
+import { useCallback, useEffect } from 'react'
 import Settings from './Settings'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectActivePlayer } from '@/features/leaderboard/leaderboardSlice'
 
 const GameArena = () => {
+
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
+  const dispatch = useDispatch()
 
-  // const [game, setGame] = useState<any>()
-  const [activePlayer, setActivePlayer] = useState<string>('')
+  const activePlayer = useSelector((state: any) =>
+  selectActivePlayer(state.leaderboard)
+  )
 
-  const handleEvent = async (sender: string, input: string) => {
-    console.log('Received event:', sender, input)
-    // console.log(hexToString(input))
+  const handleEvent = useCallback(async () => {
     await refetch()
-  }
+  }, [refetch])
 
   useEffect(() => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        handleEvent(sender, input)
+          handleEvent()
       }
     )
-  }, [rollups, refetch])
+  }, [handleEvent, rollups])
 
       useEffect(() => {
 
@@ -40,14 +42,12 @@ const GameArena = () => {
           (game: any) => game.id === gameId
         )
         if (game) {
-          // setGame(game)
-    
-          setActivePlayer(game.activePlayer)
-        
+          dispatch({ type: 'games/setGame', payload: game})
+          dispatch({ type: 'leaderboard/updateActivePlayer', payload: game.activePlayer})
         }
  
     }
-  }, [notices])
+  }, [notices, dispatch])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">
@@ -59,7 +59,7 @@ const GameArena = () => {
         </div>
 
         <div className="flex flex-col items-center gap-4 md:gap-6">
-          <LeaderBoard notices={notices} />
+          <LeaderBoard />
         </div>
       </div>
 

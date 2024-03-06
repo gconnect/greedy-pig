@@ -1,34 +1,34 @@
-import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect } from 'react'
 import { EmptyPage } from '@/components/shared/EmptyPage'
-import { shortenAddress } from '@/lib/utils'
+import { dappAddress, parseInputEvent, shortenAddress } from '@/lib/utils'
+import { useNotices } from '@/hooks/useNotices'
+import { useRollups } from '@/hooks/useRollups'
+import { useSelector } from 'react-redux'
+import { selectSelectedGame } from '@/features/games/gamesSlice'
 
-const LeaderBoard = ({ notices }: any) => {
+const LeaderBoard = () => {
 
-  const noticesRef = useRef(notices)
+  const { refetch } = useNotices()
+  const rollups = useRollups(dappAddress)
+
+  const game = useSelector((state: any) =>
+  selectSelectedGame(state.games)
+  )
   
-  const searchParams = useSearchParams()
-
-  const [game, setGame] = useState<any>(null)
-
-  useEffect(() => {
-    noticesRef.current = notices
-  }, [notices])
+  const handleEvent = useCallback(async () => {
+    await refetch()
+  }, [refetch])
 
   useEffect(() => {
-    const id = window.location.pathname.split('/').pop()
-
-    if (notices && notices.length > 0) {
- 
-      const selectedGame = JSON.parse(notices?.reverse()[0].payload).find(
-        (game: any) => game.id === id
-      )
-      if (selectedGame) {
-        setGame(selectedGame)
+    rollups?.inputContract.on(
+      'InputAdded',
+      (dappAddress, inboxInputIndex, sender, input) => {
+        if (parseInputEvent(input).method === 'addParticipant') {
+          handleEvent()
+        }
       }
-
-  }
-  }, [searchParams, notices])
+    )
+  }, [handleEvent, rollups])
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">

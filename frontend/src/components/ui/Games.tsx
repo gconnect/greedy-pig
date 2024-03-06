@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { GameStatus } from '@/interfaces'
 import GameCard from './GameCard'
 import { useNotices } from '@/hooks/useNotices'
@@ -7,29 +7,29 @@ import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
 
 const Games = () => {
-  const { notices } = useNotices()
+  const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
-  console.log('notices ', notices)
+ 
 
   const [status, setStatus] = useState<GameStatus>(GameStatus.New)
   const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setStatus(event.target.value as GameStatus)
   }
 
-  const handleEvent = (sender: string, input: string) => {
-    console.log('Received event for createGame:', sender, input)
-  }
+  const handleEvent = useCallback(async () => {
+    await refetch()
+  }, [refetch])
 
   useEffect(() => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'createGame') {
-          handleEvent(sender, input)
+          handleEvent()
         }
       }
     )
-  }, [rollups])
+  }, [handleEvent, rollups])
 
   return (
     <div>

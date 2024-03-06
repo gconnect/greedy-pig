@@ -2,31 +2,37 @@
 import { FC, useState, useEffect, useRef } from 'react'
 import ReactDice, { ReactDiceRef } from 'react-dice-complete'
 import { useConnectWallet } from '@web3-onboard/react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
 import Button from '@/components/shared/Button'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { addInput } from '@/lib/cartesi'
+import { selectParticipantAddresses, selectSelectedGame } from '@/features/games/gamesSlice'
 
 interface RouletteProps {
-  gameId: string
-  players: string[]
+
   notices: any
+
 }
 
-const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
+const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
 
   const dispatch = useDispatch()
   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
   const reactDice = useRef<ReactDiceRef>(null)
 
-  const [game, setGame] = useState<any>()
-  const [activePlayer, setActivePlayer] = useState<string>('')
+  const game = useSelector((state: any) =>
+  selectSelectedGame(state.games)
+  )
+  const players = useSelector((state: any) =>
+  selectParticipantAddresses(state.games)
+  )
 
-  const rollDone = (totalValue: number, values: number[]) => {
-    console.log('individual die values array:', values)
+  const [gameId, setGameId] = useState<string>()
+
+  const rollDone = (totalValue: number,) => {
     console.log('total dice value:', totalValue)
   }
 
@@ -41,7 +47,7 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
       return toast.error('Game has ended')
     }
 
-    if (activePlayer !== playerAddress) {
+    if (game.activePlayer !== playerAddress) {
       return toast.error('Not your turn')
     }
 
@@ -80,45 +86,45 @@ const MyDiceApp: FC<RouletteProps> = ({ gameId, players, notices }) => {
       toast.error('Not enough players to play')
     }
   }
-
+  // game.participants.map((participant: any) => participant.address)
   useEffect(() => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
         if (parseInputEvent(input).method === 'playGame') {
-          console.log('playgame')
-          console.log('playgame rolloutcome ', game?.rollOutcome)
-          if (game?.rollOutcome !== 0) {
-            console.log('the game ', game)
-            console.log('the notices ', notices)
-            reactDice.current?.rollAll([game.rollOutcome])
+
+          if (notices && notices.length > 0) {
+        
+            // const game = JSON.parse(notices[notices.length - 1].payload).find(
+            //   (game: any) => game.id === gameId
+            // )
+            if (game) {
+      
+              // setGame(game)
+    
+              // setActivePlayer(game.activePlayer)
+              // const gameParticipants = game.participants.map((participant: any) => participant.address);
+          // setPlayers(gameParticipants);
+      
+              if (game.status === 'Ended') return toast.success('Game has ended');
+                // audio.play(); // Play the audio when the game is over
+                
+              console.log('playgame rolloutcome ', game.rollOutcome)
+              if (game.rollOutcome !== 0) {
+                console.log('the game ', game)
+                console.log('the notices ', notices)
+                reactDice.current?.rollAll([game.rollOutcome])
+              }
+            
+            }
+       
           }
+        
+          
         }
       }
     )
   }, [rollups, game, notices])
-
-    useEffect(() => {
-    if (notices && notices.length > 0) {
-      if (gameId) {
-        const game = JSON.parse(notices[notices.length - 1].payload).find(
-          (game: any) => game.id === gameId
-        )
-        if (game) {
-  
-          setGame(game)
-
-          setActivePlayer(game.activePlayer)
-  
-          if (game.status === 'Ended') {
-            // audio.play(); // Play the audio when the game is over
-            toast.success('Game has ended');
-          }
-        
-        }
-      }
-    }
-  }, [notices, gameId, activePlayer])
 
   return (
     <div>
