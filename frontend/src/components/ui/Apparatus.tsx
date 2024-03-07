@@ -12,20 +12,14 @@ import {
   selectSelectedGame,
 } from '@/features/games/gamesSlice'
 
-export default function Apparatus({ notices }: any) {
+export default function Apparatus() {
   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
-  const noticesRef = useRef(notices)
+  // const noticesRef = useRef(notices)
 
   const game = useSelector((state: any) => selectSelectedGame(state.games))
 
-  const players = useSelector((state: any) =>
-    selectParticipantAddresses(state.games)
-  )
-
   const [gameId, setGameId] = useState<string>('')
-  // const [players, setPlayers] = useState<string[]>([])
-  //  const [game, setGame] = useState<any>(null)
 
   const joinGame = async (id: any) => {
     const res = await sendEther(1, rollups)
@@ -55,20 +49,6 @@ export default function Apparatus({ notices }: any) {
   //   noticesRef.current = notices // Update the ref value whenever notices changes
   // }, [notices])
 
-  // useEffect(() => {
-  //   const id = window.location.pathname.split('/').pop()
-  //   if (id && notices && notices.length > 0) {
-  //     setGameId(id)
-  //     getParticipantsForGame(gameId, notices).then((fetchedPlayers) => {
-  //       setPlayers(fetchedPlayers)
-  //     })
-  //     // const game = JSON.parse(notices[notices.length - 1].payload).find(
-  //     //     (game: any) => game.id === gameId
-  //     //   )
-  //     //   setGame(game)
-  //   }
-  // }, [notices, gameId])
-
   useEffect(() => {
     const id = window.location.pathname.split('/').pop()
     if (id) {
@@ -87,7 +67,7 @@ export default function Apparatus({ notices }: any) {
           Join Game
         </Button>
       )}
-      <Dice notices={notices} />
+      <Dice />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
-import { Wallet } from 'cartesi-wallet'
+const { Wallet } = require('cartesi-wallet')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 const wallet = new Wallet(new Map())
@@ -21,14 +21,15 @@ export const addGame = (game) => {
 export const addParticipant = async ({gameId, playerAddress}) => {
 
 
-  const rollupAddr = '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044'
+  const rollupAddr = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
      try {
         let voucher = wallet.balance_get(rollupAddr)
         const res = fetch(rollup_server + "/voucher", {
           method: "POST", headers: { "Content-Type": "application/json", },
           body: JSON.stringify({ payload: voucher.payload, destination: voucher.destination }),
         });
-        console.log('Received finish status rollup balance' + await res);
+        const x = await res
+        console.log('Received finish status rollup balance' + JSON.stringify(x));
       } catch (error) {
         console.log(error)
         return errorResponse(true, error)
@@ -95,8 +96,6 @@ const gamePlay = async (gameId, playerAddress) => {
     if (game.gameSettings.mode === 'score' && participant.playerInfo.totalScore >= game.gameSettings.winningScore) {
       
       console.log('ending game ...')
-      participant.playerInfo.totalScore += participant.playerInfo.turnScore
-      participant.playerInfo.turnScore = 0
       endGame(game);
       transferToWinner(game);
       return errorResponse(false);

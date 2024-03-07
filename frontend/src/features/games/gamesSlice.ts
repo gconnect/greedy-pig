@@ -50,6 +50,7 @@ const gamesSlice = createSlice({
   },
   reducers: {
     setGame: (state, action: PayloadAction<GameState>) => {
+      console.log('setting game in the store ...', action.payload)
       state.selectedGame = action.payload
     },
   },

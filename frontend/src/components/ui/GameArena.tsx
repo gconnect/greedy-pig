@@ -9,6 +9,7 @@ import { useCallback, useEffect } from 'react'
 import Settings from './Settings'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectActivePlayer } from '@/features/leaderboard/leaderboardSlice'
+import toast from 'react-hot-toast'
 
 const GameArena = () => {
   const { notices, refetch } = useNotices()
@@ -20,33 +21,51 @@ const GameArena = () => {
   )
 
   const handleEvent = useCallback(async () => {
-    await refetch()
+    return await refetch()
   }, [refetch])
 
+  const dispatchGameData = useCallback((game: any) => {
+    dispatch({ type: 'games/setGame', payload: game });
+    dispatch({ type: 'leaderboard/updateActivePlayer', payload: game.activePlayer });
+  }, [dispatch])
+  
   useEffect(() => {
-    rollups?.inputContract.on(
-      'InputAdded',
-      (dappAddress, inboxInputIndex, sender, input) => {
-        handleEvent()
-      }
-    )
-  }, [handleEvent, rollups])
-
-  useEffect(() => {
-    const gameId = window.location.pathname.split('/').pop()
+    const gameId = window.location.pathname.split('/').pop();
     if (gameId && notices && notices.length > 0) {
       const game = JSON.parse(notices[notices.length - 1].payload).find(
         (game: any) => game.id === gameId
-      )
+      );
       if (game) {
-        dispatch({ type: 'games/setGame', payload: game })
-        dispatch({
-          type: 'leaderboard/updateActivePlayer',
-          payload: game.activePlayer,
-        })
+        console.log('setting game from game arena on page load ... ', game);
+        dispatchGameData(game); // Dispatch actions on page load
       }
     }
-  }, [notices, dispatch])
+  }, [notices, dispatchGameData]);
+
+  useEffect(() => {
+    const gameId = window.location.pathname.split('/').pop()
+    rollups?.inputContract.on(
+      'InputAdded',
+      (dappAddress, inboxInputIndex, sender, input) => {
+        handleEvent().then(() => {
+          if (gameId && notices && notices.length > 0) {
+            const game = JSON.parse(notices[notices.length - 1].payload).find(
+              (game: any) => game.id === gameId
+            )
+            if (game) {
+
+              dispatchGameData(game)
+
+              if (game.status === 'Ended') {
+                toast.success(`${game.winner} won`)
+              }
+            }
+          }
+        })
+      }
+    )
+    
+  }, [handleEvent, rollups, dispatch, notices, dispatchGameData])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">
@@ -54,7 +73,7 @@ const GameArena = () => {
         <div className="flex flex-col items-center gap-4  px-8 py-6 md:gap-6">
           {/* <Balance /> */}
           {activePlayer && <p>{activePlayer}'s turn</p>}
-          <Apparatus notices={notices} />
+          <Apparatus />
         </div>
 
         <div className="flex flex-col items-center gap-4 md:gap-6">

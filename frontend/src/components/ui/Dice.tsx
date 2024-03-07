@@ -1,5 +1,5 @@
 'use client'
-import { FC, useState, useEffect, useRef } from 'react'
+import { FC, useState, useEffect, useRef, useCallback } from 'react'
 import ReactDice, { ReactDiceRef } from 'react-dice-complete'
 import { useConnectWallet } from '@web3-onboard/react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,12 +12,15 @@ import {
   selectParticipantAddresses,
   selectSelectedGame,
 } from '@/features/games/gamesSlice'
+import { useNotices } from '@/hooks/useNotices'
 
 interface RouletteProps {
-  notices: any
+  // notices: any
 }
 
-const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
+const MyDiceApp: FC<RouletteProps> = () => {
+
+  const { notices, refetch } = useNotices()
   const dispatch = useDispatch()
   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
@@ -27,8 +30,10 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
   const players = useSelector((state: any) =>
     selectParticipantAddresses(state.games)
   )
-
-  const [gameId, setGameId] = useState<string>()
+  
+  const handleEvent = useCallback(async () => {
+    return await refetch()
+  }, [refetch])
 
   const rollDone = (totalValue: number) => {
     console.log('total dice value:', totalValue)
@@ -41,6 +46,8 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
   const playGame = async (response: string) => {
     const playerAddress = wallet?.accounts[0].address
 
+    if (!playerAddress) return toast.error('Connect account')
+
     if (game.status === 'Ended') {
       return toast.error('Game has ended')
     }
@@ -49,17 +56,14 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
       return toast.error('Not your turn')
     }
 
-    if (!playerAddress) return toast.error('Player not connected')
-
     if (players.length >= 2) {
       const playerAddress = wallet?.accounts[0].address
 
-      // game.status === 'New' ? dispatch({ type: 'leaderboard/initTurnSync', payload: true}) : ''
-
+    
       try {
         const jsonPayload = JSON.stringify({
           method: 'playGame',
-          data: { gameId, playerAddress, response },
+          data: { gameId: game.id, playerAddress, response },
         })
 
         const tx = await addInput(
@@ -78,39 +82,19 @@ const MyDiceApp: FC<RouletteProps> = ({ notices }) => {
       toast.error('Not enough players to play')
     }
   }
-  // game.participants.map((participant: any) => participant.address)
+
   useEffect(() => {
-    rollups?.inputContract.on(
-      'InputAdded',
-      (dappAddress, inboxInputIndex, sender, input) => {
-        if (parseInputEvent(input).method === 'playGame') {
-          if (notices && notices.length > 0) {
-            // const game = JSON.parse(notices[notices.length - 1].payload).find(
-            //   (game: any) => game.id === gameId
-            // )
-            if (game) {
-              // setGame(game)
-
-              // setActivePlayer(game.activePlayer)
-              // const gameParticipants = game.participants.map((participant: any) => participant.address);
-              // setPlayers(gameParticipants);
-
-              if (game.status === 'Ended')
-                return toast.success('Game has ended')
-              // audio.play(); // Play the audio when the game is over
-
-              console.log('playgame rolloutcome ', game.rollOutcome)
-              if (game.rollOutcome !== 0) {
-                console.log('the game ', game)
-                console.log('the notices ', notices)
-                reactDice.current?.rollAll([game.rollOutcome])
-              }
-            }
-          }
-        }
+    console.log('Game:', game); // Log the game state
+    if (game) {
+      if (game.status === 'Ended') {
+        toast.success('Game has ended')
+      } 
+      if (game.rollOutcome !== 0) {
+        console.log('thee gameee ', game)
+        reactDice.current?.rollAll([game.rollOutcome]);
       }
-    )
-  }, [rollups, game, notices])
+    }
+  }, [game])
 
   return (
     <div>

@@ -37,7 +37,7 @@ async function handle_advance(data) {
         try {
           return router.process("ether_deposit", payload);
         } catch (e) {
-          return new Error_out(`failed to process ether deposti ${payload} ${e}`);
+          return new Error_out(`failed to process ether deposit ${payload} ${e}`);
         }
       } else {
 
