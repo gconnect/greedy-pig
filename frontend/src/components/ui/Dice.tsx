@@ -1,5 +1,5 @@
 'use client'
-import { FC, useState, useEffect, useRef, useCallback } from 'react'
+import { FC, useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import ReactDice, { ReactDiceRef } from 'react-dice-complete'
 import { useConnectWallet } from '@web3-onboard/react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -31,9 +31,9 @@ const MyDiceApp: FC<RouletteProps> = () => {
     selectParticipantAddresses(state.games)
   )
   
-  const handleEvent = useCallback(async () => {
-    return await refetch()
-  }, [refetch])
+  // const handleEvent = useCallback(async () => {
+  //   return await refetch()
+  // }, [refetch])
 
   const rollDone = (totalValue: number) => {
     console.log('total dice value:', totalValue)
@@ -72,9 +72,8 @@ const MyDiceApp: FC<RouletteProps> = () => {
           rollups
         )
 
-        console.log('dice tx ', tx)
         const result = await tx.wait(1)
-        console.log('result for the game ', result)
+        console.log('tx for the game ', result)
       } catch (error) {
         console.error('Error during game:', error)
       }
@@ -82,19 +81,35 @@ const MyDiceApp: FC<RouletteProps> = () => {
       toast.error('Not enough players to play')
     }
   }
-
+  const memoizedGame = useMemo(() => game, [game])
   useEffect(() => {
-    console.log('Game:', game); // Log the game state
-    if (game) {
-      if (game.status === 'Ended') {
-        toast.success('Game has ended')
-      } 
-      if (game.rollOutcome !== 0) {
-        console.log('thee gameee ', game)
-        reactDice.current?.rollAll([game.rollOutcome]);
+    console.log('thee gameee ', memoizedGame)
+    rollups?.inputContract.on(
+      'InputAdded',
+      (dappAddress, inboxInputIndex, sender, input) => {
+        if ((parseInputEvent(input).method === 'playGame') && (memoizedGame.rollOutcome !== 0)) {
+          setTimeout(() => {
+            reactDice.current?.rollAll([memoizedGame.rollOutcome]);
+          }, 5000)
+        }
       }
-    }
-  }, [game])
+    )
+  }, [memoizedGame, rollups])
+
+  // useEffect(() => {
+  //   console.log('thee gameee ', game)
+  //   rollups?.inputContract.on(
+  //     'InputAdded',
+  //     (dappAddress, inboxInputIndex, sender, input) => {
+  //       if (parseInputEvent(input).method === 'playGame') {
+  //         setTimeout(() => {
+  //           reactDice.current?.rollAll([game.rollOutcome]);
+  //         }, 5000)
+  //       }
+  //     }
+  //   )
+  // }, [game, rollups])
+
 
   return (
     <div>

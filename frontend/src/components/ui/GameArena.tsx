@@ -54,7 +54,7 @@ const GameArena = () => {
             )
             if (game) {
 
-              dispatchGameData(game)
+              // dispatchGameData(game)
 
               if (game.status === 'Ended') {
                 toast.success(`${game.winner} won`)

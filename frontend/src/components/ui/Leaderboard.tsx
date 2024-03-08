@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { EmptyPage } from '@/components/shared/EmptyPage'
 import { dappAddress, parseInputEvent, shortenAddress } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
@@ -7,20 +7,36 @@ import { useSelector } from 'react-redux'
 import { selectSelectedGame } from '@/features/games/gamesSlice'
 
 const LeaderBoard = () => {
-  const { refetch } = useNotices()
+  const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
 
+  // const [game, setGame] = useState<any>()
+  // const memoizedGame = useMemo(() => game, [game])
   const game = useSelector((state: any) => selectSelectedGame(state.games))
 
   const handleEvent = useCallback(async () => {
     await refetch()
   }, [refetch])
 
+  // useEffect(() => {
+  //   const gameId = window.location.pathname.split('/').pop();
+  //   if (gameId && notices && notices.length > 0) {
+  //     const game = JSON.parse(notices[notices.length - 1].payload).find(
+  //       (game: any) => game.id === gameId
+  //     );
+  //     if (game) {
+  //       console.log('setting game from game arena on page load ... ', game);
+  //       setGame(game)
+  //       // dispatchGameData(game); // Dispatch actions on page load
+  //     }
+  //   }
+  // }, []);
+
   useEffect(() => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        if (parseInputEvent(input).method === 'addParticipant') {
+        if (parseInputEvent(input).method === 'addParticipant' || parseInputEvent(input).method === 'playGame') {
           handleEvent()
         }
       }

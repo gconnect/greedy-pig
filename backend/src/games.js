@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
-import { Wallet } from 'cartesi-wallet'
+const { Wallet } = require('cartesi-wallet')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 const wallet = new Wallet(new Map())
@@ -21,7 +21,7 @@ export const addGame = (game) => {
 export const addParticipant = async ({gameId, playerAddress}) => {
 
 
-  const rollupAddr = '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044'
+  const rollupAddr = '0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE'
      try {
         let voucher = wallet.balance_get(rollupAddr)
         const res = fetch(rollup_server + "/voucher", {
@@ -92,7 +92,8 @@ const gamePlay = async (gameId, playerAddress) => {
     game.rollOutcome = rollOutcome; // Update the roll outcome
     participant.playerInfo.turnScore += rollOutcome
 
-    if (game.gameSettings.mode === 'score' && participant.playerInfo.totalScore >= game.gameSettings.winningScore) {
+    const totalScore = participant.playerInfo.turnScore + participant.playerInfo.totalScore
+    if (game.gameSettings.mode === 'score' && totalScore >= game.gameSettings.winningScore) {
       
       console.log('ending game ...')
       participant.playerInfo.totalScore += participant.playerInfo.turnScore
