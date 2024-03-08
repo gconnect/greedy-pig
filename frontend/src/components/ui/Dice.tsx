@@ -96,42 +96,29 @@ const MyDiceApp: FC<RouletteProps> = () => {
     )
   }, [memoizedGame, rollups])
 
-  // useEffect(() => {
-  //   console.log('thee gameee ', game)
-  //   rollups?.inputContract.on(
-  //     'InputAdded',
-  //     (dappAddress, inboxInputIndex, sender, input) => {
-  //       if (parseInputEvent(input).method === 'playGame') {
-  //         setTimeout(() => {
-  //           reactDice.current?.rollAll([game.rollOutcome]);
-  //         }, 5000)
-  //       }
-  //     }
-  //   )
-  // }, [game, rollups])
-
 
   return (
-    <div>
-      {/* <h2 onClick={rollAll}>Rollll</h2> */}
+    <div className="w-[300px]">
+      <div className="flex mb-[120px]">
+        <ReactDice
+          numDice={1}
+          ref={reactDice}
+          rollDone={rollDone}
+          disableIndividual={true}
+          dieSize={140}
+        />
+      </div>
+
       {game && game.status !== 'Ended' && (
-        <div>
-          <Button type="button" id="spin" onClick={() => handleResponse('yes')}>
-            Roll
-          </Button>
-          <Button type="button" id="spin" onClick={() => handleResponse('no')}>
+        <div className="flex justify-between">
+          <Button className="pass-btn" style={{background: ''}} onClick={() => handleResponse('no')}>
             Pass
+          </Button>
+          <Button onClick={() => handleResponse('yes')}>
+            Roll
           </Button>
         </div>
       )}
-      <ReactDice
-        numDice={1}
-        ref={reactDice}
-        rollDone={rollDone}
-        disableIndividual={true}
-        dieSize={140}
-      />
-      {/* <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} /> */}
     </div>
   )
 }

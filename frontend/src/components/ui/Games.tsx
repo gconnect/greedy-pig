@@ -5,14 +5,25 @@ import { useNotices } from '@/hooks/useNotices'
 import { IGame } from '@/interfaces'
 import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
+import { useDispatch } from 'react-redux'
+import { useConnectWallet } from '@web3-onboard/react'
+import toast from 'react-hot-toast'
+import Button from '../shared/Button'
 
 const Games = () => {
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
+  const dispatch = useDispatch()
+  const [{ wallet }] = useConnectWallet()
 
   const [status, setStatus] = useState<GameStatus>(GameStatus.New)
   const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setStatus(event.target.value as GameStatus)
+  }
+
+  const modalHandler = () => {
+    if (!wallet) return toast.error('Connect Wallet to continue')
+    dispatch({ type: 'modal/toggleGameModal' })
   }
 
   const handleEvent = useCallback(async () => {
@@ -53,10 +64,15 @@ const Games = () => {
         <div className="md:px-4 md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 space-y-4 md:space-y-0">
           {notices &&
             notices.length > 0 &&
-            JSON.parse(notices.reverse()[0].payload).map((game: IGame) => (
+            JSON.parse(notices.reverse()[0].payload)
+            .filter((game: IGame) => game.status === status)
+            .map((game: IGame) => (
               <GameCard key={game.id} game={game} />
             ))}
         </div>
+        {notices && notices.length === 0 && <div className="flex flex-row justify-center">
+          <p>No game found</p>
+          <Button className="w-[200px]" onClick={modalHandler}>Create Game</Button></div>}
       </div>
     </div>
   )

@@ -3,12 +3,12 @@
 import GameSettings from '@/components/ui/GameSettings'
 import GameArena from '@/components/ui/GameArena'
 
-import Header from '@/components/shared/Header'
+import GameHeader from '@/components/shared/GameHeader'
 
 export default function GamePage({ params }: { params: { slug: string } }) {
   return (
     <div>
-      <Header />
+      <GameHeader />
       <GameSettings />
       <GameArena />
     </div>
