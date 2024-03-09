@@ -37,7 +37,8 @@ async function handle_advance(data) {
         try {
           console.log('paypment papyload ', payload)
           const res = await router.process("ether_deposit", payload);
-          console.log('res from payment ', res)
+          // const r = viem.hexToString(res)
+          console.log('res from payment ', res.payload)
         } catch (e) {
           return new Error_out(`failed to process ether deposit ${payload} ${e}`);
         }
