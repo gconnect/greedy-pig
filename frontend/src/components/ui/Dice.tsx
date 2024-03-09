@@ -30,6 +30,11 @@ const MyDiceApp: FC<RouletteProps> = () => {
   const players = useSelector((state: any) =>
     selectParticipantAddresses(state.games)
   )
+
+  const joinSoundEfx = () => {
+    const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' )
+    audio.play()
+  }
   
   // const handleEvent = useCallback(async () => {
   //   return await refetch()

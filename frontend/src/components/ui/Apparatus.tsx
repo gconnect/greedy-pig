@@ -24,6 +24,7 @@ export default function Apparatus() {
   const joinGame = async (id: any) => {
     const res = await sendEther(1, rollups)
     const txHash = await res.wait(1)
+    return console.log(txHash)
     if (txHash) {
       const addr: string | undefined = wallet?.accounts[0].address
 

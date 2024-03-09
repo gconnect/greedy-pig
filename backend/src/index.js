@@ -35,7 +35,9 @@ async function handle_advance(data) {
     try {
       if ( msg_sender.toLowerCase() === etherPortalAddress.toLowerCase() ) {
         try {
-          return router.process("ether_deposit", payload);
+          console.log('paypment papyload ', payload)
+          const res = await router.process("ether_deposit", payload);
+          console.log('res from payment ', res)
         } catch (e) {
           return new Error_out(`failed to process ether deposit ${payload} ${e}`);
         }
