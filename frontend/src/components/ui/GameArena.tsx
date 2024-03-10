@@ -36,8 +36,7 @@ const GameArena = () => {
         (game: any) => game.id === gameId
       );
       if (game) {
-        console.log('setting game from game arena on page load ... ', game);
-        dispatchGameData(game); // Dispatch actions on page load
+        // dispatchGameData(game); // Dispatch actions on page load
       }
     }
   }, [notices, dispatchGameData]);
@@ -54,7 +53,7 @@ const GameArena = () => {
             )
             if (game) {
 
-              // dispatchGameData(game)
+              dispatchGameData(game)
 
               if (game.status === 'Ended') {
                 toast.success(`${game.winner} won`)

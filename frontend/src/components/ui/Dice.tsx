@@ -13,6 +13,7 @@ import {
   selectSelectedGame,
 } from '@/features/games/gamesSlice'
 import { useNotices } from '@/hooks/useNotices'
+import { AppDice } from './AppDice'
 
 interface RouletteProps {
   // notices: any
@@ -30,6 +31,9 @@ const MyDiceApp: FC<RouletteProps> = () => {
   const players = useSelector((state: any) =>
     selectParticipantAddresses(state.games)
   )
+
+  const [isRolling, setIsRolling] = useState(false)
+  const [value, setValue] = useState(0)
 
   const playJoinSoundEfx = () => {
     const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' )
@@ -71,7 +75,7 @@ const MyDiceApp: FC<RouletteProps> = () => {
 
     
       try {
-        playJoinSoundEfx()
+        // playJoinSoundEfx()
         const jsonPayload = JSON.stringify({
           method: 'playGame',
           data: { gameId: game.id, playerAddress, response },
@@ -82,53 +86,84 @@ const MyDiceApp: FC<RouletteProps> = () => {
           dappAddress,
           rollups
         )
-        stopJoinSoundEfx()
+        // stopJoinSoundEfx()
         const result = await tx.wait(1)
         console.log('tx for the game ', result)
       } catch (error) {
         console.error('Error during game:', error)
       }
     } else {
-      stopJoinSoundEfx()
+      // stopJoinSoundEfx()
       toast.error('Not enough players to play')
     }
   }
-  const memoizedGame = useMemo(() => game, [game])
+  // const memoizedGame = useMemo(() => game, [game])
   useEffect(() => {
-    console.log('thee gameee ', memoizedGame)
+    console.log('thee gameee ', game)
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        if ((parseInputEvent(input).method === 'playGame') && (memoizedGame.rollOutcome !== 0)) {
+        if (
+          parseInputEvent(input).method === 'playGame' &&
+          game.rollOutcome !== 0
+        ) {
           setTimeout(() => {
-            reactDice.current?.rollAll([memoizedGame.rollOutcome]);
+            setValue(game.rollOutcome)
+            setIsRolling(true)
+            // reactDice.current?.rollAll([memoizedGame.rollOutcome]);
           }, 5000)
         }
       }
     )
-  }, [memoizedGame, rollups])
+  }, [game, rollups])
+  // const memoizedGame = useMemo(() => game, [game])
+  // useEffect(() => {
+  //   console.log('thee gameee ', memoizedGame)
+  //   rollups?.inputContract.on(
+  //     'InputAdded',
+  //     (dappAddress, inboxInputIndex, sender, input) => {
+  //       if ((parseInputEvent(input).method === 'playGame') && (memoizedGame.rollOutcome !== 0)) {
+  //         setTimeout(() => {
+  //           setValue(memoizedGame.rollOutcome)
+  //           setIsRolling(true)
+  //           // reactDice.current?.rollAll([memoizedGame.rollOutcome]);
+  //         }, 5000)
+  //       }
+  //     }
+  //   )
+  // }, [memoizedGame, rollups])
 
 
   return (
     <div className="w-[300px]">
       <div className="flex justify-center mb-[120px]">
-        <ReactDice
+        <AppDice
+          handleDiceClick={() => handleResponse('yes')}
+          isRolling={isRolling}
+          setIsRolling={setIsRolling}
+          value={value}
+        />
+        {/* <ReactDice
           numDice={1}
           ref={reactDice}
           rollDone={rollDone}
           disableIndividual={true}
           dieSize={140}
-        />
+        /> */}
       </div>
 
       {game && game.status !== 'Ended' && (
         <div className="flex justify-between">
-          <Button className="pass-btn" style={{background: ''}} onClick={() => handleResponse('no')}>
+          <Button
+            className="pass-btn"
+            style={{ background: '' }}
+            onClick={() => handleResponse('no')}
+          >
             Pass
           </Button>
-          <Button onClick={() => handleResponse('yes')}>
+          {/* <Button onClick={() => handleResponse('yes')}>
             Roll
-          </Button>
+          </Button> */}
         </div>
       )}
     </div>
