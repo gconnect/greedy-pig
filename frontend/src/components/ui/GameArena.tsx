@@ -2,7 +2,7 @@
 
 import Apparatus from '@/components/ui/Apparatus'
 import LeaderBoard from './Leaderboard'
-import { dappAddress } from '@/lib/utils'
+import { dappAddress, shortenAddress } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
 import { useNotices } from '@/hooks/useNotices'
 import { useCallback, useEffect } from 'react'
@@ -72,7 +72,7 @@ const GameArena = () => {
       <div className="grid gap-4 md:grid-cols-2 md:gap-8">
         <div className="flex flex-col items-center gap-4  px-8 py-6 md:gap-6">
           {/* <Balance /> */}
-          {activePlayer && <p>{activePlayer}'s turn</p>}
+          {activePlayer && <p>{shortenAddress(activePlayer)}'s turn</p>}
           <Apparatus />
         </div>
 

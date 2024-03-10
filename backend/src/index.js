@@ -35,10 +35,10 @@ async function handle_advance(data) {
     try {
       if ( msg_sender.toLowerCase() === etherPortalAddress.toLowerCase() ) {
         try {
-          console.log('paypment papyload ', payload)
+          console.log('payment payload ', payload)
           const res = await router.process("ether_deposit", payload);
-          // const r = viem.hexToString(res)
-          console.log('res from payment ', res.payload)
+          const r = viem.parse(viem.hexToString(res.payload))
+          console.log('res from payment ', r)
         } catch (e) {
           return new Error_out(`failed to process ether deposit ${payload} ${e}`);
         }

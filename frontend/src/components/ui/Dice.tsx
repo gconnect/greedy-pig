@@ -31,9 +31,14 @@ const MyDiceApp: FC<RouletteProps> = () => {
     selectParticipantAddresses(state.games)
   )
 
-  const joinSoundEfx = () => {
+  const playJoinSoundEfx = () => {
     const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' )
     audio.play()
+  }
+
+  const stopJoinSoundEfx = () => {
+    const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' )
+    audio.pause()
   }
   
   // const handleEvent = useCallback(async () => {
@@ -66,6 +71,7 @@ const MyDiceApp: FC<RouletteProps> = () => {
 
     
       try {
+        playJoinSoundEfx()
         const jsonPayload = JSON.stringify({
           method: 'playGame',
           data: { gameId: game.id, playerAddress, response },
@@ -76,13 +82,14 @@ const MyDiceApp: FC<RouletteProps> = () => {
           dappAddress,
           rollups
         )
-
+        stopJoinSoundEfx()
         const result = await tx.wait(1)
         console.log('tx for the game ', result)
       } catch (error) {
         console.error('Error during game:', error)
       }
     } else {
+      stopJoinSoundEfx()
       toast.error('Not enough players to play')
     }
   }
@@ -104,7 +111,7 @@ const MyDiceApp: FC<RouletteProps> = () => {
 
   return (
     <div className="w-[300px]">
-      <div className="flex mb-[120px]">
+      <div className="flex justify-center mb-[120px]">
         <ReactDice
           numDice={1}
           ref={reactDice}
