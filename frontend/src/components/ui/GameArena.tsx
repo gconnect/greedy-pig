@@ -24,22 +24,28 @@ const GameArena = () => {
     return await refetch()
   }, [refetch])
 
-  const dispatchGameData = useCallback((game: any) => {
-    dispatch({ type: 'games/setGame', payload: game });
-    dispatch({ type: 'leaderboard/updateActivePlayer', payload: game.activePlayer });
-  }, [dispatch])
-  
+  const dispatchGameData = useCallback(
+    (game: any) => {
+      dispatch({ type: 'games/setGame', payload: game })
+      dispatch({
+        type: 'leaderboard/updateActivePlayer',
+        payload: game.activePlayer,
+      })
+    },
+    [dispatch]
+  )
+
   useEffect(() => {
-    const gameId = window.location.pathname.split('/').pop();
+    const gameId = window.location.pathname.split('/').pop()
     if (gameId && notices && notices.length > 0) {
       const game = JSON.parse(notices[notices.length - 1].payload).find(
         (game: any) => game.id === gameId
-      );
+      )
       if (game) {
-        // dispatchGameData(game); // Dispatch actions on page load
+        dispatchGameData(game); // Dispatch actions on page load
       }
     }
-  }, [notices, dispatchGameData]);
+  }, [notices, dispatchGameData])
 
   useEffect(() => {
     const gameId = window.location.pathname.split('/').pop()
@@ -52,7 +58,6 @@ const GameArena = () => {
               (game: any) => game.id === gameId
             )
             if (game) {
-
               dispatchGameData(game)
 
               if (game.status === 'Ended') {
@@ -63,7 +68,6 @@ const GameArena = () => {
         })
       }
     )
-    
   }, [handleEvent, rollups, dispatch, notices, dispatchGameData])
 
   return (
