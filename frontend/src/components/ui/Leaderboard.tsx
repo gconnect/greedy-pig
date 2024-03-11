@@ -5,8 +5,11 @@ import { useNotices } from '@/hooks/useNotices'
 import { useRollups } from '@/hooks/useRollups'
 import { useSelector } from 'react-redux'
 import { selectSelectedGame } from '@/features/games/gamesSlice'
+import useAudio from '@/hooks/useAudio'
 
 const LeaderBoard = () => {
+
+  const addPlayerSound = useAudio('/sounds/addPlayer.mp3')
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
 
@@ -16,6 +19,7 @@ const LeaderBoard = () => {
 
   const handleEvent = useCallback(async () => {
     await refetch()
+    addPlayerSound?.play()
   }, [refetch])
 
   // useEffect(() => {

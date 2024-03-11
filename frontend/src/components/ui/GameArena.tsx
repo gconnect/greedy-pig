@@ -10,8 +10,11 @@ import Settings from './Settings'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectActivePlayer } from '@/features/leaderboard/leaderboardSlice'
 import toast from 'react-hot-toast'
+import useAudio from '@/hooks/useAudio'
 
 const GameArena = () => {
+
+  const gameOverSound = useAudio('/sounds/gameOver.mp3')
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
   const dispatch = useDispatch()
@@ -61,6 +64,7 @@ const GameArena = () => {
               dispatchGameData(game)
 
               if (game.status === 'Ended') {
+                gameOverSound?.play()
                 toast.success(`${game.winner} won`)
               }
             }

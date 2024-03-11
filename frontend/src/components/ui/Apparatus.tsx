@@ -11,8 +11,10 @@ import {
   selectParticipantAddresses,
   selectSelectedGame,
 } from '@/features/games/gamesSlice'
+import useAudio from '@/hooks/useAudio'
 
 export default function Apparatus() {
+
   const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
   // const noticesRef = useRef(notices)

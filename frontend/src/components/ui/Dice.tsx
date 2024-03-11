@@ -14,6 +14,7 @@ import {
 } from '@/features/games/gamesSlice'
 import { useNotices } from '@/hooks/useNotices'
 import { AppDice } from './AppDice'
+import useAudio from '@/hooks/useAudio'
 
 interface RouletteProps {
   // notices: any
@@ -21,6 +22,7 @@ interface RouletteProps {
 
 const MyDiceApp: FC<RouletteProps> = () => {
 
+  const loseSound = useAudio('/sounds/loseSound.mp3')
   const { notices, refetch } = useNotices()
   const dispatch = useDispatch()
   const [{ wallet }] = useConnectWallet()
@@ -35,23 +37,10 @@ const MyDiceApp: FC<RouletteProps> = () => {
   const [isRolling, setIsRolling] = useState(false)
   const [value, setValue] = useState(0)
 
-  const playJoinSoundEfx = () => {
-    const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' )
-    audio.play()
-  }
-
-  const stopJoinSoundEfx = () => {
-    const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' )
-    audio.pause()
-  }
-  
   // const handleEvent = useCallback(async () => {
   //   return await refetch()
   // }, [refetch])
 
-  const rollDone = (totalValue: number) => {
-    console.log('total dice value:', totalValue)
-  }
 
   const handleResponse = (response: string) => {
     playGame(response)
@@ -75,7 +64,7 @@ const MyDiceApp: FC<RouletteProps> = () => {
 
     
       try {
-        // playJoinSoundEfx()
+  
         const jsonPayload = JSON.stringify({
           method: 'playGame',
           data: { gameId: game.id, playerAddress, response },
@@ -86,32 +75,33 @@ const MyDiceApp: FC<RouletteProps> = () => {
           dappAddress,
           rollups
         )
-        // stopJoinSoundEfx()
+
         const result = await tx.wait(1)
         console.log('tx for the game ', result)
       } catch (error) {
         console.error('Error during game:', error)
       }
     } else {
-      // stopJoinSoundEfx()
       toast.error('Not enough players to play')
     }
   }
   // const memoizedGame = useMemo(() => game, [game])
   useEffect(() => {
-    console.log('thee gameee ', game)
+
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
         if (
           parseInputEvent(input).method === 'playGame' &&
-          game.rollOutcome !== 0
+          game.rollOutcome !== 1
         ) {
           setTimeout(() => {
             setValue(game.rollOutcome)
             setIsRolling(true)
             // reactDice.current?.rollAll([memoizedGame.rollOutcome]);
           }, 5000)
+        } else {
+          loseSound?.play()
         }
       }
     )
