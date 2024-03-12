@@ -7,17 +7,17 @@ services:
       [
         "deploy",
         "--network",
-        "${NETWORK:?undefined NETWORK}",
+        "sepolia",
         "--export",
         "/home/node/rollups.json",
       ]
     volumes:
-      - ./.deployments/${NETWORK:?undefined NETWORK}:/home/node
+      - ./.deployments/sepolia:/home/node
     environment:
-      - MNEMONIC=${MNEMONIC:?undefined MNEMONIC}
-      - RPC_URL=${RPC_URL:?undefined RPC_URL}
-      - NETWORK=${NETWORK:?undefined NETWORK}
-      - CHAIN_ID=${CHAIN_ID:?undefined CHAIN_ID}
+      - MNEMONIC="screen fence prize absurd acoustic sure view parade moment car bitter sick"
+      - RPC_URL=https://eth-sepolia.g.alchemy.com/v2/q7fjK5eosDfEgAmoNXHHIXMjEomWECLk
+      - NETWORK=sepolia
+      - CHAIN_ID=11155111
 
   dapp-deployer:
     build:
@@ -28,18 +28,18 @@ services:
           RUN <<EOF
           echo '
             #!/bin/sh
-            if [ ! -f /deployments/$NETWORK/rollups.json ]; then
+            if [ ! -f /deployments/sepolia/rollups.json ]; then
               echo "No authority defined"
               exit 1
             fi
-            echo "Deploying DApp on network \"$NETWORK\" using consensus address \"$(cat /deployments/$NETWORK/rollups.json | jq -r '.contracts.Authority.address')\"..."
+            echo "Deploying DApp on network \"sepolia\" using consensus address \"$(cat /deployments/sepolia/rollups.json | jq -r '.contracts.Authority.address')\"..."
             cartesi-rollups create \
                 --rpc "$RPC_URL" \
                 --mnemonic "$MNEMONIC" \
-                --deploymentFile "/deployments/$NETWORK/rollups.json" \
+                --deploymentFile "/deployments/sepolia/rollups.json" \
                 --templateHashFile /var/opt/cartesi/machine-snapshots/image/hash \
-                --outputFile "/deployments/$NETWORK/dapp.json" \
-                --consensusAddress "$(cat /deployments/$NETWORK/rollups.json | jq -r '.contracts.Authority.address')"
+                --outputFile "/deployments/sepolia/dapp.json" \
+                --consensusAddress "$(cat /deployments/sepolia/rollups.json | jq -r '.contracts.Authority.address')"
           ' > deploy.sh
           EOF
           ENTRYPOINT [ "sh"]
@@ -49,7 +49,7 @@ services:
       - ./.sunodo:/var/opt/cartesi/machine-snapshots:ro
       - ./.deployments:/deployments
     environment:
-      - MNEMONIC=${MNEMONIC:?undefined MNEMONIC}
-      - NETWORK=${NETWORK:?undefined NETWORK}
-      - RPC_URL=${RPC_URL:?undefined RPC_URL}
-      - CHAIN_ID=${CHAIN_ID:?undefined CHAIN_ID}
+      - MNEMONIC="screen fence prize absurd acoustic sure view parade moment car bitter sick"
+      - NETWORK=sepolia
+      - RPC_URL=https://eth-sepolia.g.alchemy.com/v2/q7fjK5eosDfEgAmoNXHHIXMjEomWECLk
+      - CHAIN_ID=11155111
