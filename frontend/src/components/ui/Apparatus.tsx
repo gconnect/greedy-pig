@@ -19,6 +19,9 @@ export default function Apparatus() {
   const rollups = useRollups(dappAddress)
   // const noticesRef = useRef(notices)
 
+  const players = useSelector((state: any) =>
+    selectParticipantAddresses(state.games)
+  )
   const game = useSelector((state: any) => selectSelectedGame(state.games))
 
   const [gameId, setGameId] = useState<string>('')
@@ -62,16 +65,19 @@ export default function Apparatus() {
 
   return (
     <div>
-      {game && game.status === 'New' && (
-        <Button
-          onClick={() => joinGame(gameId)}
-          className="mb-10"
-          type="button"
-        >
-          Join Game
-        </Button>
-      )}
       <Dice />
+      {game &&
+        game.status === 'New' &&
+        wallet &&
+        !players.includes(wallet.accounts[0].address) && (
+          <Button
+            onClick={() => joinGame(gameId)}
+            className="mb-10"
+            type="button"
+          >
+            Join Game
+          </Button>
+        )}
     </div>
   )
 }

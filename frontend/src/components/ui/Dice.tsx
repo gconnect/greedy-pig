@@ -65,6 +65,9 @@ const MyDiceApp: FC<RouletteProps> = () => {
     
       try {
   
+        // Don't update the leaderboard except via dice result.
+        dispatch({ type: 'leaderboard/freezLeaderboard', payload: true })
+
         const jsonPayload = JSON.stringify({
           method: 'playGame',
           data: { gameId: game.id, playerAddress, response },
@@ -80,6 +83,7 @@ const MyDiceApp: FC<RouletteProps> = () => {
         console.log('tx for the game ', result)
       } catch (error) {
         console.error('Error during game:', error)
+        dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
       }
     } else {
       toast.error('Not enough players to play')
@@ -91,16 +95,21 @@ const MyDiceApp: FC<RouletteProps> = () => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
+        
         if (
           parseInputEvent(input).method === 'playGame' &&
           game.rollOutcome !== 1
         ) {
-          setTimeout(() => {
+
+          dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
+
+          // setTimeout(() => {            
             setValue(game.rollOutcome)
             setIsRolling(true)
             // reactDice.current?.rollAll([memoizedGame.rollOutcome]);
-          }, 5000)
+          // }, 5000)
         } else {
+          dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
           loseSound?.play()
         }
       }
@@ -133,13 +142,6 @@ const MyDiceApp: FC<RouletteProps> = () => {
           setIsRolling={setIsRolling}
           value={value}
         />
-        {/* <ReactDice
-          numDice={1}
-          ref={reactDice}
-          rollDone={rollDone}
-          disableIndividual={true}
-          dieSize={140}
-        /> */}
       </div>
 
       {game && game.status !== 'Ended' && (
@@ -151,9 +153,6 @@ const MyDiceApp: FC<RouletteProps> = () => {
           >
             Pass
           </Button>
-          {/* <Button onClick={() => handleResponse('yes')}>
-            Roll
-          </Button> */}
         </div>
       )}
     </div>

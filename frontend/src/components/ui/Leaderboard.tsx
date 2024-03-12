@@ -3,12 +3,13 @@ import { EmptyPage } from '@/components/shared/EmptyPage'
 import { dappAddress, parseInputEvent, shortenAddress } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
 import { useRollups } from '@/hooks/useRollups'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { selectSelectedGame } from '@/features/games/gamesSlice'
 import useAudio from '@/hooks/useAudio'
+import { selectFreez } from '@/features/leaderboard/leaderboardSlice'
 
 const LeaderBoard = () => {
-
+  const dispatch = useDispatch()
   const addPlayerSound = useAudio('/sounds/addPlayer.mp3')
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
@@ -16,6 +17,9 @@ const LeaderBoard = () => {
   // const [game, setGame] = useState<any>()
   // const memoizedGame = useMemo(() => game, [game])
   const game = useSelector((state: any) => selectSelectedGame(state.games))
+  const isFreezLeaderboard = useSelector((state: any) =>
+    selectFreez(state.leaderboard)
+  )
 
   const handleEvent = useCallback(async () => {
     await refetch()

@@ -15,6 +15,7 @@ interface State {
   participants: Participant[]
   activePlayer: string | null
   turnSync: boolean
+  freez: boolean
 }
 
 export interface UpdatePlayerInfoPayload {
@@ -29,6 +30,7 @@ const leaderboardSlice = createSlice({
     participants: [],
     activePlayer: '',
     turnSync: false,
+    freez: false,
   } as State,
   reducers: {
     initLeaderboard: (state, action: PayloadAction<string>) => {
@@ -68,6 +70,9 @@ const leaderboardSlice = createSlice({
     resetLeaderboard: (state) => {
       state.participants = []
     },
+    freezLeaderboard: (state, action: PayloadAction<boolean>) => {
+      state.freez = action.payload
+    },
     initTurnSync: (state, action: PayloadAction<boolean>) => {
       state.turnSync = action.payload // Update the turnSync state with the new value
     },
@@ -91,11 +96,14 @@ export const selectParticipants = (state: State) => state.participants
 
 export const selectTurnSync = (state: State) => state.turnSync
 
+export const selectFreez = (state: State) => state.freez
+
 export const {
   initLeaderboard,
   updatePlayerInfo,
   resetLeaderboard,
   initTurnSync,
+  freezLeaderboard
 } = leaderboardSlice.actions
 
 export default leaderboardSlice.reducer

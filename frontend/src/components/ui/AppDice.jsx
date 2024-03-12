@@ -24,14 +24,12 @@ export function AppDice({handleDiceClick, setIsRolling, isRolling, value}) {
         if (endRoll < 30) {
           diceRollSound?.play();
           diceValue = Math.floor(Math.random() * 6);
-          setCurrentDice(diceValue);
-          endRoll++;
+          setCurrentDice(diceValue)
+          endRoll++
         } else {
           setCurrentDice(value - 1)
-          clearInterval(interval);
-          // getFinalDiceValue(diceValue + 1);
-          setIsRolling(false);
-          // setChangeBackground(false);
+          clearInterval(interval)
+          setIsRolling(false)
         }
       }, 100);
     }
