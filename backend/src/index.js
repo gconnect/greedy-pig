@@ -1,7 +1,7 @@
 
 const viem = require('viem')
-import { Router } from 'cartesi-router'
-import { Wallet, Notice, Output, Error_out } from 'cartesi-wallet'
+const { Router } = require('cartesi-router')
+const { Wallet, Notice, Output, Error_out } = require('cartesi-wallet')
 const { 
   noticeHandler,
   reportHandler

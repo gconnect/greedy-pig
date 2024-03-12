@@ -13,7 +13,6 @@ import toast from 'react-hot-toast'
 import useAudio from '@/hooks/useAudio'
 
 const GameArena = () => {
-
   const gameOverSound = useAudio('/sounds/gameOver.mp3')
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
@@ -45,7 +44,7 @@ const GameArena = () => {
         (game: any) => game.id === gameId
       )
       if (game) {
-        dispatchGameData(game); // Dispatch actions on page load
+        dispatchGameData(game) // Dispatch actions on page load
       }
     }
   }, [notices, dispatchGameData])

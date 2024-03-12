@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRollups } from '@/hooks/useRollups'
-import { dappAddress, getParticipantsForGame } from '@/lib/utils'
+import { dappAddress } from '@/lib/utils'
 import { addInput, sendEther } from '@/lib/cartesi'
 import Button from '../shared/Button'
 import { useConnectWallet } from '@web3-onboard/react'
@@ -11,7 +11,6 @@ import {
   selectParticipantAddresses,
   selectSelectedGame,
 } from '@/features/games/gamesSlice'
-import useAudio from '@/hooks/useAudio'
 
 export default function Apparatus() {
 
@@ -51,10 +50,6 @@ export default function Apparatus() {
       toast.error('Ether not sent')
     }
   }
-
-  // useEffect(() => {
-  //   noticesRef.current = notices // Update the ref value whenever notices changes
-  // }, [notices])
 
   useEffect(() => {
     const id = window.location.pathname.split('/').pop()

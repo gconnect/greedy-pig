@@ -1,17 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
-import { useDispatch } from 'react-redux'
 import Logo from '@/assets/img/logo.png'
 import ConnectButton from '@/components/ui/ConnectButton'
-import Socials from '@/components/ui/Socials'
-import { useConnectWallet } from '@web3-onboard/react'
 
 const GameHeader = () => {
-  const dispatch = useDispatch()
-  const [{ wallet }] = useConnectWallet()
-
-
 
   return (
     <div className="mx-auto max-w-screen-2xl">

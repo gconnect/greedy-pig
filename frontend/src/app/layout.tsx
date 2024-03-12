@@ -8,7 +8,7 @@ import injectedModule from '@web3-onboard/injected-wallets'
 import { Toaster } from 'react-hot-toast'
 
 import configFile from '@/config/cartesi.json'
-import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
+// import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
 import store from '@/store'
 
 import './globals.css'
