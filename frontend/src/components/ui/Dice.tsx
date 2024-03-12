@@ -103,11 +103,11 @@ const MyDiceApp: FC<RouletteProps> = () => {
 
           dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
 
-          // setTimeout(() => {            
+          setTimeout(() => {            
             setValue(game.rollOutcome)
             setIsRolling(true)
             // reactDice.current?.rollAll([memoizedGame.rollOutcome]);
-          // }, 5000)
+          }, 5000)
         } else {
           dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
           loseSound?.play()
