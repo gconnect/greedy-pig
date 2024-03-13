@@ -1,162 +1,66 @@
-'use client'
-import { FC, useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import ReactDice, { ReactDiceRef } from 'react-dice-complete'
-import { useConnectWallet } from '@web3-onboard/react'
-import { useDispatch, useSelector } from 'react-redux'
-import toast from 'react-hot-toast'
-import Button from '@/components/shared/Button'
-import { useRollups } from '@/hooks/useRollups'
-import { dappAddress, parseInputEvent } from '@/lib/utils'
-import { addInput } from '@/lib/cartesi'
-import {
-  selectParticipantAddresses,
-  selectSelectedGame,
-} from '@/features/games/gamesSlice'
-import { useNotices } from '@/hooks/useNotices'
-import { AppDice } from './AppDice'
+import { FC, useEffect, useState } from 'react'
+import Die1 from '@/assets/img/dice_1.png'
+import Die2 from '@/assets/img/dice_2.png'
+import Die3 from '@/assets/img/dice_3.png'
+import Die4 from '@/assets/img/dice_4.png'
+import Die5 from '@/assets/img/dice_5.png'
+import Die6 from '@/assets/img/dice_6.png'
+import Image from 'next/image'
 import useAudio from '@/hooks/useAudio'
 
-interface RouletteProps {
-  // notices: any
+const die = [Die1, Die2, Die3, Die4, Die5, Die6]
+
+interface ApparatusProps {
+  handleDiceClick: () => void
+  setIsRolling: (value: boolean) => void
+  isRolling: boolean
+  value: number
 }
 
-const MyDiceApp: FC<RouletteProps> = () => {
+const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, value}) => {
 
-  const loseSound = useAudio('/sounds/loseSound.mp3')
-  const { notices, refetch } = useNotices()
-  const dispatch = useDispatch()
-  const [{ wallet }] = useConnectWallet()
-  const rollups = useRollups(dappAddress)
-  const reactDice = useRef<ReactDiceRef>(null)
+  const [currentDice, setCurrentDice] = useState(0);
 
-  const game = useSelector((state: any) => selectSelectedGame(state.games))
-  const players = useSelector((state: any) =>
-    selectParticipantAddresses(state.games)
-  )
+  const diceRollSound = useAudio('/sounds/diceRoll.mp3')
 
-  const [isRolling, setIsRolling] = useState(false)
-  const [value, setValue] = useState(0)
-
-  // const handleEvent = useCallback(async () => {
-  //   return await refetch()
-  // }, [refetch])
-
-
-  const handleResponse = (response: string) => {
-    playGame(response)
-  }
-
-  const playGame = async (response: string) => {
-    const playerAddress = wallet?.accounts[0].address
-
-    if (!playerAddress) return toast.error('Connect account')
-
-    if (game.status === 'Ended') {
-      return toast.error('Game has ended')
-    }
-
-    if (game.activePlayer !== playerAddress) {
-      return toast.error('Not your turn')
-    }
-
-    if (players.length >= 2) {
-      const playerAddress = wallet?.accounts[0].address
-
-    
-      try {
-  
-        // Don't update the leaderboard except via dice result.
-        dispatch({ type: 'leaderboard/freezLeaderboard', payload: true })
-
-        const jsonPayload = JSON.stringify({
-          method: 'playGame',
-          data: { gameId: game.id, playerAddress, response },
-        })
-
-        const tx = await addInput(
-          JSON.stringify(jsonPayload),
-          dappAddress,
-          rollups
-        )
-
-        const result = await tx.wait(1)
-        console.log('tx for the game ', result)
-      } catch (error) {
-        console.error('Error during game:', error)
-        dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
-      }
-    } else {
-      toast.error('Not enough players to play')
-    }
-  }
-  // const memoizedGame = useMemo(() => game, [game])
   useEffect(() => {
-
-    rollups?.inputContract.on(
-      'InputAdded',
-      (dappAddress, inboxInputIndex, sender, input) => {
-        
-        if (
-          parseInputEvent(input).method === 'playGame' &&
-          game.rollOutcome !== 1
-        ) {
-
-          dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
-
-          setTimeout(() => {            
-            setValue(game.rollOutcome)
-            setIsRolling(true)
-            // reactDice.current?.rollAll([memoizedGame.rollOutcome]);
-          }, 5000)
+    if (isRolling) {
+      let endRoll = 0;
+      let interval: any
+      let diceValue;
+      interval = setInterval(() => {
+        if (endRoll < 30) {
+          diceRollSound?.play();
+          diceValue = Math.floor(Math.random() * 6);
+          setCurrentDice(diceValue)
+          endRoll++
         } else {
-          dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
-          loseSound?.play()
+          setCurrentDice(value - 1)
+          clearInterval(interval)
+          setIsRolling(false)
         }
-      }
-    )
-  }, [game, rollups])
-  // const memoizedGame = useMemo(() => game, [game])
-  // useEffect(() => {
-  //   console.log('thee gameee ', memoizedGame)
-  //   rollups?.inputContract.on(
-  //     'InputAdded',
-  //     (dappAddress, inboxInputIndex, sender, input) => {
-  //       if ((parseInputEvent(input).method === 'playGame') && (memoizedGame.rollOutcome !== 0)) {
-  //         setTimeout(() => {
-  //           setValue(memoizedGame.rollOutcome)
-  //           setIsRolling(true)
-  //           // reactDice.current?.rollAll([memoizedGame.rollOutcome]);
-  //         }, 5000)
-  //       }
-  //     }
-  //   )
-  // }, [memoizedGame, rollups])
-
+      }, 100);
+    }
+  }, [isRolling, value]);
 
   return (
-    <div className="w-[300px]">
-      <div className="flex justify-center mb-[120px]">
-        <AppDice
-          handleDiceClick={() => handleResponse('yes')}
-          isRolling={isRolling}
-          setIsRolling={setIsRolling}
-          value={value}
-        />
-      </div>
-
-      {game && game.status !== 'Ended' && (
-        <div className="flex justify-between">
-          <Button
-            className="pass-btn"
-            style={{ background: '' }}
-            onClick={() => handleResponse('no')}
-          >
-            Pass
-          </Button>
-        </div>
-      )}
-    </div>
-  )
+    <>
+      <button
+        className={`hover:scale-105 active:scale-100 duration-300 md:w-auto w-[200px]`}
+        onClick={handleDiceClick}
+        disabled={isRolling}
+      >
+        {die.map((dice, index) => (
+          <Image
+            key={index}
+            src={dice}
+            alt="Dice"
+            className={`${currentDice === index ? "" : "hidden"}`}
+          />
+        ))}
+      </button>
+    </>
+  );
 }
 
-export default MyDiceApp
+export default Dice
