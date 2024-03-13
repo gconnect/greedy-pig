@@ -21,7 +21,7 @@ export const addGame = (game) => {
 export const addParticipant = async ({gameId, playerAddress}) => {
 
 
-  const rollupAddr = '0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE'
+  const rollupAddr = '0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C'
      try {
         let voucher = wallet.balance_get(rollupAddr)
         const res = fetch(rollup_server + "/voucher", {

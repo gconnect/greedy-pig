@@ -129,6 +129,7 @@ const Apparatus: FC<RouletteProps> = () => {
         } else {
           dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
           loseSound?.play()
+          setValue(game.rollOutcome)
         }
       }
     )
