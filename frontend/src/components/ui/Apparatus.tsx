@@ -13,6 +13,7 @@ import {
 } from '@/features/games/gamesSlice'
 import Dice from '@/components/ui/Dice'
 import useAudio from '@/hooks/useAudio'
+import { ethers } from 'ethers'
 
 interface RouletteProps {
   // notices: any
@@ -79,12 +80,52 @@ const Apparatus: FC<RouletteProps> = () => {
     }
   }
 
-  const joinGame = async (id: any) => {
-    const res = await sendEther(1, rollups)
-    const txHash = await res.wait(1)
-    console.log(txHash)
+    const betGame = async (id: any) => {
+      // const res = await sendEther(1, rollups)
 
-    if (txHash) {
+       const jsonPayload = JSON.stringify({
+         method: 'transfer',
+         from: wallet?.accounts[0].address,
+         to: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+         ether: '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044',
+         amount: 2
+       })
+
+
+       const tx = await sendEther(1, rollups, jsonPayload)
+
+       console.log(tx)
+
+    }
+
+    const getBalance = async (id: any) => {
+
+      const addr: string | undefined = wallet?.accounts[0].address
+
+      const jsonPayload = JSON.stringify({
+        method: 'balance',
+        data: { address: addr },
+        from: addr
+      })
+
+      const tx = await addInput(
+        JSON.stringify(jsonPayload),
+        dappAddress,
+        rollups
+      )
+
+      const result = await tx.wait(1)
+      console.log(result)
+
+    }
+
+
+  const joinGame = async (id: any) => {
+    // const res = await sendEther(1, rollups)
+    // const txHash = await res.wait(1)
+    // console.log(txHash)
+
+    // if (txHash) {
       const addr: string | undefined = wallet?.accounts[0].address
 
       const jsonPayload = JSON.stringify({
@@ -100,9 +141,9 @@ const Apparatus: FC<RouletteProps> = () => {
 
       const result = await tx.wait(1)
       console.log(result)
-    } else {
-      toast.error('Ether not sent')
-    }
+    // } else {
+    //   toast.error('Ether not sent')
+    // }
   }
 
   useEffect(() => {
@@ -151,13 +192,17 @@ const Apparatus: FC<RouletteProps> = () => {
           game.status === 'New' &&
           wallet &&
           !players.includes(wallet.accounts[0].address) && (
-            <Button
-              onClick={() => joinGame(gameId)}
-              className="mb-10"
-              type="button"
-            >
-              Join Game
-            </Button>
+            <div>
+              <Button
+                onClick={() => joinGame(gameId)}
+                className="mb-10"
+                type="button"
+              >
+                Join Game
+              </Button>
+              <Button onClick={() => (betGame('gameId'))}>Bet Game</Button>
+              <Button onClick={getBalance}>Get balance</Button>
+            </div>
           )}
         {game && game.status === 'In Progress' && (
           <div className="flex justify-between">
