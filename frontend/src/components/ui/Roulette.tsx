@@ -1,11 +1,11 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import Button from '@/components/shared/Button'
 import toast from 'react-hot-toast'
-import { addInput } from '@/lib/cartesi'
+// import { addInput } from '@/lib/cartesi'
 import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
-import { useConnectWallet } from '@web3-onboard/react'
-import ConfirmModal from './ConfirmModal'
+// import { useConnectWallet } from '@web3-onboard/react'
+
 import { useDispatch } from 'react-redux'
 // import gameOverSound from '/sounds/game-over.mp3'
 
@@ -17,13 +17,13 @@ interface RouletteProps {
 
 const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
   const dispatch = useDispatch()
-  const [{ wallet }] = useConnectWallet()
+  // const [{ wallet }] = useConnectWallet()
   const rollups = useRollups(dappAddress)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const noticesRef = useRef(notices)
 
   // const [audio] = useState(new Audio(gameOverSound));
-  const [activePlayer, selectActivePlayer] = useState<string>('')
+  // const [activePlayer, selectActivePlayer] = useState<string>('')
   const [startAngle, setStartAngle] = useState<number>(0)
   const [spinAngleStart, setSpinAngleStart] = useState<number>(0)
   const [game, setGame] = useState<any>()
@@ -123,56 +123,56 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
     }
   }
 
-  const handleResponse = (response: string) => {
-    playGame(response)
-  }
+  // const handleResponse = (response: string) => {
+  //   playGame(response)
+  // }
 
-  const playGame = async (response: string) => {
-    const playerAddress = wallet?.accounts[0].address
+  // const playGame = async (response: string) => {
+  //   const playerAddress = wallet?.accounts[0].address
 
-    if (game.status === 'Ended') {
-      return toast.error('Game has ended')
-    }
+  //   if (game.status === 'Ended') {
+  //     return toast.error('Game has ended')
+  //   }
 
-    if (activePlayer !== playerAddress) {
-      return toast.error('Not your turn')
-    }
+  //   if (activePlayer !== playerAddress) {
+  //     return toast.error('Not your turn')
+  //   }
 
-    if (!playerAddress) return toast.error('Player not connected')
+  //   if (!playerAddress) return toast.error('Player not connected')
 
-    if (players.length >= 2) {
-      const playerAddress = wallet?.accounts[0].address
+  //   if (players.length >= 2) {
+  //     const playerAddress = wallet?.accounts[0].address
 
-      game.status === 'New'
-        ? dispatch({ type: 'leaderboard/initTurnSync', payload: true })
-        : ''
+  //     game.status === 'New'
+  //       ? dispatch({ type: 'leaderboard/initTurnSync', payload: true })
+  //       : ''
 
-      dispatch({ type: 'modal/toggleConfirmModal' })
+  //     dispatch({ type: 'modal/toggleConfirmModal' })
 
-      try {
-        const jsonPayload = JSON.stringify({
-          method: 'playGame',
-          data: { gameId, playerAddress, response },
-        })
+  //     try {
+  //       const jsonPayload = JSON.stringify({
+  //         method: 'playGame',
+  //         data: { gameId, playerAddress, response },
+  //       })
 
-        const tx = await addInput(
-          JSON.stringify(jsonPayload),
-          dappAddress,
-          rollups
-        )
+  //       const tx = await addInput(
+  //         JSON.stringify(jsonPayload),
+  //         dappAddress,
+  //         rollups
+  //       )
 
-        console.log('roulette tx ', tx)
-        const result = await tx.wait(1)
-      } catch (error) {
-        console.error('Error during game:', error)
-      }
+  //       console.log('roulette tx ', tx)
+  //       const result = await tx.wait(1)
+  //     } catch (error) {
+  //       console.error('Error during game:', error)
+  //     }
 
-      spinTime = 0
-      spinTimeTotal = 20000 // Math.random() * 3 + 4 * 1000;
-    } else {
-      toast.error('Not enough players to play')
-    }
-  }
+  //     spinTime = 0
+  //     spinTimeTotal = 20000 // Math.random() * 3 + 4 * 1000;
+  //   } else {
+  //     toast.error('Not enough players to play')
+  //   }
+  // }
 
   const spin = useCallback(() => {
     console.log(game?.startAngle)
@@ -258,7 +258,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
           setGame(game)
           console.log(`game angle , ${game.startAngle}`)
           spin()
-          selectActivePlayer(game.activePlayer)
+          // selectActivePlayer(game.activePlayer)
 
           if (game.status === 'Ended') {
             // audio.play(); // Play the audio when the game is over
@@ -281,7 +281,7 @@ const Roulette: FC<RouletteProps> = ({ gameId, players, notices }) => {
         </Button>
       )}
       <canvas id="canvas" width="500" height="500" ref={canvasRef}></canvas>
-      <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} />
+      {/* <ConfirmModal onSubmit={handleResponse} activePlayer={activePlayer} /> */}
     </div>
   )
 }

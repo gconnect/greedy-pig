@@ -6,7 +6,7 @@ import { useRollups } from '@/hooks/useRollups'
 import { useSelector } from 'react-redux'
 import { selectSelectedGame } from '@/features/games/gamesSlice'
 import useAudio from '@/hooks/useAudio'
-import { selectFreez } from '@/features/leaderboard/leaderboardSlice'
+// import { selectFreez } from '@/features/leaderboard/leaderboardSlice'
 
 const LeaderBoard = () => {
   const addPlayerSound = useAudio('/sounds/addPlayer.mp3')
