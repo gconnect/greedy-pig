@@ -13,7 +13,7 @@ const RouletteGame: React.FC = () => {
 
   useEffect(() => {
     drawRouletteWheel()
-  }, [])
+  })
 
   const byte2Hex = (n: number): string => {
     const nybHexString = '0123456789ABCDEF'

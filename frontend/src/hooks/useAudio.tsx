@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function useAudio(src: string) {
 
@@ -6,7 +6,7 @@ export default function useAudio(src: string) {
 
   useEffect(() => {
     setAudio(new Audio(src))
-  }, [])
+  }, [src])
 
   return audio
 }
