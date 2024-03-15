@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev:all": "npm-run-all dev:init --parallel dev:backend dev:frontend",
-        "dev": "next dev",
+        "dev": "NODE_ENV=development next dev",
         "dev:backend": "convex dev",
         "dev:init": "convex dev --until-success",
         "build": "next build",
