@@ -1,50 +1,36 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { EmptyPage } from '@/components/shared/EmptyPage'
 import { dappAddress, parseInputEvent, shortenAddress } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
 import { useRollups } from '@/hooks/useRollups'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { selectSelectedGame } from '@/features/games/gamesSlice'
 import useAudio from '@/hooks/useAudio'
 import { selectFreez } from '@/features/leaderboard/leaderboardSlice'
 
 const LeaderBoard = () => {
-  const dispatch = useDispatch()
   const addPlayerSound = useAudio('/sounds/addPlayer.mp3')
-  const { notices, refetch } = useNotices()
+  const { refetch } = useNotices()
   const rollups = useRollups(dappAddress)
 
-  // const [game, setGame] = useState<any>()
-  // const memoizedGame = useMemo(() => game, [game])
   const game = useSelector((state: any) => selectSelectedGame(state.games))
-  const isFreezLeaderboard = useSelector((state: any) =>
-    selectFreez(state.leaderboard)
-  )
+  // const isFreezLeaderboard = useSelector((state: any) =>
+  //   selectFreez(state.leaderboard)
+  // )
 
   const handleEvent = useCallback(async () => {
     await refetch()
     addPlayerSound?.play()
-  }, [refetch])
-
-  // useEffect(() => {
-  //   const gameId = window.location.pathname.split('/').pop();
-  //   if (gameId && notices && notices.length > 0) {
-  //     const game = JSON.parse(notices[notices.length - 1].payload).find(
-  //       (game: any) => game.id === gameId
-  //     );
-  //     if (game) {
-  //       console.log('setting game from game arena on page load ... ', game);
-  //       setGame(game)
-  //       // dispatchGameData(game); // Dispatch actions on page load
-  //     }
-  //   }
-  // }, []);
+  }, [refetch, addPlayerSound])
 
   useEffect(() => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        if (parseInputEvent(input).method === 'addParticipant' || parseInputEvent(input).method === 'playGame') {
+        if (
+          parseInputEvent(input).method === 'addParticipant' ||
+          parseInputEvent(input).method === 'playGame'
+        ) {
           handleEvent()
         }
       }

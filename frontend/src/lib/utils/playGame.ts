@@ -73,6 +73,7 @@ export async function playGame(
         playerTurn++
       }
 
+      console.log(playerTurn)
       playerScores[address] += turnScore
 
       await updatePlayerInfo(address, 'turnScore', playerScores[address])

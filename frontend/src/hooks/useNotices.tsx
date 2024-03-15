@@ -33,7 +33,7 @@ export const GET_NOTICES = gql`
 `
 
 export const useNotices = () => {
-  const [cursor, setCursor] = useState(null)
+  const [cursor] = useState(null)
   // debugger
   const { loading, error, data, refetch } = useQuery(GET_NOTICES, {
     variables: { cursor },

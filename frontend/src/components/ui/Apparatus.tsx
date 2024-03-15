@@ -173,7 +173,7 @@ const Apparatus: FC<RouletteProps> = () => {
         }
       }
     )
-  }, [game, rollups])
+  }, [game, rollups, loseSound, dispatch])
 
   return (
     <div className="w-[300px]">

@@ -12,7 +12,6 @@ import { selectActivePlayer } from '@/features/leaderboard/leaderboardSlice'
 import toast from 'react-hot-toast'
 import useAudio from '@/hooks/useAudio'
 
-
 const GameArena = () => {
   const gameOverSound = useAudio('/sounds/gameOver.mp3')
   const { notices, refetch } = useNotices()
@@ -72,7 +71,7 @@ const GameArena = () => {
         })
       }
     )
-  }, [handleEvent, rollups, dispatch, notices, dispatchGameData])
+  }, [handleEvent, rollups, dispatch, notices, dispatchGameData, gameOverSound])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">
