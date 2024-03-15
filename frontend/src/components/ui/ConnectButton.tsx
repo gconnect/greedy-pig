@@ -11,15 +11,12 @@
 // under the License.
 
 import { FC } from 'react'
-import { useConnectWallet, useSetChain } from '@web3-onboard/react'
-import configFile from '@/config/cartesi.json'
+import { useConnectWallet } from '@web3-onboard/react'
 import Button from '../shared/Button'
 
-const config: any = configFile
 
 const ConnectButton: FC = () => {
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
-  const [{ chains, connectedChain, settingChain }, setChain] = useSetChain()
 
   return (
     <div>
@@ -37,46 +34,6 @@ const ConnectButton: FC = () => {
         </div>
       )}
     </div>
-    // <div>
-    //     {!wallet && <button
-    //         onClick={() =>
-    //             connect()
-    //         }
-    //     >
-    //         {connecting ? "connecting" : "connect"}
-    //     </button>}
-    //     {wallet && (
-    //         <div>
-    //             <label>Switch Chain</label>
-    //             {settingChain ? (
-    //                 <span>Switching chain...</span>
-    //             ) : (
-    //                 <select
-    //                     onChange={({ target: { value } }) => {
-    //                         if (config[value] !== undefined) {
-    //                             setChain({ chainId: value })
-    //                         } else {
-    //                             alert("No deploy on this chain")
-    //                         }
-    //                         }
-    //                     }
-    //                     value={connectedChain?.id}
-    //                 >
-    //                     {chains.map(({ id, label }) => {
-    //                         return (
-    //                             <option key={id} value={id}>
-    //                                 {label}
-    //                             </option>
-    //                         );
-    //                     })}
-    //                 </select>
-    //             )}
-    //             <button onClick={() => disconnect(wallet)}>
-    //                 Disconnect Wallet
-    //             </button>
-    //         </div>
-    //     )}
-    // </div>
   )
 }
 

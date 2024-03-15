@@ -13,7 +13,6 @@ import {
 } from '@/features/games/gamesSlice'
 import Dice from '@/components/ui/Dice'
 import useAudio from '@/hooks/useAudio'
-import { ethers } from 'ethers'
 
 interface RouletteProps {
   // notices: any

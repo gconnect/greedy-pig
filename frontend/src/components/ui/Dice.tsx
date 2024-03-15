@@ -17,21 +17,25 @@ interface ApparatusProps {
   value: number
 }
 
-const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, value}) => {
-
-  const [currentDice, setCurrentDice] = useState(0);
+const Dice: FC<ApparatusProps> = ({
+  handleDiceClick,
+  setIsRolling,
+  isRolling,
+  value,
+}) => {
+  const [currentDice, setCurrentDice] = useState(0)
 
   const diceRollSound = useAudio('/sounds/diceRoll.mp3')
 
   useEffect(() => {
     if (isRolling) {
-      let endRoll = 0;
+      let endRoll = 0
       let interval: any
-      let diceValue;
+      let diceValue
       interval = setInterval(() => {
         if (endRoll < 30) {
-          diceRollSound?.play();
-          diceValue = Math.floor(Math.random() * 6);
+          diceRollSound?.play()
+          diceValue = Math.floor(Math.random() * 6)
           setCurrentDice(diceValue)
           endRoll++
         } else {
@@ -39,9 +43,9 @@ const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, val
           clearInterval(interval)
           setIsRolling(false)
         }
-      }, 100);
+      }, 100)
     }
-  }, [isRolling, value]);
+  }, [isRolling, value])
 
   return (
     <>
@@ -55,12 +59,12 @@ const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, val
             key={index}
             src={dice}
             alt="Dice"
-            className={`${currentDice === index ? "" : "hidden"}`}
+            className={`${currentDice === index ? '' : 'hidden'}`}
           />
         ))}
       </button>
     </>
-  );
+  )
 }
 
 export default Dice
