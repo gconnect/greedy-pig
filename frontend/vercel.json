@@ -1,5 +1,0 @@
-{
-  "routes": [
-    { "src": "/(.*)", "dest": "https://greedypig.vercel.app/$1", "status": 301, "headers": { "Location": "http://greedypig.vercel.app/$1" } }
-  ]
-}

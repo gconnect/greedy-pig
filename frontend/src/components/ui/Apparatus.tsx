@@ -7,6 +7,7 @@ import Button from '@/components/shared/Button'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, parseInputEvent } from '@/lib/utils'
 import { addInput, sendEther } from '@/lib/cartesi'
+import { Wallet } from 'cartesi-wallet'
 import {
   selectParticipantAddresses,
   selectSelectedGame,
@@ -17,6 +18,8 @@ import useAudio from '@/hooks/useAudio'
 interface RouletteProps {
   // notices: any
 }
+
+const myWallet = new Wallet(new Map())
 
 const Apparatus: FC<RouletteProps> = () => {
   const loseSound = useAudio('/sounds/loseSound.mp3')
@@ -99,6 +102,9 @@ const Apparatus: FC<RouletteProps> = () => {
 
     const getBalance = async (id: any) => {
 
+      let amount = myWallet.balance_get(wallet?.accounts[0].address).ether_get()
+      return console.log(amount)
+
       const addr: string | undefined = wallet?.accounts[0].address
 
       const jsonPayload = JSON.stringify({
@@ -120,6 +126,7 @@ const Apparatus: FC<RouletteProps> = () => {
 
 
   const joinGame = async (id: any) => {
+
     // const res = await sendEther(1, rollups)
     // const txHash = await res.wait(1)
     // console.log(txHash)
