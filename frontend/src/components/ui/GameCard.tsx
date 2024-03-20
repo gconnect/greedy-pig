@@ -53,7 +53,7 @@ const GameCard = ({ game }: GameCardProps) => {
               />
             </svg>
           </span>
-          <p>1:34:23 Minutes</p>
+          {/* <p>1:34:23 Minutes</p> */}
         </div>
         <div className="flex space-x-1 items-center">
           <span>
@@ -72,7 +72,7 @@ const GameCard = ({ game }: GameCardProps) => {
               />
             </svg>
           </span>
-          <p>Turn Based</p>
+          <p>Score Based</p>
         </div>
         <div className="flex space-x-1 items-center">
           <span>

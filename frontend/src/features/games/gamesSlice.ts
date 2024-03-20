@@ -29,7 +29,7 @@ interface GameState {
       turnScore: number // Use number instead of float64
     }
   }[]
-  startTime: string
+  // startTime: string
   status: 'New' | 'In Progress' | 'Ended' | 'Cancelled'
   id: string
   startAngle: number

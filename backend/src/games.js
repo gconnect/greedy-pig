@@ -99,7 +99,7 @@ const gamePlay = async (gameId, playerAddress) => {
       participant.playerInfo.totalScore += participant.playerInfo.turnScore
       participant.playerInfo.turnScore = 0
       endGame(game);
-      transferToWinner(game);
+      // transferToWinner(game);
       return errorResponse(false);
 
     } else {
@@ -210,11 +210,11 @@ const calculateWinner = game => {
 
 const endGame = game => {
 
-  const winner = calculateWinner(game)
+  // const winner = calculateWinner(game)
 
-  game.activePlayer = ''
   game.status = getGameStatus('ended')
-  game.winner = winner
+  game.winner = game.activePlayer
+  // game.activePlayer = ''
   return
  
 }
@@ -224,9 +224,9 @@ const transferToWinner = async (game) => {
 // ether_transfer: (account: Address, to: Address, amount: bigint) => Notice | Error_out;
   if (game.gameSettings.bet && game.status === 'Ended') {
     console.log('transfering to winner: ', game.winner)
-    const addr = '0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE'
+    const addr = '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044'
      try {
-        let voucher = wallet.ether_transfer(addr, game.winner, BigInt(game.bettingFund))
+        let voucher = wallet.ether_transfer(addr, game.winner, BigInt(1))
         await fetch(rollup_server + "/voucher", {
           method: "POST", headers: { "Content-Type": "application/json", },
           body: JSON.stringify({ payload: voucher.payload, destination: voucher.destination }),

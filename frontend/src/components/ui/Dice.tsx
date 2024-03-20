@@ -41,7 +41,7 @@ const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, val
         }
       }, 100);
     }
-  }, [isRolling, value, diceRollSound, setIsRolling]);
+  }, [isRolling, value, diceRollSound]);
 
   return (
     <>

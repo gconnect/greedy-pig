@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { EmptyPage } from '@/components/shared/EmptyPage'
 import { dappAddress, parseInputEvent, shortenAddress } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
@@ -6,17 +6,24 @@ import { useRollups } from '@/hooks/useRollups'
 import { useSelector } from 'react-redux'
 import { selectSelectedGame } from '@/features/games/gamesSlice'
 import useAudio from '@/hooks/useAudio'
-// import { selectFreez } from '@/features/leaderboard/leaderboardSlice'
 
 const LeaderBoard = () => {
+
   const addPlayerSound = useAudio('/sounds/addPlayer.mp3')
   const { refetch } = useNotices()
   const rollups = useRollups(dappAddress)
-
   const game = useSelector((state: any) => selectSelectedGame(state.games))
-  // const isFreezLeaderboard = useSelector((state: any) =>
-  //   selectFreez(state.leaderboard)
-  // )
+
+  const [delayedGame, setDelayedGame] = useState<any>(null)
+  
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDelayedGame(game)
+    }, 8000)
+    return () => clearTimeout(timeoutId)
+  }, [game])
+
+  const currentGame = delayedGame || game
 
   const handleEvent = useCallback(async () => {
     await refetch()
@@ -27,12 +34,13 @@ const LeaderBoard = () => {
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        if (
-          parseInputEvent(input).method === 'addParticipant' ||
-          parseInputEvent(input).method === 'playGame'
-        ) {
-          handleEvent()
-        }
+        handleEvent()
+        // if (
+        //   parseInputEvent(input).method === 'addParticipant' ||
+        //   parseInputEvent(input).method === 'playGame'
+        // ) {
+        //   handleEvent()
+        // }
       }
     )
   }, [handleEvent, rollups])
@@ -41,11 +49,11 @@ const LeaderBoard = () => {
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">
       <div className="p-6 pb-0 mb-0 rounded-t-2xl">
         <h1 className="font-bold text-2xl mb-10">
-          {game?.gameName} Leaderboard
+          {currentGame?.gameName} Leaderboard
         </h1>
       </div>
 
-      {game && game.participants?.length ? (
+      {currentGame && currentGame.participants?.length ? (
         <div className="flex-auto px-0 pt-0 pb-2">
           <div className="p-0 overflow-x-auto">
             <table className="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
@@ -66,8 +74,8 @@ const LeaderBoard = () => {
                 </tr>
               </thead>
               <tbody>
-                {game.participants.length &&
-                  game.participants.map((player: any, i: number) => (
+                {currentGame.participants.length &&
+                  currentGame.participants.map((player: any, i: number) => (
                     <tr key={i}>
                       {/* <tr key={i} className={player.username === activePlayer ? 'bg-gray-100' : ''}> */}
                       <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">

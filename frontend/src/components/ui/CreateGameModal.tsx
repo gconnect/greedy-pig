@@ -19,7 +19,8 @@ const CreateGameModal = () => {
 
   const [creator, setCreator] = useState<string | undefined>('')
   const [gameName, setGameName] = useState<string>('')
-  const [startTime, setStartTime] = useState<string>('')
+  const [winningScore, setWinningScore] = useState<number>(20)
+  // const [startTime, setStartTime] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
 
   const game = {
@@ -29,7 +30,7 @@ const CreateGameModal = () => {
     participants: [],
     gameSettings: {
       numbersOfTurn: 2,
-      winningScore: 20,
+      winningScore: winningScore,
       mode: 'score',
       apparatus: 'dice',
       bet: true,
@@ -37,7 +38,6 @@ const CreateGameModal = () => {
       limitNumberOfPlayer: true,
     },
     status: GameStatus.New,
-    startTime,
     rollOutcome: 0,
     winner: '',
     bettingAmount: 1, // in ether
@@ -61,8 +61,10 @@ const CreateGameModal = () => {
   }
 
   const createGameHandler = async () => {
+
     game.gameName = gameName
-    game.startTime = startTime
+    game.gameSettings.winningScore = winningScore
+
     const jsonPayload = JSON.stringify({
       method: 'createGame',
       data: game,
@@ -70,19 +72,12 @@ const CreateGameModal = () => {
 
     const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
 
-    console.log(tx)
     const result = await tx.wait(1)
     console.log(result)
   }
 
-  const cancelHandler = () => {
-    dispatch({ type: 'modal/toggleGameModal' })
-    reset()
-  }
-
   const reset = () => {
     setGameName('')
-    setStartTime('')
     dispatch({ type: 'modal/toggleGameModal' })
   }
 
@@ -109,7 +104,7 @@ const CreateGameModal = () => {
         onSubmit={submitHandler}
       >
         <button
-          onClick={cancelHandler}
+          onClick={reset}
           type="button"
           className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none absolute right-6 z-50"
           data-te-modal-dismiss
@@ -149,6 +144,22 @@ const CreateGameModal = () => {
         <div className="my-4">
           <label
             className="block text-gray-400 text-sm font-bold mb-2"
+            htmlFor="winningScore"
+          >
+            Winning Score
+          </label>
+          <input
+            onChange={(e) => setWinningScore(parseInt(e.target.value))}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="winningScore"
+            type="number"
+            placeholder="Set Winning Score"
+          />
+        </div>
+
+        {/* <div className="my-4">
+          <label
+            className="block text-gray-400 text-sm font-bold mb-2"
             htmlFor="startDate"
           >
             Start Time
@@ -158,7 +169,7 @@ const CreateGameModal = () => {
             type="datetime-local"
             className="appearance-none bg-gray-100 border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
           />
-        </div>
+        </div> */}
 
         <div className="mb-4">
           <span className="block">Bet Game?</span>
@@ -166,7 +177,7 @@ const CreateGameModal = () => {
             <input
               type="radio"
               className="form-radio"
-              checked
+              disabled
               name="accountType"
               value="yes"
             />
@@ -176,7 +187,7 @@ const CreateGameModal = () => {
             <input
               type="radio"
               className="form-radio"
-              disabled
+              checked
               name="accountType"
               value="no"
             />

@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import Button from '@/components/shared/Button'
 import { useRollups } from '@/hooks/useRollups'
 import { dappAddress, parseInputEvent } from '@/lib/utils'
-import { addInput, sendEther } from '@/lib/cartesi'
+import { addInput } from '@/lib/cartesi'
 import { Wallet } from 'cartesi-wallet'
 import {
   selectParticipantAddresses,
@@ -57,8 +57,6 @@ const Apparatus: FC<RouletteProps> = () => {
       const playerAddress = wallet?.accounts[0].address
 
       try {
-        // Don't update the leaderboard except via dice result.
-        dispatch({ type: 'leaderboard/freezLeaderboard', payload: true })
 
         const jsonPayload = JSON.stringify({
           method: 'playGame',
@@ -75,81 +73,48 @@ const Apparatus: FC<RouletteProps> = () => {
         console.log('tx for the game ', result)
       } catch (error) {
         console.error('Error during game:', error)
-        dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
       }
     } else {
       toast.error('Not enough players to play')
     }
   }
 
-    const betGame = async (id: any) => {
-      // const res = await sendEther(1, rollups)
+    // const betGame = async (id: any) => {
+    //   // const res = await sendEther(1, rollups)
 
-       const jsonPayload = JSON.stringify({
-         method: 'transfer',
-         from: wallet?.accounts[0].address,
-         to: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-         ether: '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044',
-         amount: 2
-       })
+    //    const jsonPayload = JSON.stringify({
+    //      method: 'transfer',
+    //      from: wallet?.accounts[0].address,
+    //      to: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    //      ether: '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044',
+    //      amount: 2
+    //    })
 
 
-       const tx = await sendEther(1, rollups, jsonPayload)
+    //    const tx = await sendEther(1, rollups, jsonPayload)
 
-       console.log(tx)
+    //    console.log(tx)
 
-    }
-
-    const getBalance = async (id: any) => {
-
-      let amount = myWallet.balance_get(wallet?.accounts[0].address).ether_get()
-      return console.log(amount)
-
-      const addr: string | undefined = wallet?.accounts[0].address
-
-      const jsonPayload = JSON.stringify({
-        method: 'balance',
-        data: { address: addr },
-        from: addr
-      })
-
-      const tx = await addInput(
-        JSON.stringify(jsonPayload),
-        dappAddress,
-        rollups
-      )
-
-      const result = await tx.wait(1)
-      console.log(result)
-
-    }
-
+    // }
 
   const joinGame = async (id: any) => {
 
-    // const res = await sendEther(1, rollups)
-    // const txHash = await res.wait(1)
-    // console.log(txHash)
+    const addr: string | undefined = wallet?.accounts[0].address
 
-    // if (txHash) {
-      const addr: string | undefined = wallet?.accounts[0].address
+    const jsonPayload = JSON.stringify({
+      method: 'addParticipant',
+      data: { gameId: id, playerAddress: addr },
+    })
 
-      const jsonPayload = JSON.stringify({
-        method: 'addParticipant',
-        data: { gameId: id, playerAddress: addr },
-      })
+    const tx = await addInput(
+      JSON.stringify(jsonPayload),
+      dappAddress,
+      rollups
+    )
 
-      const tx = await addInput(
-        JSON.stringify(jsonPayload),
-        dappAddress,
-        rollups
-      )
+    const result = await tx.wait(1)
+    console.log(result)
 
-      const result = await tx.wait(1)
-      console.log(result)
-    // } else {
-    //   toast.error('Ether not sent')
-    // }
   }
 
   useEffect(() => {
@@ -160,27 +125,28 @@ const Apparatus: FC<RouletteProps> = () => {
   }, [gameId])
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout | undefined
+
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
-        if (
-          parseInputEvent(input).method === 'playGame' &&
-          game.rollOutcome !== 1
-        ) {
-          dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
+        // clearTimeout(timeoutId)
+        timeoutId = setTimeout(() => {
+          if (
+            parseInputEvent(input).method === 'playGame' &&
+            game.rollOutcome !== 0
+          ) {
 
-          setTimeout(() => {
             setValue(game.rollOutcome)
             setIsRolling(true)
-          }, 5000)
-        } else {
-          dispatch({ type: 'leaderboard/freezLeaderboard', payload: false })
-          loseSound?.play()
-          setValue(game.rollOutcome)
-        }
+          } else {
+            loseSound?.play()
+            setValue(1)
+          }
+        }, 7000)
       }
     )
-  }, [game, rollups, loseSound, dispatch])
+  }, [game, rollups])
 
   return (
     <div className="w-[300px]">
@@ -206,8 +172,7 @@ const Apparatus: FC<RouletteProps> = () => {
               >
                 Join Game
               </Button>
-              <Button onClick={() => (betGame('gameId'))}>Bet Game</Button>
-              <Button onClick={getBalance}>Get balance</Button>
+
             </div>
           )}
         {game && game.status === 'In Progress' && (
