@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
 import { EmptyPage } from '@/components/shared/EmptyPage'
-import { dappAddress, parseInputEvent, shortenAddress } from '@/lib/utils'
+import { dappAddress, shortenAddress } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
 import { useRollups } from '@/hooks/useRollups'
 import { useSelector } from 'react-redux'
 import { selectSelectedGame } from '@/features/games/gamesSlice'
 import useAudio from '@/hooks/useAudio'
+import toast from 'react-hot-toast'
 
 const LeaderBoard = () => {
-
-  const addPlayerSound = useAudio('/sounds/addPlayer.mp3')
+  const gameOverSound = useAudio('/sounds/gameOver.mp3')
   const { refetch } = useNotices()
   const rollups = useRollups(dappAddress)
   const game = useSelector((state: any) => selectSelectedGame(state.games))
 
   const [delayedGame, setDelayedGame] = useState<any>(null)
-  
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDelayedGame(game)
@@ -27,8 +27,7 @@ const LeaderBoard = () => {
 
   const handleEvent = useCallback(async () => {
     await refetch()
-    addPlayerSound?.play()
-  }, [refetch, addPlayerSound])
+  }, [refetch])
 
   useEffect(() => {
     rollups?.inputContract.on(
@@ -45,12 +44,25 @@ const LeaderBoard = () => {
     )
   }, [handleEvent, rollups])
 
+  useEffect(() => {
+    if (game.status === 'Ended') {
+      gameOverSound?.play()
+      toast.success(`${game.winner} won`)
+    }
+  }, [game])
+
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">
       <div className="p-6 pb-0 mb-0 rounded-t-2xl">
         <h1 className="font-bold text-2xl mb-10">
           {currentGame?.gameName} Leaderboard
         </h1>
+        <span>
+          Winning score:{' '}
+          <span className="font-bold">
+            {currentGame?.gameSettings?.winningScore}
+          </span>
+        </span>
       </div>
 
       {currentGame && currentGame.participants?.length ? (

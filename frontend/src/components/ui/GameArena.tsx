@@ -44,7 +44,6 @@ const GameArena = () => {
         (game: any) => game.id === gameId
       )
       if (game) {
-        console.log('the gamer ', game)
         dispatchGameData(game) // Dispatch actions on page load
       }
     }
