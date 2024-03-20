@@ -34,12 +34,6 @@ const LeaderBoard = () => {
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
         handleEvent()
-        // if (
-        //   parseInputEvent(input).method === 'addParticipant' ||
-        //   parseInputEvent(input).method === 'playGame'
-        // ) {
-        //   handleEvent()
-        // }
       }
     )
   }, [handleEvent, rollups])

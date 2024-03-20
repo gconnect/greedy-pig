@@ -61,17 +61,12 @@ const GameArena = () => {
             )
             if (game) {
               dispatchGameData(game)
-
-              // if (game.status === 'Ended') {
-              //   gameOverSound?.play()
-              //   toast.success(`${game.winner} won`)
-              // }
             }
           }
         })
       }
     )
-  }, [handleEvent, rollups, dispatch, notices, dispatchGameData, gameOverSound])
+  }, [handleEvent, rollups, dispatch, notices, dispatchGameData])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">

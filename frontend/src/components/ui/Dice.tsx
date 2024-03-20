@@ -24,7 +24,9 @@ const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, val
   const diceRollSound = useAudio('/sounds/diceRoll.mp3')
 
   useEffect(() => {
+    console.log('inside rolig usefect')
     if (isRolling) {
+      console.log('inside roling', value)
       let endRoll = 0;
       let interval: any
       let diceValue;
