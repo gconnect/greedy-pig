@@ -20,20 +20,6 @@ export const addGame = (game) => {
 
 export const addParticipant = async ({gameId, playerAddress}) => {
 
-
-  const rollupAddr = '0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C'
-     try {
-        let voucher = wallet.balance_get(rollupAddr)
-        const res = fetch(rollup_server + "/voucher", {
-          method: "POST", headers: { "Content-Type": "application/json", },
-          body: JSON.stringify({ payload: voucher.payload, destination: voucher.destination }),
-        });
-        console.log('Received finish status rollup balance' + await res);
-      } catch (error) {
-        console.log(error)
-        return errorResponse(true, error)
-      }
-
   const game = games.find(game => game.id === gameId)
 
   if (!game) {

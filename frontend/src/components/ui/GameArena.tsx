@@ -44,6 +44,7 @@ const GameArena = () => {
         (game: any) => game.id === gameId
       )
       if (game) {
+        console.log('the gamer ', game)
         dispatchGameData(game) // Dispatch actions on page load
       }
     }
@@ -62,10 +63,10 @@ const GameArena = () => {
             if (game) {
               dispatchGameData(game)
 
-              if (game.status === 'Ended') {
-                gameOverSound?.play()
-                toast.success(`${game.winner} won`)
-              }
+              // if (game.status === 'Ended') {
+              //   gameOverSound?.play()
+              //   toast.success(`${game.winner} won`)
+              // }
             }
           }
         })

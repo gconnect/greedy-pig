@@ -1,7 +1,7 @@
 
 const viem = require('viem')
 const { Router } = require('cartesi-router')
-const { Wallet, Notice, Output, Error_out } = require('cartesi-wallet')
+const { Wallet, Error_out } = require('cartesi-wallet')
 const { 
   noticeHandler,
   reportHandler
@@ -36,7 +36,6 @@ async function handle_advance(data) {
       if ( msg_sender.toLowerCase() === etherPortalAddress.toLowerCase() ) {
         try {
           console.log('payment payload ', payload)
-          // ether_transfer: (account: Address, to: Address, amount: bigint) => Notice | Error_out;
           const res = await router.process("ether_deposit", payload);
           const r = viem.parse(viem.hexToString(res.payload))
           console.log('res from payment ', r)
