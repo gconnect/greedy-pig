@@ -13,17 +13,16 @@ const LeaderBoard = () => {
   const { refetch } = useNotices()
   const rollups = useRollups(dappAddress)
   const game = useSelector((state: any) => selectSelectedGame(state.games))
-
   const [delayedGame, setDelayedGame] = useState<any>(null)
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setDelayedGame(game)
-    }, 8000)
-    return () => clearTimeout(timeoutId)
-  }, [game])
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     setDelayedGame(game)
+  //   }, 500)
+  //   return () => clearTimeout(timeoutId)
+  // }, [game])
 
-  const currentGame = delayedGame || game
+  // const currentGame = delayedGame || game
 
   const handleEvent = useCallback(async () => {
     await refetch()
@@ -49,17 +48,17 @@ const LeaderBoard = () => {
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">
       <div className="p-6 pb-0 mb-0 rounded-t-2xl">
         <h1 className="font-bold text-2xl mb-10">
-          {currentGame?.gameName} Leaderboard
+          {game?.gameName} Leaderboard
         </h1>
         <span>
           Winning score:{' '}
           <span className="font-bold">
-            {currentGame?.gameSettings?.winningScore}
+            {game?.gameSettings?.winningScore}
           </span>
         </span>
       </div>
 
-      {currentGame && currentGame.participants?.length ? (
+      {game && game.participants?.length ? (
         <div className="flex-auto px-0 pt-0 pb-2">
           <div className="p-0 overflow-x-auto">
             <table className="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
@@ -80,8 +79,8 @@ const LeaderBoard = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentGame.participants.length &&
-                  currentGame.participants.map((player: any, i: number) => (
+                {game.participants.length &&
+                  game.participants.map((player: any, i: number) => (
                     <tr key={i}>
                       {/* <tr key={i} className={player.username === activePlayer ? 'bg-gray-100' : ''}> */}
                       <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">

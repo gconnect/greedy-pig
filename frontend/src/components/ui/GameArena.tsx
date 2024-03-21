@@ -47,7 +47,7 @@ const GameArena = () => {
         dispatchGameData(game) // Dispatch actions on page load
       }
     }
-  }, [notices, dispatchGameData])
+  }, [notices, dispatchGameData, window.location.pathname])
 
   useEffect(() => {
     const gameId = window.location.pathname.split('/').pop()
@@ -66,7 +66,14 @@ const GameArena = () => {
         })
       }
     )
-  }, [handleEvent, rollups, dispatch, notices, dispatchGameData])
+  }, [
+    handleEvent,
+    rollups,
+    dispatch,
+    notices,
+    dispatchGameData,
+    window.location.pathname,
+  ])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">

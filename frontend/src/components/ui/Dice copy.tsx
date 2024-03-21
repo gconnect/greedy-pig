@@ -42,6 +42,7 @@ const Dice: FC<ApparatusProps> = () => {
   const [currentDice, setCurrentDice] = useState(0);
   const [delayedGame, setDelayedGame] = useState<any>(null)
   const [isRolling, setIsRolling] = useState<boolean>(false)
+  const [pass, setPass] = useState<boolean>(false)
 
   const playGame = async (response: string) => {
     const playerAddress = wallet?.accounts[0].address
@@ -98,23 +99,30 @@ const Dice: FC<ApparatusProps> = () => {
       rollups?.inputContract.on(
         'InputAdded',
         (dappAddress, inboxInputIndex, sender, input) => {
-          const inputEvent = parseInputEvent(input)
-          console.log('inside event input added')
-          if (inputEvent.method === 'playGame' && currentGame.rollOutcome !== 0) {
-            console.log('inside conditional event input added')
-            handleEvent()
-            setIsRolling(true)
-          }
+          handleEvent()
         }
       )
-    
-    }, [handleEvent, rollups, currentGame, isRolling])
+    }, [handleEvent, rollups])
 
+    useEffect(() => {
+      rollups?.inputContract.on(
+        'InputAdded',
+        (dappAddress, inboxInputIndex, sender, input) => {
+          handleEvent().then(() => {
+            if (parseInputEvent(input).method === 'playGame' && game.rollOutcome !== 0 && !pass) {
+              setIsRolling(true)
+            } else if (pass) {
+              setPass(false)
+            }
+          })
+        }
+      )
+    }, [handleEvent, rollups, game, isRolling])
 
   useEffect(() => {
     console.log('inside rolig usefect')
     if (isRolling) {
-      console.log('inside roling', game.rollOutcome)
+      console.log('inside roling', currentGame.rollOutcome)
       let endRoll = 0
       let interval: any
       let diceValue
@@ -125,18 +133,17 @@ const Dice: FC<ApparatusProps> = () => {
           setCurrentDice(diceValue)
           endRoll++
         } else {
-          if (game.rollOutcome !== 0) {
-            setCurrentDice(game.rollOutcome - 1)
+          if (currentGame.rollOutcome !== 0) {
+            setCurrentDice(currentGame.rollOutcome - 1)
           } else {
             setCurrentDice(0)
           }
           clearInterval(interval)
-          console.log('setting isRolling to false')
           setIsRolling(false)
         }
       }, 100)
     }
-  }, [isRolling, game, diceRollSound])
+  }, [isRolling, currentGame, diceRollSound])
 
   return (
     <div className="flex flex-col">
