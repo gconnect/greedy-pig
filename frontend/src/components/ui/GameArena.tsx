@@ -47,7 +47,7 @@ const GameArena = () => {
         dispatchGameData(game) // Dispatch actions on page load
       }
     }
-  }, [notices, dispatchGameData, window.location.pathname])
+  }, [notices, dispatchGameData])
 
   useEffect(() => {
     const gameId = window.location.pathname.split('/').pop()
@@ -61,19 +61,17 @@ const GameArena = () => {
             )
             if (game) {
               dispatchGameData(game)
+
+              // if (game.status === 'Ended') {
+              //   gameOverSound?.play()
+              //   toast.success(`${game.winner} won`)
+              // }
             }
           }
         })
       }
     )
-  }, [
-    handleEvent,
-    rollups,
-    dispatch,
-    notices,
-    dispatchGameData,
-    window.location.pathname,
-  ])
+  }, [handleEvent, rollups, dispatch, notices, dispatchGameData, gameOverSound])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">
