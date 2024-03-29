@@ -33,7 +33,7 @@ const CreateGameModal = () => {
       winningScore: winningScore,
       mode: 'score',
       apparatus: 'dice',
-      bet: true,
+      bet: false,
       maxPlayer: 10,
       limitNumberOfPlayer: true,
     },

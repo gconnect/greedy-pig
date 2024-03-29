@@ -10,7 +10,10 @@ import useAudio from '@/hooks/useAudio'
 import { parseInputEvent, playGame } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
-import { selectParticipantAddresses, selectSelectedGame } from '@/features/games/gamesSlice'
+import {
+  selectParticipantAddresses,
+  selectSelectedGame,
+} from '@/features/games/gamesSlice'
 import { dappAddress } from '@/lib/utils'
 import { useConnectWallet } from '@web3-onboard/react'
 import { addInput } from '@/lib/cartesi'
@@ -25,23 +28,78 @@ interface ApparatusProps {
   // setIsRolling: (value: boolean) => void
   // isRolling: boolean
   // value: number
+  game: any
 }
 
-const Dice: FC<ApparatusProps> = () => {
-// const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, value}) => {
+const fetchGame = async (gameId: any, notices: any) => {
+  try {
+    if (gameId && notices && notices.length > 0) {
+      const game = JSON.parse(notices[notices.length - 1].payload).find(
+        (game: any) => game.id === gameId
+      )
+      if (game) {
+        return game
+      }
+    }
+    return null
+  } catch (error) {
+    console.error('Error fetching game state:', error)
+    return null
+  }
+}
 
-  const { refetch } = useNotices()
+const Dice: FC<ApparatusProps> = ({ game }) => {
+  // const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, value}) => {
+
+  const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
   const [{ wallet }] = useConnectWallet()
   const diceRollSound = useAudio('/sounds/diceRoll.mp3')
-  const game = useSelector((state: any) => selectSelectedGame(state.games))
+  // const [game, setGame] = useState<any>()
+  // const game = useSelector((state: any) => selectSelectedGame(state.games))
   const players = useSelector((state: any) =>
     selectParticipantAddresses(state.games)
   )
-  
-  const [currentDice, setCurrentDice] = useState(0);
+
+  const [currentDice, setCurrentDice] = useState(0)
   const [delayedGame, setDelayedGame] = useState<any>(null)
   const [isRolling, setIsRolling] = useState<boolean>(false)
+
+  const fetchGameMemoized = useCallback(fetchGame, []) // Memoize the fetchGame function
+
+  // const fetchGame = async (gameId: string | undefined, notices: any) => {
+  //   try {
+  //     if (gameId && notices && notices.length > 0) {
+  //       const game = JSON.parse(notices[notices.length - 1].payload).find(
+  //         (game: any) => game.id === gameId
+  //       )
+  //       if (game) {
+  //         return game
+  //       }
+  //     }
+  //     return null // Return null if game is not found or conditions are not met
+  //   } catch (error) {
+  //     console.error('Error fetching game state:', error)
+  //     return null // Handle error by returning null or implement error handling logic
+  //   }
+  // }
+
+  const joinGame = async () => {
+    const id = window.location.pathname.split('/').pop()
+    if (!id) return toast.error('Game not found')
+
+    const addr: string | undefined = wallet?.accounts[0].address
+
+    const jsonPayload = JSON.stringify({
+      method: 'addParticipant',
+      data: { gameId: id, playerAddress: addr },
+    })
+
+    const tx = await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+
+    const result = await tx.wait(1)
+    console.log(result)
+  }
 
   const playGame = async (response: string) => {
     const playerAddress = wallet?.accounts[0].address
@@ -88,28 +146,26 @@ const Dice: FC<ApparatusProps> = () => {
     return () => clearTimeout(timeoutId)
   }, [game])
 
-  const currentGame = delayedGame || game
+  // const currentGame = delayedGame || game
 
-    const handleEvent = useCallback(async () => {
-      await refetch()
-    }, [refetch])
+  const handleEvent = useCallback(async () => {
+    await refetch()
+  }, [refetch])
 
-    useEffect(() => {
-      rollups?.inputContract.on(
-        'InputAdded',
-        (dappAddress, inboxInputIndex, sender, input) => {
-          const inputEvent = parseInputEvent(input)
-          console.log('inside event input added')
-          if (inputEvent.method === 'playGame' && currentGame.rollOutcome !== 0) {
-            console.log('inside conditional event input added')
-            handleEvent()
-            setIsRolling(true)
-          }
+  useEffect(() => {
+    rollups?.inputContract.on(
+      'InputAdded',
+      (dappAddress, inboxInputIndex, sender, input) => {
+        const inputEvent = parseInputEvent(input)
+        console.log('inside event input added')
+        if (inputEvent.method === 'playGame' && game.rollOutcome !== 0) {
+          console.log('inside conditional event input added')
+          handleEvent()
+          setIsRolling(true)
         }
-      )
-    
-    }, [handleEvent, rollups, currentGame, isRolling])
-
+      }
+    )
+  }, [handleEvent, rollups, game])
 
   useEffect(() => {
     console.log('inside rolig usefect')
@@ -130,13 +186,16 @@ const Dice: FC<ApparatusProps> = () => {
           } else {
             setCurrentDice(0)
           }
-          clearInterval(interval)
           console.log('setting isRolling to false')
           setIsRolling(false)
+          clearInterval(interval)
         }
       }, 100)
+      return () => {
+        if (interval) clearInterval(interval)
+      }
     }
-  }, [isRolling, game, diceRollSound])
+  }, [game?.rollOutcome, diceRollSound, isRolling])
 
   return (
     <div className="flex flex-col">
@@ -154,7 +213,7 @@ const Dice: FC<ApparatusProps> = () => {
           />
         ))}
       </button>
-      {currentGame && currentGame.status === 'In Progress' && (
+      {game && game.status === 'In Progress' && (
         <Button
           className="mt-6"
           style={{ background: '' }}
@@ -163,6 +222,18 @@ const Dice: FC<ApparatusProps> = () => {
           Pass
         </Button>
       )}
+      <div className="flex justify-center">
+        {game &&
+          game.status === 'New' &&
+          wallet &&
+          !players.includes(wallet.accounts[0].address) && (
+            <div>
+              <Button onClick={joinGame} className="mb-10" type="button">
+                Join Game
+              </Button>
+            </div>
+          )}
+      </div>
     </div>
   )
 }

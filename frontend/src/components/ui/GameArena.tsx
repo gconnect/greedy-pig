@@ -5,12 +5,13 @@ import LeaderBoard from './Leaderboard'
 import { dappAddress, shortenAddress } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
 import { useNotices } from '@/hooks/useNotices'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Settings from './Settings'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectActivePlayer } from '@/features/leaderboard/leaderboardSlice'
 import toast from 'react-hot-toast'
 import useAudio from '@/hooks/useAudio'
+import Dice from './Dice'
 
 const GameArena = () => {
   const gameOverSound = useAudio('/sounds/gameOver.mp3')
@@ -26,8 +27,11 @@ const GameArena = () => {
     return await refetch()
   }, [refetch])
 
+  const [game, setGame] = useState<any>()
+
   const dispatchGameData = useCallback(
     (game: any) => {
+      setGame(game)
       dispatch({ type: 'games/setGame', payload: game })
       dispatch({
         type: 'leaderboard/updateActivePlayer',
@@ -79,11 +83,11 @@ const GameArena = () => {
         <div className="flex flex-col items-center gap-4  px-8 py-6 md:gap-6">
           {/* <Balance /> */}
           {activePlayer && <p>{shortenAddress(activePlayer)}'s turn</p>}
-          <Apparatus />
+          <Dice game={game} />
         </div>
 
         <div className="flex flex-col items-center gap-4 md:gap-6">
-          <LeaderBoard />
+          <LeaderBoard game={game} />
         </div>
       </div>
 

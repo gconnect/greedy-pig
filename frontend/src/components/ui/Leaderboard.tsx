@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import { EmptyPage } from '@/components/shared/EmptyPage'
 import { dappAddress, shortenAddress } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
@@ -8,11 +8,15 @@ import { selectSelectedGame } from '@/features/games/gamesSlice'
 import useAudio from '@/hooks/useAudio'
 import toast from 'react-hot-toast'
 
-const LeaderBoard = () => {
+interface LeaderBoardProps {
+  game: any
+}
+
+const LeaderBoard: FC<LeaderBoardProps> = ({ game }) => {
   const gameOverSound = useAudio('/sounds/gameOver.mp3')
   const { refetch } = useNotices()
   const rollups = useRollups(dappAddress)
-  const game = useSelector((state: any) => selectSelectedGame(state.games))
+  // const game = useSelector((state: any) => selectSelectedGame(state.games))
   const [delayedGame, setDelayedGame] = useState<any>(null)
 
   // useEffect(() => {
@@ -38,11 +42,14 @@ const LeaderBoard = () => {
   }, [handleEvent, rollups])
 
   useEffect(() => {
-    if (game.status === 'Ended') {
+    if (game?.status === 'Ended') {
       gameOverSound?.play()
       toast.success(`${game.winner} won`)
     }
-  }, [game])
+    return () => {
+      rollups?.inputContract.removeAllListeners('InputAdded')
+    }
+  }, [game, gameOverSound, rollups])
 
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">

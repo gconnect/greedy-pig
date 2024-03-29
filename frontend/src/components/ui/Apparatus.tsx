@@ -66,7 +66,7 @@ const Apparatus: FC<RouletteProps> = () => {
   return (
     <div className="w-[300px]">
       <div className="flex justify-center mb-[60px]">
-        <Dice />
+        {/* <Dice  /> */}
       </div>
 
       <div className="flex justify-center">
