@@ -152,7 +152,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
     await refetch()
   }, [refetch])
 
-  useEffect(() => {
+  useEffect(() => { // rerendering happening here
     rollups?.inputContract.on(
       'InputAdded',
       (dappAddress, inboxInputIndex, sender, input) => {
@@ -160,12 +160,12 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
         console.log('inside event input added')
         if (inputEvent.method === 'playGame' && game.rollOutcome !== 0) {
           console.log('inside conditional event input added')
-          handleEvent()
           setIsRolling(true)
         }
       }
     )
-  }, [handleEvent, rollups, game])
+  }, [rollups, game])
+
 
   useEffect(() => {
     console.log('inside rolig usefect')
