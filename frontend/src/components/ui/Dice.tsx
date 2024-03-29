@@ -152,20 +152,43 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
     await refetch()
   }, [refetch])
 
-  useEffect(() => { // rerendering happening here
-    rollups?.inputContract.on(
-      'InputAdded',
-      (dappAddress, inboxInputIndex, sender, input) => {
-        const inputEvent = parseInputEvent(input)
-        console.log('inside event input added')
-        if (inputEvent.method === 'playGame' && game.rollOutcome !== 0) {
-          console.log('inside conditional event input added')
-          setIsRolling(true)
-        }
+  useEffect(() => {
+    console.log('Setting up event listener')
+    const handleInputAdded = (
+      dappAddress,
+      inboxInputIndex,
+      sender,
+      input: any
+    ) => {
+      const inputEvent = parseInputEvent(input)
+      console.log('inside event input added')
+      if (inputEvent.method === 'playGame' && game.rollOutcome !== 0) {
+        console.log('inside conditional event input added')
+        setIsRolling(true)
       }
-    )
-  }, [rollups, game])
+    }
 
+    rollups?.inputContract.on('InputAdded', handleInputAdded)
+
+    return () => {
+      // Clean up by removing the event listener when the component unmounts
+      rollups?.inputContract.removeListener('InputAdded', handleInputAdded)
+    }
+  }, [rollups]) // Empty dependency array ensures this effect runs only once on mount
+
+  // useEffect(() => { // rerendering happening here
+  //   rollups?.inputContract.on(
+  //     'InputAdded',
+  //     (dappAddress, inboxInputIndex, sender, input) => {
+  //       const inputEvent = parseInputEvent(input)
+  //       console.log('inside event input added')
+  //       if (inputEvent.method === 'playGame' && game.rollOutcome !== 0) {
+  //         console.log('inside conditional event input added')
+  //         setIsRolling(true)
+  //       }
+  //     }
+  //   )
+  // }, [rollups, game])
 
   useEffect(() => {
     console.log('inside rolig usefect')
