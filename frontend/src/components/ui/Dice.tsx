@@ -24,10 +24,6 @@ import Button from '../shared/Button'
 const die = [Die1, Die2, Die3, Die4, Die5, Die6]
 
 interface ApparatusProps {
-  // handleDiceClick: () => void
-  // setIsRolling: (value: boolean) => void
-  // isRolling: boolean
-  // value: number
   game: any
 }
 
@@ -49,14 +45,11 @@ const fetchGame = async (gameId: any, notices: any) => {
 }
 
 const Dice: FC<ApparatusProps> = ({ game }) => {
-  // const Dice: FC<ApparatusProps> = ({handleDiceClick, setIsRolling, isRolling, value}) => {
 
   const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
   const [{ wallet }] = useConnectWallet()
   const diceRollSound = useAudio('/sounds/diceRoll.mp3')
-  // const [game, setGame] = useState<any>()
-  // const game = useSelector((state: any) => selectSelectedGame(state.games))
   const players = useSelector((state: any) =>
     selectParticipantAddresses(state.games)
   )
@@ -64,25 +57,6 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
   const [currentDice, setCurrentDice] = useState(0)
   const [delayedGame, setDelayedGame] = useState<any>(null)
   const [isRolling, setIsRolling] = useState<boolean>(false)
-
-  const fetchGameMemoized = useCallback(fetchGame, []) // Memoize the fetchGame function
-
-  // const fetchGame = async (gameId: string | undefined, notices: any) => {
-  //   try {
-  //     if (gameId && notices && notices.length > 0) {
-  //       const game = JSON.parse(notices[notices.length - 1].payload).find(
-  //         (game: any) => game.id === gameId
-  //       )
-  //       if (game) {
-  //         return game
-  //       }
-  //     }
-  //     return null // Return null if game is not found or conditions are not met
-  //   } catch (error) {
-  //     console.error('Error fetching game state:', error)
-  //     return null // Handle error by returning null or implement error handling logic
-  //   }
-  // }
 
   const joinGame = async () => {
     const id = window.location.pathname.split('/').pop()
@@ -174,21 +148,9 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       // Clean up by removing the event listener when the component unmounts
       rollups?.inputContract.removeListener('InputAdded', handleInputAdded)
     }
-  }, [rollups]) // Empty dependency array ensures this effect runs only once on mount
+  }, [rollups])
 
-  // useEffect(() => { // rerendering happening here
-  //   rollups?.inputContract.on(
-  //     'InputAdded',
-  //     (dappAddress, inboxInputIndex, sender, input) => {
-  //       const inputEvent = parseInputEvent(input)
-  //       console.log('inside event input added')
-  //       if (inputEvent.method === 'playGame' && game.rollOutcome !== 0) {
-  //         console.log('inside conditional event input added')
-  //         setIsRolling(true)
-  //       }
-  //     }
-  //   )
-  // }, [rollups, game])
+ 
 
   useEffect(() => {
     console.log('inside rolig usefect')

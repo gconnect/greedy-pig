@@ -18,19 +18,19 @@ export const noticeHandler = async (data) => {
 export const reportHandler = async (message) => {
 
   const result = JSON.stringify({
-        error: String(message),
-      });
+    error: String(message),
+  });
 
-      const hexresult = viem.stringToHex(result);
+  const hexresult = viem.stringToHex(result);
 
-      await fetch(rollupServer + '/report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+  await fetch(rollupServer + '/report', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
 
-        body: JSON.stringify({
-          payload: hexresult,
-        }),
-      });
+    body: JSON.stringify({
+      payload: hexresult,
+    }),
+  });
 }

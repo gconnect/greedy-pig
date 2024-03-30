@@ -1,6 +1,5 @@
 'use client'
 
-import Apparatus from '@/components/ui/Apparatus'
 import LeaderBoard from './Leaderboard'
 import { dappAddress, shortenAddress } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
