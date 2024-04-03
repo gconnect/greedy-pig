@@ -1,8 +1,25 @@
+const { vrfhandler, getRandomNumber } = require('./utils/helpers')
+const {vrfContractAddr} = require('./utils/helpers')
+const vrfAbi = require('./utils/vrfAbi.json') 
 const { v4: uuidv4 } = require('uuid')
 const { Wallet } = require('cartesi-wallet')
+const { ethers } = require('ethers')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 const wallet = new Wallet(new Map())
+
+const provider = new ethers.JsonRpcProvider('https://sepolia-rollup.arbitrum.io/rpc')
+// Instantiate the contract
+const contract = new ethers.Contract(vrfContractAddr, vrfAbi.abi, provider);
+
+// Function to listen for events emitted by the smart contract
+const listenForEvents = async (eventName) => {
+    return new Promise((resolve, reject) => {
+        contract.on(eventName, (...args) => resolve(args));
+        contract.once('error', reject);
+    });
+};
+
 
 export const games = []
 
@@ -52,6 +69,40 @@ export const addParticipant = async ({gameId, playerAddress}) => {
   return errorResponse(false)
 }
 
+export const test = async () => {
+    try {
+        // Call the vrfhandler function to request random words
+
+      
+        const requestId = await vrfhandler();
+        // const requestId = await response.json();
+        // console.log('Request ID from vrf:', requestId);
+
+        // Wait for the RequestFulfilled event to be emitted
+        // const eve = await listenForEvents(contract, 'RequestFulfilled');
+        // const [requestIdEvent, randomWord] = await listenForEvents(contract, 'RequestFulfilled');
+      const res = await getRandomNumber(requestId);
+      // const res = await requestStatus.json();
+        console.log('Random num:', res);
+        // console.log('Request ID from event:', eve);
+        // console.log('Random Word:', eve);
+    } catch (error) {
+      console.log('error in vrf', error)
+        errorResponse(true, `Error in VRF: ${error}`);
+    }
+};
+
+// export const test = async () => {
+//  try {
+//   const reqId = await vrfhandler()
+//    console.log('reqId from vrf', reqId)
+//    const rollOutcome = await getRandomNumber(reqId)
+//    console.log('rollOutcome from vrf', rollOutcome)
+//  } catch (error) {
+//   errorResponse(true, `error in vrf ${error}`)
+//  }
+// }
+
 const gamePlay = async (gameId, playerAddress) => {
 
   const game = games.find(game => game.id === gameId)
@@ -59,7 +110,10 @@ const gamePlay = async (gameId, playerAddress) => {
   const participant = game.participants.find(p => p.address === playerAddress)
 
   const rollOutcome = Math.floor(Math.random() * 6) + 1
-  console.log('rollOutcome ', rollOutcome)
+  // const reqId = await vrfhandler()
+  // console.log('reqId from vrf', reqId)
+  // const rollOutcome = await getRandomNumber(reqId)
+  // console.log('rollOutcome from vrf', rollOutcome)
 
 
   if (rollOutcome === 1) {

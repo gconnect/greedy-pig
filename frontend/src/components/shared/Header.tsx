@@ -63,7 +63,7 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="lg-hidded">
+        <div className="lg-hidden">
           <ConnectButton />
         </div>
         <button

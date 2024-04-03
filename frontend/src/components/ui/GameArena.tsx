@@ -59,6 +59,7 @@ const GameArena = () => {
       (dappAddress, inboxInputIndex, sender, input) => {
         handleEvent().then(() => {
           if (gameId && notices && notices.length > 0) {
+            console.log(notices)
             const game = JSON.parse(notices[notices.length - 1].payload).find(
               (game: any) => game.id === gameId
             )
@@ -74,7 +75,7 @@ const GameArena = () => {
         })
       }
     )
-  }, [handleEvent, rollups, dispatch, notices, dispatchGameData, gameOverSound])
+  }, [handleEvent, dispatch, notices, dispatchGameData])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">

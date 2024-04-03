@@ -8,6 +8,7 @@ const {
  } = require('./utils/helpers')
 const { 
   games, 
+  test,
   addParticipant, 
   addGame, 
   gamePlayHandler
@@ -89,6 +90,16 @@ async function handle_advance(data) {
       }
       advance_req = await noticeHandler(games)
     
+    } 
+    else if(JSONpayload.method === 'test') {
+      console.log('test ...')
+      const res = test()
+      if (res.error) {
+        await reportHandler(res.message);
+        return 'reject';
+      }
+     
+      advance_req = await noticeHandler(games)
     } else {
       console.log('invalid request');
       const message = `method undefined: ${JSONpayload.method}`
