@@ -54,28 +54,67 @@ const GameArena = () => {
 
   useEffect(() => {
     const gameId = window.location.pathname.split('/').pop()
-    rollups?.inputContract.on(
-      'InputAdded',
-      (dappAddress, inboxInputIndex, sender, input) => {
-        handleEvent().then(() => {
-          if (gameId && notices && notices.length > 0) {
-            console.log(notices)
-            const game = JSON.parse(notices[notices.length - 1].payload).find(
-              (game: any) => game.id === gameId
-            )
-            if (game) {
-              dispatchGameData(game)
-
-              // if (game.status === 'Ended') {
-              //   gameOverSound?.play()
-              //   toast.success(`${game.winner} won`)
-              // }
-            }
-          }
-        })
+    if (gameId && notices && notices.length > 0) {
+      const game = JSON.parse(notices[notices.length - 1].payload).find(
+        (game: any) => game.id === gameId
+      )
+      if (game) {
+        dispatchGameData(game) // Dispatch actions on page load
       }
-    )
-  }, [handleEvent, dispatch, notices, dispatchGameData])
+    }
+  }, [notices]) // Only run when 'notices' changes
+  useEffect(() => {
+    const gameId = window.location.pathname.split('/').pop()
+    const handleInputAdded = (dappAddress, inboxInputIndex, sender, input) => {
+      handleEvent().then(() => {
+        if (gameId && notices && notices.length > 0) {
+          const game = JSON.parse(notices[notices.length - 1].payload).find(
+            (game: any) => game.id === gameId
+          )
+          if (game) {
+            dispatchGameData(game)
+
+            // if (game.status === 'Ended') {
+            //   gameOverSound?.play();
+            //   toast.success(`${game.winner} won`);
+            // }
+          }
+        }
+      })
+    }
+
+    rollups?.inputContract.on('InputAdded', handleInputAdded)
+
+    return () => {
+      // Cleanup function to unsubscribe from event listener
+      rollups?.inputContract.off('InputAdded', handleInputAdded)
+    }
+  }, [rollups, notices, handleEvent, dispatchGameData]) // Ensure all dependencies are included
+
+  // useEffect(() => {
+  //   const gameId = window.location.pathname.split('/').pop()
+  //   rollups?.inputContract.on(
+  //     'InputAdded',
+  //     (dappAddress, inboxInputIndex, sender, input) => {
+  //       handleEvent().then(() => {
+  //         if (gameId && notices && notices.length > 0) {
+  //           console.log(notices)
+  //           const game = JSON.parse(notices[notices.length - 1].payload).find(
+  //             (game: any) => game.id === gameId
+  //           )
+  //           if (game) {
+  //             dispatchGameData(game)
+
+  //             // if (game.status === 'Ended') {
+  //             //   gameOverSound?.play()
+  //             //   toast.success(`${game.winner} won`)
+  //             // }
+  //           }
+  //         }
+  //       })
+  //     }
+  //   )
+  // }, [handleEvent, dispatch, notices, dispatchGameData])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">

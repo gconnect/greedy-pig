@@ -57,6 +57,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
   const [currentDice, setCurrentDice] = useState(0)
   const [delayedGame, setDelayedGame] = useState<any>(null)
   const [isRolling, setIsRolling] = useState<boolean>(false)
+  const [result, setResult] = useState(0)
 
   const joinGame = async () => {
     const id = window.location.pathname.split('/').pop()
@@ -138,7 +139,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       console.log('inside event input added')
       if (inputEvent.method === 'playGame' && game.rollOutcome !== 0) {
         console.log('inside conditional event input added')
-        setIsRolling(true)
+        // setIsRolling(true)
       }
     }
 
@@ -150,53 +151,90 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
     }
   }, [rollups])
 
+  useEffect(() => {
+    if (game?.rollOutcome !== null) {
+      setIsRolling(true)
+
+      const interval = setInterval(() => {
+        setResult(Math.floor(Math.random() * 6) + 1)
+      }, 100) // Adjust the interval speed as needed
+
+      // Stop rolling after a certain time and show the final result
+      setTimeout(() => {
+        clearInterval(interval)
+        diceRollSound?.play()
+        setResult(game?.rollOutcome)
+        setIsRolling(false)
+      }, 2000) // Adjust the duration as needed
+
+      return () => clearInterval(interval)
+    }
+  }, [game?.rollOutcome, diceRollSound])
  
 
-  useEffect(() => {
-    console.log('inside rolig usefect')
-    if (isRolling) {
-      console.log('inside roling', game.rollOutcome)
-      let endRoll = 0
-      let interval: any
-      let diceValue
-      interval = setInterval(() => {
-        if (endRoll < 30) {
-          diceRollSound?.play()
-          diceValue = Math.floor(Math.random() * 6)
-          setCurrentDice(diceValue)
-          endRoll++
-        } else {
-          if (game.rollOutcome !== 0) {
-            setCurrentDice(game.rollOutcome - 1)
-          } else {
-            setCurrentDice(0)
-          }
-          console.log('setting isRolling to false')
-          setIsRolling(false)
-          clearInterval(interval)
-        }
-      }, 100)
-      return () => {
-        if (interval) clearInterval(interval)
-      }
-    }
-  }, [game?.rollOutcome, diceRollSound, isRolling])
+  // useEffect(() => {
+  //   console.log('inside rolig usefect')
+  //   if (isRolling) {
+  //     console.log('inside roling', game.rollOutcome)
+  //     let endRoll = 0
+  //     let interval: any
+  //     let diceValue
+  //     interval = setInterval(() => {
+  //       if (endRoll < 30) {
+  //         diceRollSound?.play()
+  //         diceValue = Math.floor(Math.random() * 6)
+  //         setCurrentDice(diceValue)
+  //         endRoll++
+  //       } else {
+  //         if (game.rollOutcome !== 0) {
+  //           setCurrentDice(game.rollOutcome - 1)
+  //         } else {
+  //           setCurrentDice(0)
+  //         }
+  //         console.log('setting isRolling to false')
+  //         setIsRolling(false)
+  //         clearInterval(interval)
+  //       }
+  //     }, 100)
+  //     return () => {
+  //       if (interval) clearInterval(interval)
+  //     }
+  //   }
+  // }, [game?.rollOutcome, diceRollSound, isRolling])
 
   return (
     <div className="flex flex-col">
+      {/* <div>
+        <p>{isRolling ? 'Rolling...' : `Result: ${result}`}</p>
+        <div className={`dicee ${isRolling ? 'rollingg' : ''}`}>
+          {result !== null && (
+            <img
+              src={die[result - 1]} // Adjust for 0-based index
+              alt={`Die ${result}`}
+              className={`${currentDice === index ? '' : 'hidden'}`}
+            />
+          )}
+        </div>
+      </div> */}
       <button
         className={`hover:scale-105 active:scale-100 duration-300 md:w-auto w-[200px]`}
         onClick={() => playGame('yes')}
         disabled={isRolling}
       >
-        {die.map((dice, index) => (
+        {result !== null && (
+          <Image
+            src={die[result - 1]}
+            alt={`Die ${result}`}
+          />
+        )}
+        {/* {die.map((dice, index) => (
           <Image
             key={index}
             src={dice}
             alt="Dice"
             className={`${currentDice === index ? '' : 'hidden'}`}
           />
-        ))}
+        ))} */}
       </button>
       {game && game.status === 'In Progress' && (
         <Button

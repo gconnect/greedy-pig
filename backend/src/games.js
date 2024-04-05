@@ -109,7 +109,7 @@ const gamePlay = async (gameId, playerAddress) => {
 
   const participant = game.participants.find(p => p.address === playerAddress)
 
-  const rollOutcome = Math.floor(Math.random() * 6) + 1
+  const rollOutcome = Math.floor(Math.random() * 6) + 1 // I want to replace this line 112 with Drand solution
   // const reqId = await vrfhandler()
   // console.log('reqId from vrf', reqId)
   // const rollOutcome = await getRandomNumber(reqId)
@@ -123,7 +123,7 @@ const gamePlay = async (gameId, playerAddress) => {
     // cancel all acumulated point for the turn
     participant.playerInfo.turnScore = 0; // Reset turn score for the next turn
     game.activePlayer = game.participants[(game.participants.findIndex(p => p.address === playerAddress) + 1) % game.participants.length].address; // Move to the next player's turn or end the game
-    game.rollOutcome = 0
+    game.rollOutcome = rollOutcome
     return;
 
   } else {
@@ -133,6 +133,7 @@ const gamePlay = async (gameId, playerAddress) => {
     participant.playerInfo.turnScore += rollOutcome
 
     const totalScore = participant.playerInfo.turnScore + participant.playerInfo.totalScore
+    console.log('totalScore', totalScore)
     if (game.gameSettings.mode === 'score' && totalScore >= game.gameSettings.winningScore) {
       
       console.log('ending game ...')
