@@ -48,17 +48,6 @@ const LeaderBoard: FC<LeaderBoardProps> = ({ game }) => {
     }
   }, [game?.status, gameOverSound])
 
-
-  // useEffect(() => {
-  //   if (game?.status === 'Ended') {
-  //     gameOverSound?.play()
-  //     toast.success(`${game.winner} won`)
-  //   }
-  //   return () => {
-  //     rollups?.inputContract.removeAllListeners('InputAdded')
-  //   }
-  // }, [game, gameOverSound, rollups])
-
   return (
     <div className="relative flex flex-col w-full min-w-0 break-words border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border mb-4 draggable">
       <div className="p-6 pb-0 mb-0 rounded-t-2xl">

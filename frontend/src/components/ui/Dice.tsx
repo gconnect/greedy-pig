@@ -27,26 +27,9 @@ interface ApparatusProps {
   game: any
 }
 
-const fetchGame = async (gameId: any, notices: any) => {
-  try {
-    if (gameId && notices && notices.length > 0) {
-      const game = JSON.parse(notices[notices.length - 1].payload).find(
-        (game: any) => game.id === gameId
-      )
-      if (game) {
-        return game
-      }
-    }
-    return null
-  } catch (error) {
-    console.error('Error fetching game state:', error)
-    return null
-  }
-}
 
 const Dice: FC<ApparatusProps> = ({ game }) => {
 
-  const { notices, refetch } = useNotices()
   const rollups = useRollups(dappAddress)
   const [{ wallet }] = useConnectWallet()
   const diceRollSound = useAudio('/sounds/diceRoll.mp3')
@@ -54,7 +37,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
     selectParticipantAddresses(state.games)
   )
 
-  const [currentDice, setCurrentDice] = useState(0)
+  const [rollCount, setRollCount] = useState<number>(0)
   const [delayedGame, setDelayedGame] = useState<any>(null)
   const [isRolling, setIsRolling] = useState<boolean>(false)
   const [result, setResult] = useState(0)
@@ -123,9 +106,9 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
 
   // const currentGame = delayedGame || game
 
-  const handleEvent = useCallback(async () => {
-    await refetch()
-  }, [refetch])
+  useEffect(() => {
+    setRollCount((prevCount) => prevCount + 1)
+  }, [result])
 
   useEffect(() => {
     console.log('Setting up event listener')
@@ -156,16 +139,17 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       setIsRolling(true)
 
       const interval = setInterval(() => {
+        diceRollSound?.play()
         setResult(Math.floor(Math.random() * 6) + 1)
-      }, 100) // Adjust the interval speed as needed
+      }, 200) // Adjust the interval speed as needed
 
       // Stop rolling after a certain time and show the final result
       setTimeout(() => {
         clearInterval(interval)
-        diceRollSound?.play()
+        
         setResult(game?.rollOutcome)
         setIsRolling(false)
-      }, 2000) // Adjust the duration as needed
+      }, 1000) // Adjust the duration as needed
 
       return () => clearInterval(interval)
     }
@@ -225,6 +209,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
           <Image
             src={die[result - 1]}
             alt={`Die ${result}`}
+            className={`die ${rollCount}`} // Rerenders the die when the roll count changes
           />
         )}
         {/* {die.map((dice, index) => (
