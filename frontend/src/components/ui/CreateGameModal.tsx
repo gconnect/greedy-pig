@@ -38,7 +38,7 @@ const CreateGameModal = () => {
       limitNumberOfPlayer: true,
     },
     status: GameStatus.New,
-    rollOutcome: 0,
+    rollOutcome: 1,
     winner: '',
     bettingAmount: 1, // in ether
     bettingFund: 0, // total fund transfered by players

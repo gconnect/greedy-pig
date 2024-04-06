@@ -31,7 +31,7 @@ export const addGame = (game) => {
   }
 
 
-  games.push({ ...game, id: uuidv4()})
+  games.push({ ...game, id: uuidv4(), dateCreated: Date.now()})
   return errorResponse(false)
 }
 
