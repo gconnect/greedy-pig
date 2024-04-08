@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const viem = require('viem')
 const { ethers } = require('ethers')
 const vrfAbi = require('./vrfAbi.json')
@@ -10,6 +11,56 @@ const provider = new ethers.JsonRpcProvider('https://sepolia-rollup.arbitrum.io/
 // Instantiate the contract
 
 const contract = new ethers.Contract(vrfContractAddr, vrfAbi.abi, provider);
+
+// Function to verify commitment during the reveal phase
+export const verifyCommitment = async (commitment, move, nonce) => {
+
+  console.log('verification move ', move )
+  console.log('verification nonce ', nonce)
+  
+    const data = ethers.toUtf8Bytes(move + nonce);
+
+    // Generate hash using SHA-256 algorithm
+    const hashBytes = await crypto.subtle.digest("SHA-256", data);
+    const calculatedCommitment = Array.from(new Uint8Array(hashBytes))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+
+        console.log('calculated commitment ', calculatedCommitment)
+        console.log('actual commitment ', commitment)
+
+    // Compare calculated commitment with the commitment received from the frontend
+    return calculatedCommitment === commitment;
+};
+
+// Generate commitment hash for a given move
+const generateCommitmentHash = (move) => {
+    // Use a cryptographic hash function (SHA-256) to generate the commitment hash
+    const hash = crypto.createHash('sha256');
+    hash.update(move.toString());
+    return hash.digest('hex');
+}
+
+// Verify commitment hash against the revealed move
+const verifyCommitment2 = (commitmentHash, revealedMove) => {
+    const expectedHash = generateCommitmentHash(revealedMove);
+    return commitmentHash === expectedHash;
+}
+
+// Reveal phase function
+const revealMove = async (gameId, playerAddress, committedMove, commitmentHash) => {
+    // Retrieve the commitment hash stored for the player from the game state
+
+    // Verify that the commitment hash matches the hash of the revealed move
+    const isMatching = verifyCommitment(commitmentHash, committedMove);
+
+    if (!isMatching) {
+        // Handle the case where the revealed move does not match the commitment hash
+        return errorResponse(true, 'Invalid commitment');
+    }
+
+    return committedMove
+}
 
 
 export const noticeHandler = async (data) => {
@@ -43,6 +94,26 @@ export const reportHandler = async (message) => {
       payload: hexresult,
     }),
   });
+}
+
+export const getParticipantsMove = game => {
+  return game.participants.filter(p => p.move !== null)
+}
+
+export const generateRollOutcome = (moves) => {
+
+  const sum = moves.reduce((acc, curr) => acc + curr, 0);
+  const rollOutcome = (sum % 6) + 1; 
+  return rollOutcome;
+};
+
+export const resetMoveCommitment = game => {
+  game.commitmentPhase = false
+  // reset all players move/commitment
+  game.participants.forEach(p => {
+    p.move = null
+    p.commitment = null
+  })
 }
 
 export const vrfhandler = async () => {

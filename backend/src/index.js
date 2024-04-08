@@ -8,7 +8,8 @@ const {
  } = require('./utils/helpers')
 const { 
   games, 
-  test,
+  reveal,
+  commit,
   addParticipant, 
   addGame, 
   gamePlayHandler
@@ -90,10 +91,18 @@ async function handle_advance(data) {
       }
       advance_req = await noticeHandler(games)
     
-    } 
-    else if(JSONpayload.method === 'test') {
-      console.log('test ...')
-      const res = test()
+    } else if(JSONpayload.method === 'commit') {
+      console.log(`committing for ${msg_sender}...`)
+      const res = commit(JSONpayload.gameId, JSONpayload.commitment, msg_sender.toLowerCase())
+      if (res.error) {
+        await reportHandler(res.message);
+        return 'reject';
+      }
+     
+      advance_req = await noticeHandler(games)
+    } else if(JSONpayload.method === 'reveal') {
+      console.log(`reveaiing for ${msg_sender} ...`)
+      const res = reveal(JSONpayload.gameId, JSONpayload.move, JSONpayload.nonce, msg_sender.toLowerCase())
       if (res.error) {
         await reportHandler(res.message);
         return 'reject';

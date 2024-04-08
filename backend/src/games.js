@@ -1,5 +1,11 @@
-const { vrfhandler, getRandomNumber } = require('./utils/helpers')
-const {vrfContractAddr} = require('./utils/helpers')
+const { 
+  vrfhandler, 
+  getRandomNumber, 
+  vrfContractAddr,
+  verifyCommitment,
+  resetMoveCommitment
+ } = require('./utils/helpers')
+
 const vrfAbi = require('./utils/vrfAbi.json') 
 const { v4: uuidv4 } = require('uuid')
 const { Wallet } = require('cartesi-wallet')
@@ -103,13 +109,76 @@ export const test = async () => {
 //  }
 // }
 
-const gamePlay = async (gameId, playerAddress) => {
+export const commit = (gameId, commitment, playerAddress) => {
+  const game = games.find(game => game.id === gameId)
+
+  if (!game) {
+    return errorResponse(true, 'Game not found')
+  }
+
+  if (game.status === getGameStatus('ended')) {
+    return errorResponse(true, 'Game ended')
+  }
+
+  const participant = game.participants.find(p => p.address.toLowerCase() === playerAddress)
+
+   if (!participant) {
+    return errorResponse(true, 'Participant not found')
+  }
+
+  if (participant.commitment) {
+    return errorResponse(true, 'Commitment already exist')
+  }
+
+  if (participant.move) {
+    return errorResponse(true, 'Move already exist')
+  }
+
+  if (!game.commitmentPhase) {
+    game.commitmentPhase = true
+  }
+
+  console.log(`committed for ${playerAddress}`)
+  participant.commitment = commitment
+  return errorResponse(false)
+}
+
+export const reveal = (gameId, move, nonce, playerAddress) => {
+
+  const game = games.find(game => game.id === gameId)
+
+  if (!game) {
+    return errorResponse(true, 'Game not found')
+  }
+  
+  const participant = game.participants.find(p => p.address.toLowerCase() === playerAddress)
+
+  if (!participant) {
+    return errorResponse(true, 'Participant not found')
+  }
+
+  if (participant.move) {
+    return errorResponse(true, 'Move already exist')
+  }
+
+  const isVerified = verifyCommitment(participant.commitment, move, nonce)
+
+  if (!isVerified) return errorResponse(true, 'Invalid commitment')
+
+  console.log(`revealed for ${playerAddress}`)
+  participant.move = parseInt(move)
+  return errorResponse(false)
+}
+
+const gamePlay = async (gameId, playerAddress, commitment) => {
 
   const game = games.find(game => game.id === gameId)
 
   const participant = game.participants.find(p => p.address === playerAddress)
 
-  const rollOutcome = Math.floor(Math.random() * 6) + 1 // I want to replace this line 112 with Drand solution
+  const moves = getParticipantsMove(game)
+  const rollOutcome = generateRollOutcome(moves)
+  // const rollOutcome = Math.floor(Math.random() * 6) + 1
   // const reqId = await vrfhandler()
   // console.log('reqId from vrf', reqId)
   // const rollOutcome = await getRandomNumber(reqId)
@@ -161,7 +230,7 @@ const gamePlay = async (gameId, playerAddress) => {
 
 
 // Define a function to handle player responses
-export const gamePlayHandler = ({gameId, playerAddress, response}) => {
+export const gamePlayHandler = ({gameId, playerAddress, response, commitment}) => {
   
   const game = games.find(game => game.id === gameId)
 
@@ -200,7 +269,7 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
  
   if (response === 'yes') {
     try {
-      gamePlay(gameId, playerAddress)
+      gamePlay(gameId, playerAddress, commitment)
     } catch (error) {
       return errorResponse(true, error)
     }
@@ -217,6 +286,8 @@ export const gamePlayHandler = ({gameId, playerAddress, response}) => {
     game.activePlayer = game.participants[nextPlayerIndex].address;
     game.rollOutcome = 0
   }
+
+  resetMoveCommitment(game)
 
   return errorResponse(false)
 }
@@ -316,8 +387,11 @@ const gameStructure = () => {
    creator: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
    activePlayer: '',
    gameName: 'Justin Obi',
+   commitmentPhase: false,
    participants: [
      {
+      move: '',
+      commitment: '',
        address: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
        playerInfo: {
         turn: 0,
@@ -326,6 +400,8 @@ const gameStructure = () => {
        }
      },
      {
+      move: '',
+      commitment: '',
        address: '0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199',
        playerInfo: {
         turn: 0,
@@ -334,6 +410,8 @@ const gameStructure = () => {
        }
      },
      {
+      move: '',
+      commitment: '',
        address: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
        playerInfo: {
         turn: 0,
@@ -346,7 +424,7 @@ const gameStructure = () => {
      numbersOfTurn: 2,
      winningScore: 0,
      mode: 'turn', // turn || score
-     apparatus: 'roulette',
+     apparatus: 'roulette', // roulette || dice
      bet: true,
      maxPlayer: 10,
      limitNumberOfPlayer: true

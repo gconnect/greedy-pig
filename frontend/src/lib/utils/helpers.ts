@@ -13,3 +13,25 @@ export const parseInputEvent = (input: `0x${string}`) => {
     return JSON.parse(JSON.parse(decodedString))
   }
 }
+
+export const generateCommitment = async (address: string) => {
+ debugger 
+  const randomNum = Math.floor(Math.random() * 6) + 1
+
+  const nonce = Math.random() * 1000; // Generate a nonce
+  const nonceString = nonce.toString();
+  const randomString = randomNum.toString();
+  // const timestamp = Date.now().toString(); // Get current timestamp
+
+  // Store nonce along with commitment
+  localStorage.setItem(`nonce${address.toLowerCase()}`, nonceString);
+  localStorage.setItem(`move${address.toLowerCase()}`, randomString);
+
+  const encoder = new TextEncoder();
+  const data = encoder.encode(randomString + nonceString);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  console.log('hashHex ', hashHex)
+  return hashHex
+};

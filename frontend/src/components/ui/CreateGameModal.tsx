@@ -27,6 +27,7 @@ const CreateGameModal = () => {
     creator,
     activePlayer: '',
     gameName,
+    commitmentPhase: false,
     participants: [],
     gameSettings: {
       numbersOfTurn: 2,
@@ -38,7 +39,7 @@ const CreateGameModal = () => {
       limitNumberOfPlayer: true,
     },
     status: GameStatus.New,
-    rollOutcome: 1,
+    rollOutcome: 0,
     winner: '',
     bettingAmount: 1, // in ether
     bettingFund: 0, // total fund transfered by players
