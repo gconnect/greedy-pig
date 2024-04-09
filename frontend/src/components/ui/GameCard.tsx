@@ -13,7 +13,7 @@ const GameCard = ({ game }: GameCardProps) => {
   const router = useRouter()
 
   const handleNavigate = (id: string, action: string) => {
-    if (!wallet?.accounts[0].address) return toast.error('Connect Wallet')
+    // if (!wallet?.accounts[0].address) return toast.error('Connect Wallet')
     router.push(`/games/${id}?action=${action}`)
   }
 

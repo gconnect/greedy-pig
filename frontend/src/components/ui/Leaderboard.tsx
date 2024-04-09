@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from 'react'
+import { FC, memo, useCallback, useEffect, useState } from 'react'
 import { EmptyPage } from '@/components/shared/EmptyPage'
 import { dappAddress, shortenAddress } from '@/lib/utils'
 import { useNotices } from '@/hooks/useNotices'
@@ -13,6 +13,7 @@ interface LeaderBoardProps {
 }
 
 const LeaderBoard: FC<LeaderBoardProps> = ({ game }) => {
+// const LeaderBoard: FC<LeaderBoardProps> = memo(({ game }) => {
   const gameOverSound = useAudio('/sounds/gameOver.mp3')
   const { refetch } = useNotices()
   const rollups = useRollups(dappAddress)

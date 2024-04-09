@@ -1,106 +1,104 @@
-'use client'
-
 import LeaderBoard from './Leaderboard'
 import { dappAddress, shortenAddress } from '@/lib/utils'
 import { useRollups } from '@/hooks/useRollups'
-import { useNotices } from '@/hooks/useNotices'
-import { useCallback, useEffect, useState } from 'react'
+
+import { memo, useCallback, useEffect, useState } from 'react'
 import Settings from './Settings'
-import { useDispatch, useSelector } from 'react-redux'
-import { selectActivePlayer } from '@/features/leaderboard/leaderboardSlice'
 import Dice from './Dice'
+import { useQuery, gql } from '@apollo/client'
+import { ethers } from 'ethers'
+// const MemoizedLeaderBoard = memo(LeaderBoard)
+
+const GET_LATEST_NOTICE = gql`
+  query latestNotice {
+    notices(first: 1) {
+      edges {
+        node {
+          payload
+        }
+      }
+    }
+  }
+`
 
 const GameArena = () => {
-  const { notices, refetch } = useNotices()
+
+  const { loading, error, data, refetch } = useQuery(GET_LATEST_NOTICE, {
+    pollInterval: 500,
+  })
   const rollups = useRollups(dappAddress)
-  const dispatch = useDispatch()
-
-  const activePlayer = useSelector((state: any) =>
-    selectActivePlayer(state.leaderboard)
-  )
-
-  const handleEvent = useCallback(async () => {
-    return await refetch()
-  }, [refetch])
 
   const [game, setGame] = useState<any>()
 
-  const dispatchGameData = useCallback(
-    (game: any) => {
-      console.log('gamearena game', game)
-      setGame(game)
-      dispatch({ type: 'games/setGame', payload: game })
-      dispatch({
-        type: 'leaderboard/updateActivePlayer',
-        payload: game.activePlayer,
-      })
-    },
-    [dispatch]
-  )
+  const dispatchGameData = useCallback((game: any) => {
+    console.log('gamearena game', game)
+    setGame(game)
+  }, [])
 
   useEffect(() => {
-    const gameId = window.location.pathname.split('/').pop()
-    if (gameId && notices && notices.length > 0) {
-      const game = JSON.parse(notices[notices.length - 1].payload).find(
-        (game: any) => game.id === gameId
-      )
-      if (game) {
-        dispatchGameData(game) // Dispatch actions on page load
-      }
-    }
-  }, [notices, dispatchGameData])
 
-  useEffect(() => {
     const gameId = window.location.pathname.split('/').pop()
-    if (gameId && notices && notices.length > 0) {
-      const game = JSON.parse(notices[notices.length - 1].payload).find(
-        (game: any) => game.id === gameId
-      )
-      if (game) {
-        dispatchGameData(game) // Dispatch actions on page load
-      }
+    if (loading) {
+      console.log('Loading notices')
     }
-  }, [notices]) // Only run when 'notices' changes
-  useEffect(() => {
-    const gameId = window.location.pathname.split('/').pop()
-    const handleInputAdded = (dappAddress, inboxInputIndex, sender, input) => {
-      handleEvent().then(() => {
-        if (gameId && notices && notices.length > 0) {
-          const game = JSON.parse(notices[notices.length - 1].payload).find(
+    if (error) {
+      console.error(`Error querying Query Server: ${JSON.stringify(error)}`)
+    }
+
+    if (data) {
+      const latestNotice = data.notices.edges[0]
+
+      if (latestNotice) {
+        const noticePayload = ethers.utils.toUtf8String(
+          latestNotice.node.payload
+        )
+
+        if (gameId) {
+          const game = JSON.parse(noticePayload).find(
             (game: any) => game.id === gameId
           )
           if (game) {
+            console.log('Game found:', game)
             dispatchGameData(game)
           }
         }
-      })
+      }
+    }
+  }, [data, dispatchGameData, error, loading])
+
+  // Handle inputAdded event to trigger refetch
+  useEffect(() => {
+    const handleInputAdded = () => {
+      refetch()
     }
 
+    // Add event listener for inputAdded event
     rollups?.inputContract.on('InputAdded', handleInputAdded)
 
+    // Cleanup function to remove event listener
     return () => {
-      // Cleanup function to unsubscribe from event listener
       rollups?.inputContract.off('InputAdded', handleInputAdded)
     }
-  }, [rollups, notices, handleEvent, dispatchGameData]) // Ensure all dependencies are included
+  }, [rollups, refetch])
 
   return (
     <div className="py-6 sm:py-8 lg:py-12">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8">
         <div className="flex flex-col items-center gap-4  px-8 py-6 md:gap-6">
-          {/* <Balance /> */}
-          {activePlayer && <p>{shortenAddress(activePlayer)}'s turn</p>}
-          {/* <Dice game={game} /> */}
+          {game?.activePlayer && (
+            <p>{shortenAddress(game?.activePlayer)}'s turn</p>
+          )}
+          <Dice game={game} />
         </div>
-
         <div className="flex flex-col items-center gap-4 md:gap-6">
           <LeaderBoard game={game} />
+          {/* <MemoizedLeaderBoard game={game} /> */}
         </div>
       </div>
-
       <Settings />
     </div>
   )
 }
 
 export default GameArena
+

@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from 'react'
+import { FC, memo, useCallback, useEffect, useState } from 'react'
 import Die1 from '@/assets/img/dice_1.png'
 import Die2 from '@/assets/img/dice_2.png'
 import Die3 from '@/assets/img/dice_3.png'
@@ -36,7 +36,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
   const [rollCount, setRollCount] = useState<number>(0)
   const [delayedGame, setDelayedGame] = useState<any>(null)
   const [isRolling, setIsRolling] = useState<boolean>(false)
-  const [result, setResult] = useState<number>(1)
+  const [result, setResult] = useState<number>()
   const [commitmentStatus, setCommitmentStatus] = useState<boolean>(false)
   const [revealMove, setRevealMove] = useState<boolean>(false)
   const [canRollDice, setCanRollDice] = useState<boolean>(false)
@@ -219,7 +219,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       setIsRolling(true)
 
       const interval = setInterval(() => {
-        diceRollSound?.play()
+        // diceRollSound?.play()
         setResult(Math.floor(Math.random() * 6) + 1)
       }, 80)
 
@@ -232,6 +232,8 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       }, 4000)
 
       return () => clearInterval(interval)
+    } else {
+      setResult(1)
     }
   }, [game?.rollOutcome, game?.dateCreated, diceRollSound])
 
