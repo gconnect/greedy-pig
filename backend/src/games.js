@@ -3,7 +3,9 @@ const {
   getRandomNumber, 
   vrfContractAddr,
   verifyCommitment,
-  resetMoveCommitment
+  resetMoveCommitment,
+  getParticipantsMove,
+  generateRollOutcome
  } = require('./utils/helpers')
 
 const vrfAbi = require('./utils/vrfAbi.json') 
@@ -62,7 +64,9 @@ export const addParticipant = async ({gameId, playerAddress}) => {
       turn: 0,
       turnScore: 0,
       totalScore: 0
-    }
+    },
+    commitment: '',
+    move: null
   })
 
   if (game.gameSettings.bet) {
@@ -177,17 +181,12 @@ const gamePlay = async (gameId, playerAddress, commitment) => {
   const participant = game.participants.find(p => p.address === playerAddress)
 
   const moves = getParticipantsMove(game)
+  console.log('moves', moves)
   const rollOutcome = generateRollOutcome(moves)
-  // const rollOutcome = Math.floor(Math.random() * 6) + 1
-  // const reqId = await vrfhandler()
-  // console.log('reqId from vrf', reqId)
-  // const rollOutcome = await getRandomNumber(reqId)
-  // console.log('rollOutcome from vrf', rollOutcome)
-
+  console.log('roll outcome is ', rollOutcome)
 
   if (rollOutcome === 1) {
 
-    console.log('roll outcome is ', rollOutcome)
     participant.playerInfo.turn += 1;
     // cancel all acumulated point for the turn
     participant.playerInfo.turnScore = 0; // Reset turn score for the next turn
@@ -196,7 +195,6 @@ const gamePlay = async (gameId, playerAddress, commitment) => {
     return;
 
   } else {
-    console.log('roll outcome is ', rollOutcome)
 
     game.rollOutcome = rollOutcome; // Update the roll outcome
     participant.playerInfo.turnScore += rollOutcome

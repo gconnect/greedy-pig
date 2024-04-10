@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import Die1 from '@/assets/img/dice_1.png'
 import Die2 from '@/assets/img/dice_2.png'
 import Die3 from '@/assets/img/dice_3.png'
@@ -7,7 +7,7 @@ import Die5 from '@/assets/img/dice_5.png'
 import Die6 from '@/assets/img/dice_6.png'
 import Image from 'next/image'
 import useAudio from '@/hooks/useAudio'
-import { generateCommitment, parseInputEvent } from '@/lib/utils'
+import { generateCommitment } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import { selectParticipantAddresses } from '@/features/games/gamesSlice'
@@ -36,7 +36,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
   const [rollCount, setRollCount] = useState<number>(0)
   const [delayedGame, setDelayedGame] = useState<any>(null)
   const [isRolling, setIsRolling] = useState<boolean>(false)
-  const [result, setResult] = useState<number>()
+  const [result, setResult] = useState<number>(1)
   const [commitmentStatus, setCommitmentStatus] = useState<boolean>(false)
   const [revealMove, setRevealMove] = useState<boolean>(false)
   const [canRollDice, setCanRollDice] = useState<boolean>(false)
@@ -171,6 +171,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       if (allPlayersMoved) {
         toast.success('All set to roll!')
         setCanRollDice(true)
+        setRevealMove(false)
       }
     }
   }, [game?.participants.map((participant: any) => participant.move).join(',')])
@@ -189,29 +190,6 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
   useEffect(() => {
     setRollCount((prevCount) => prevCount + 1)
   }, [result])
-
-  useEffect(() => {
-    console.log('Setting up event listener')
-    const handleInputAdded = (
-      dappAddress,
-      inboxInputIndex,
-      sender,
-      input: any
-    ) => {
-      const inputEvent = parseInputEvent(input)
-      console.log('inside event input added')
-      if (inputEvent.method === 'playGame' && game.rollOutcome !== 0) {
-        console.log('inside conditional event input added')
-        // setIsRolling(true)
-      }
-    }
-
-    rollups?.inputContract.on('InputAdded', handleInputAdded)
-
-    return () => {
-      rollups?.inputContract.removeListener('InputAdded', handleInputAdded)
-    }
-  }, [rollups])
 
 
   useEffect(() => {
@@ -255,7 +233,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       </button>
 
       <div className="flex justify-center">
-        {game && game.status === 'In Progress' && (
+        {game && game.status === 'In Progress' && canRollDice && (
           <div>
             <Button
               className="mt-6"
@@ -279,9 +257,16 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
         <Button
           onClick={commit}
           className={
-            game && game.participants && game.participants.length && game.participants.find(
-              (participant: any) => participant.commitment
-            )
+            !wallet ||
+            !players.includes(wallet.accounts[0].address) ||
+            (game &&
+              game.participants &&
+              game.participants.length &&
+              game.participants.some(
+                (participant: any) =>
+                  participant.playerAddress === wallet.accounts[0].address &&
+                  participant.commitment !== null
+              ))
               ? 'hidden'
               : ''
           }

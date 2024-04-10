@@ -97,7 +97,7 @@ export const reportHandler = async (message) => {
 }
 
 export const getParticipantsMove = game => {
-  return game.participants.filter(p => p.move !== null)
+  return game.participants.map(p => p.move !== null ? p.move : 0)
 }
 
 export const generateRollOutcome = (moves) => {

@@ -7,11 +7,12 @@ import Settings from './Settings'
 import Dice from './Dice'
 import { useQuery, gql } from '@apollo/client'
 import { ethers } from 'ethers'
+import { useDispatch } from 'react-redux'
 // const MemoizedLeaderBoard = memo(LeaderBoard)
 
 const GET_LATEST_NOTICE = gql`
   query latestNotice {
-    notices(first: 1) {
+    notices(last: 1) {
       edges {
         node {
           payload
@@ -27,12 +28,14 @@ const GameArena = () => {
     pollInterval: 500,
   })
   const rollups = useRollups(dappAddress)
+  const dispatch = useDispatch()
 
   const [game, setGame] = useState<any>()
 
   const dispatchGameData = useCallback((game: any) => {
     console.log('gamearena game', game)
     setGame(game)
+    dispatch({ type: 'games/setGame', payload: game })
   }, [])
 
   useEffect(() => {
@@ -68,7 +71,9 @@ const GameArena = () => {
 
   // Handle inputAdded event to trigger refetch
   useEffect(() => {
+    debugger
     const handleInputAdded = () => {
+      console.log('Input added, refetching notices')
       refetch()
     }
 
