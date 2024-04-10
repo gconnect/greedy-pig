@@ -56,15 +56,9 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
 
   }
 
-  const activePlayerCommit = () => {
-    if (game.activePlayer === wallet?.accounts[0].address && !game.commitmentPhase) {
-      commit()
-    }
-  }
-
   const playGame = async (response: string) => {
 
-    if (!canRollDice) return toast.error('Can\'t roll dice now')
+    if (!canRollDice) return toast.error('Wait for all players to move')
 
     const playerAddress = wallet?.accounts[0].address
 
@@ -128,7 +122,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
   }
 
   const reveal = async () => {
-    debugger
+    
     const playerAddress = wallet?.accounts[0].address
     const nonce = localStorage.getItem(`nonce${playerAddress}`)
     const move = localStorage.getItem(`move${playerAddress}`)
@@ -193,11 +187,13 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
 
 
   useEffect(() => {
-    if (game?.rollOutcome !== 0) {
+    
+    if (game?.rollOutcome && game?.rollOutcome !== 0) {
+      console.log(game?.rollOutcome)
       setIsRolling(true)
 
       const interval = setInterval(() => {
-        // diceRollSound?.play()
+        diceRollSound?.play()
         setResult(Math.floor(Math.random() * 6) + 1)
       }, 80)
 
@@ -207,6 +203,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
         
         setResult(game?.rollOutcome)
         setIsRolling(false)
+        setCanRollDice(false)
       }, 4000)
 
       return () => clearInterval(interval)
@@ -260,6 +257,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
             !wallet ||
             !players.includes(wallet.accounts[0].address) ||
             (game &&
+              !game.commitPhase &&
               game.participants &&
               game.participants.length &&
               game.participants.some(

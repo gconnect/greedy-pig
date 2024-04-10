@@ -15,13 +15,12 @@ export const parseInputEvent = (input: `0x${string}`) => {
 }
 
 export const generateCommitment = async (address: string) => {
- debugger 
+  
   const randomNum = Math.floor(Math.random() * 6) + 1
 
   const nonce = Math.random() * 1000; // Generate a nonce
   const nonceString = nonce.toString();
   const randomString = randomNum.toString();
-  // const timestamp = Date.now().toString(); // Get current timestamp
 
   // Store nonce along with commitment
   localStorage.setItem(`nonce${address.toLowerCase()}`, nonceString);

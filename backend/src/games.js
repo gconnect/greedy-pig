@@ -138,8 +138,8 @@ export const commit = (gameId, commitment, playerAddress) => {
     return errorResponse(true, 'Move already exist')
   }
 
-  if (!game.commitmentPhase) {
-    game.commitmentPhase = true
+  if (!game.commitPhase) {
+    game.commitPhase = true
   }
 
   console.log(`committed for ${playerAddress}`)
@@ -168,6 +168,13 @@ export const reveal = (gameId, move, nonce, playerAddress) => {
   const isVerified = verifyCommitment(participant.commitment, move, nonce)
 
   if (!isVerified) return errorResponse(true, 'Invalid commitment')
+
+  if (!game.revealPhase) {
+    game.revealPhase = true
+  }
+  if (game.commitPhase) {
+    game.commitPhase = false
+  }
 
   console.log(`revealed for ${playerAddress}`)
   participant.move = parseInt(move)
@@ -385,7 +392,7 @@ const gameStructure = () => {
    creator: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
    activePlayer: '',
    gameName: 'Justin Obi',
-   commitmentPhase: false,
+   commit: false,
    participants: [
      {
       move: '',

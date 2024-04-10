@@ -27,7 +27,8 @@ const CreateGameModal = () => {
     creator,
     activePlayer: '',
     gameName,
-    commitmentPhase: false,
+    commitPhase: false,
+    revealPhase: false,
     participants: [],
     gameSettings: {
       numbersOfTurn: 2,
@@ -62,7 +63,6 @@ const CreateGameModal = () => {
   }
 
   const createGameHandler = async () => {
-
     game.gameName = gameName
     game.gameSettings.winningScore = winningScore
 

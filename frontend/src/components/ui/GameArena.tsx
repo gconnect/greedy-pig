@@ -71,7 +71,7 @@ const GameArena = () => {
 
   // Handle inputAdded event to trigger refetch
   useEffect(() => {
-    debugger
+    
     const handleInputAdded = () => {
       console.log('Input added, refetching notices')
       refetch()
