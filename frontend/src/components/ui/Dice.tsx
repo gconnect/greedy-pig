@@ -56,13 +56,42 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
 
   }
 
+  const rollDice = async () => {
+    try {
+      const jsonPayload = JSON.stringify({
+        method: 'rollDice',
+        data: {
+          gameId: game.id,
+          playerAddress: game.activePlayer,
+        },
+      })
+
+      if (game.activePlayer === wallet?.accounts[0].address) {
+        const tx = await addInput(
+          JSON.stringify(jsonPayload),
+          dappAddress,
+          rollups
+        )
+
+        const result = await tx.wait(1)
+        console.log('tx for the game roll', result)
+      }
+    } catch (error) {
+      console.error('Error during game roll:', error)
+    }
+  }
+
   const playGame = async (response: string) => {
 
-    if (!canRollDice) return toast.error('Wait for all players to move')
+    // if (!canRollDice) return toast.error('Wait for all players to move')
 
     const playerAddress = wallet?.accounts[0].address
 
     if (!playerAddress) return toast.error('Connect account')
+
+    if (game.activePlayer !== wallet?.accounts[0].address) {
+      return toast.error('Not your turn to play')
+    }
 
     if (game.status === 'Ended') {
       return toast.error('Game has ended')
@@ -82,7 +111,8 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
           data: {
             gameId: game.id,
             playerAddress,
-            response
+            response,
+            commitment: await generateCommitment(playerAddress)
           },
         })
 
@@ -93,9 +123,9 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
         )
 
         const result = await tx.wait(1)
-        console.log('tx for the game ', result)
+        console.log('tx for the game play ', result)
       } catch (error) {
-        console.error('Error during game:', error)
+        console.error('Error during game play: ', error)
       }
     } else {
       toast.error('Not enough players to play')
@@ -185,6 +215,11 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
     setRollCount((prevCount) => prevCount + 1)
   }, [result])
 
+  useEffect(() => {
+    if (canRollDice) {
+      rollDice()
+    }
+  }, [canRollDice])
 
   useEffect(() => {
     
@@ -230,7 +265,7 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       </button>
 
       <div className="flex justify-center">
-        {game && game.status === 'In Progress' && canRollDice && (
+        {game && game.status === 'In Progress' && !game.commitPhase && !game.movePhase && (
           <div>
             <Button
               className="mt-6"
@@ -256,15 +291,16 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
           className={
             !wallet ||
             !players.includes(wallet.accounts[0].address) ||
+            game?.activePlayer === wallet.accounts[0].address ||
             (game &&
-              !game.commitPhase &&
-              game.participants &&
-              game.participants.length &&
-              game.participants.some(
+              !game?.commitPhase &&
+              game?.participants &&
+              game?.participants.length) ||
+              game?.participants.some(
                 (participant: any) =>
                   participant.playerAddress === wallet.accounts[0].address &&
                   participant.commitment !== null
-              ))
+              )
               ? 'hidden'
               : ''
           }

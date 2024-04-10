@@ -65,7 +65,7 @@ export const addParticipant = async ({gameId, playerAddress}) => {
       turnScore: 0,
       totalScore: 0
     },
-    commitment: '',
+    commitment: null,
     move: null
   })
 
@@ -102,18 +102,8 @@ export const test = async () => {
     }
 };
 
-// export const test = async () => {
-//  try {
-//   const reqId = await vrfhandler()
-//    console.log('reqId from vrf', reqId)
-//    const rollOutcome = await getRandomNumber(reqId)
-//    console.log('rollOutcome from vrf', rollOutcome)
-//  } catch (error) {
-//   errorResponse(true, `error in vrf ${error}`)
-//  }
-// }
-
 export const commit = (gameId, commitment, playerAddress) => {
+
   const game = games.find(game => game.id === gameId)
 
   if (!game) {
@@ -138,13 +128,15 @@ export const commit = (gameId, commitment, playerAddress) => {
     return errorResponse(true, 'Move already exist')
   }
 
+
   if (!game.commitPhase) {
     game.commitPhase = true
-  }
+  } 
 
   console.log(`committed for ${playerAddress}`)
   participant.commitment = commitment
   return errorResponse(false)
+
 }
 
 export const reveal = (gameId, move, nonce, playerAddress) => {
@@ -181,7 +173,7 @@ export const reveal = (gameId, move, nonce, playerAddress) => {
   return errorResponse(false)
 }
 
-const gamePlay = async (gameId, playerAddress, commitment) => {
+export const rollDice = async ({gameId, playerAddress}) => {
 
   const game = games.find(game => game.id === gameId)
 
@@ -199,6 +191,7 @@ const gamePlay = async (gameId, playerAddress, commitment) => {
     participant.playerInfo.turnScore = 0; // Reset turn score for the next turn
     game.activePlayer = game.participants[(game.participants.findIndex(p => p.address === playerAddress) + 1) % game.participants.length].address; // Move to the next player's turn or end the game
     game.rollOutcome = rollOutcome
+    resetMoveCommitment(game)
     return;
 
   } else {
@@ -227,6 +220,7 @@ const gamePlay = async (gameId, playerAddress, commitment) => {
         transferToWinner(game)
         return errorResponse(false)
       }
+      resetMoveCommitment(game)
     }
     return
   }
@@ -235,7 +229,7 @@ const gamePlay = async (gameId, playerAddress, commitment) => {
 
 
 // Define a function to handle player responses
-export const gamePlayHandler = ({gameId, playerAddress, response, commitment}) => {
+export const playGame = ({gameId, playerAddress, response, commitment}) => {
   
   const game = games.find(game => game.id === gameId)
 
@@ -274,7 +268,9 @@ export const gamePlayHandler = ({gameId, playerAddress, response, commitment}) =
  
   if (response === 'yes') {
     try {
-      gamePlay(gameId, playerAddress, commitment)
+      console.log('commiting ....')
+      commit(gameId, commitment, playerAddress)
+      // gamePlay(gameId, playerAddress)
     } catch (error) {
       return errorResponse(true, error)
     }
@@ -292,7 +288,7 @@ export const gamePlayHandler = ({gameId, playerAddress, response, commitment}) =
     game.rollOutcome = 0
   }
 
-  resetMoveCommitment(game)
+  // resetMoveCommitment(game)
 
   return errorResponse(false)
 }

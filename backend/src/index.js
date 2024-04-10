@@ -12,7 +12,8 @@ const {
   commit,
   addParticipant, 
   addGame, 
-  gamePlayHandler
+  playGame,
+  rollDice
 } = require('./games')
 
 const wallet = new Wallet(new Map())
@@ -84,14 +85,24 @@ async function handle_advance(data) {
     } else if (JSONpayload.method === 'playGame') {
       
       console.log('game play ...', JSONpayload.data)
-      const res = gamePlayHandler(JSONpayload.data)
+      const res = playGame(JSONpayload.data)
       if (res.error) {
         await reportHandler(res.message);
         return 'reject';
       }
       advance_req = await noticeHandler(games)
     
-    } else if(JSONpayload.method === 'commit') {
+    } else if (JSONpayload.method === 'rollDice') {
+      
+      console.log('rolling dice ...', JSONpayload.data)
+      const res = rollDice(JSONpayload.data)
+      if (res.error) {
+        await reportHandler(res.message);
+        return 'reject';
+      }
+      advance_req = await noticeHandler(games)
+    
+    } else if (JSONpayload.method === 'commit') {
       console.log(`committing for ${msg_sender}...`)
       const res = commit(JSONpayload.gameId, JSONpayload.commitment, msg_sender.toLowerCase())
       if (res.error) {
