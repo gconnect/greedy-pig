@@ -34,3 +34,13 @@ export const generateCommitment = async (address: string) => {
   console.log('hashHex ', hashHex)
   return hashHex
 };
+
+export const hasDeposited = (playerAddress: string, gameId: string, bettingAmount: number, reports: any) => {
+  const playerReport = reports.find((report: any) => {
+    return report.address.toLowerCase() === playerAddress.toLowerCase() && report.gameId === gameId
+  })
+
+  const hasDeposited = playerReport && playerReport.amount === bettingAmount
+
+  return !!hasDeposited
+}

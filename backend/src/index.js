@@ -1,7 +1,7 @@
 
 const viem = require('viem')
 const { Router } = require('cartesi-router')
-const { Wallet, Error_out } = require('cartesi-wallet')
+const { Wallet, Error_out, Notice, Report } = require('cartesi-wallet')
 const { 
   noticeHandler,
   reportHandler
@@ -13,13 +13,15 @@ const {
   addParticipant, 
   addGame, 
   playGame,
-  rollDice
+  rollDice,
+  updateBalance
 } = require('./games')
 
 const wallet = new Wallet(new Map())
 const router = new Router(wallet)
 
 const etherPortalAddress = '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044'
+const dappAddressRelay = '0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE'
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 console.log('HTTP rollup_server url is ' + rollup_server)
 
@@ -40,12 +42,24 @@ async function handle_advance(data) {
         try {
           console.log('payment payload ', payload)
           const res = await router.process("ether_deposit", payload);
-          const r = viem.parse(viem.hexToString(res.payload))
-          console.log('res from payment ', r)
+          console.log('after payment payload ', res.payload)
+          // const res = updateBalance(address, amount, gameId)
+          // TODO: update the payment record
+
         } catch (e) {
           return new Error_out(`failed to process ether deposit ${payload} ${e}`);
         }
-      } else {
+      } else if ( msg_sender.toLowerCase() === dappAddressRelay.toLowerCase()) {
+        
+        rollup_address = payload;
+        router.set_rollup_address(rollup_address, "ether_withdraw");
+        router.set_rollup_address(rollup_address, "erc20_withdraw");
+        router.set_rollup_address(rollup_address, "erc721_withdraw");
+
+        console.log("Setting DApp address");
+        return new Notice( `DApp address set up successfully to ${rollup_address}` );
+    }
+      else {
 
         let JSONpayload = {};
 
@@ -56,7 +70,26 @@ async function handle_advance(data) {
 
   try {
 
-    if (JSONpayload.method === 'createGame') {
+     if (JSONpayload.method === 'transfer') {
+      
+      try {
+        let res = wallet.ether_transfer(JSONpayload.from, JSONpayload.to, BigInt(JSONpayload.amount));
+        // await fetch(rollup_server + "/notice", {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify({ payload: notice.payload }),
+        // });
+        console.log('notice after deposit ', res)
+      } catch (error) {
+        console.log("ERROR transfering");
+        console.log(error);
+        await reportHandler('ERROR transfering')
+        return 'reject'
+      }
+      
+      
+  
+    } else if (JSONpayload.method === 'createGame') {
       if (JSONpayload.data == '' || null) {
         console.log('Result cannot be empty');
         await reportHandler(message)
@@ -146,7 +179,36 @@ async function handle_advance(data) {
 
 async function handle_inspect(data) {
   console.log('Received inspect request data ' + JSON.stringify(data));
-  return 'accept';
+  try {
+    const url = viem.hexToString(data.payload).split('/')
+    const address = url[1]
+    const gameId = url[2]
+
+    amount = wallet.balance_get(url[1]).ether_get()
+    const amountString = amount.toString();
+
+    console.log('retrieved bal ', amount)
+
+    const res = {
+      address,
+      gameId,
+      amount: amountString 
+    }
+
+    await fetch(rollup_server + "/report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ payload: viem.stringToHex(JSON.stringify(res)) }),
+    });
+    
+    return Report(`balance for ${address} for ${gameId} is ${viem.stringToHex(amountString)}`)
+
+  } catch (error) {
+    const error_msg = `failed to process inspect request ${error}`;
+    console.debug(error_msg);
+    return new Error_out(error_msg);
+  }
+
 }
 
 var handlers = {

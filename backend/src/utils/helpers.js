@@ -33,36 +33,6 @@ export const verifyCommitment = async (commitment, move, nonce) => {
     return calculatedCommitment === commitment;
 };
 
-// Generate commitment hash for a given move
-const generateCommitmentHash = (move) => {
-    // Use a cryptographic hash function (SHA-256) to generate the commitment hash
-    const hash = crypto.createHash('sha256');
-    hash.update(move.toString());
-    return hash.digest('hex');
-}
-
-// Verify commitment hash against the revealed move
-const verifyCommitment2 = (commitmentHash, revealedMove) => {
-    const expectedHash = generateCommitmentHash(revealedMove);
-    return commitmentHash === expectedHash;
-}
-
-// Reveal phase function
-const revealMove = async (gameId, playerAddress, committedMove, commitmentHash) => {
-    // Retrieve the commitment hash stored for the player from the game state
-
-    // Verify that the commitment hash matches the hash of the revealed move
-    const isMatching = verifyCommitment(commitmentHash, committedMove);
-
-    if (!isMatching) {
-        // Handle the case where the revealed move does not match the commitment hash
-        return errorResponse(true, 'Invalid commitment');
-    }
-
-    return committedMove
-}
-
-
 export const noticeHandler = async (data) => {
   const result = JSON.stringify(data)
   const hexresult = viem.stringToHex(result)

@@ -1,32 +1,16 @@
 const { 
-  vrfhandler, 
-  getRandomNumber, 
-  vrfContractAddr,
   verifyCommitment,
   resetMoveCommitment,
   getParticipantsMove,
   generateRollOutcome
  } = require('./utils/helpers')
 
-const vrfAbi = require('./utils/vrfAbi.json') 
 const { v4: uuidv4 } = require('uuid')
 const { Wallet } = require('cartesi-wallet')
 const { ethers } = require('ethers')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 const wallet = new Wallet(new Map())
-
-const provider = new ethers.JsonRpcProvider('https://sepolia-rollup.arbitrum.io/rpc')
-// Instantiate the contract
-const contract = new ethers.Contract(vrfContractAddr, vrfAbi.abi, provider);
-
-// Function to listen for events emitted by the smart contract
-const listenForEvents = async (eventName) => {
-    return new Promise((resolve, reject) => {
-        contract.on(eventName, (...args) => resolve(args));
-        contract.once('error', reject);
-    });
-};
 
 
 export const games = []
@@ -66,7 +50,8 @@ export const addParticipant = async ({gameId, playerAddress}) => {
       totalScore: 0
     },
     commitment: null,
-    move: null
+    move: null,
+    deposited: false
   })
 
   if (game.gameSettings.bet) {
@@ -78,29 +63,6 @@ export const addParticipant = async ({gameId, playerAddress}) => {
   }
   return errorResponse(false)
 }
-
-export const test = async () => {
-    try {
-        // Call the vrfhandler function to request random words
-
-      
-        const requestId = await vrfhandler();
-        // const requestId = await response.json();
-        // console.log('Request ID from vrf:', requestId);
-
-        // Wait for the RequestFulfilled event to be emitted
-        // const eve = await listenForEvents(contract, 'RequestFulfilled');
-        // const [requestIdEvent, randomWord] = await listenForEvents(contract, 'RequestFulfilled');
-      const res = await getRandomNumber(requestId);
-      // const res = await requestStatus.json();
-        console.log('Random num:', res);
-        // console.log('Request ID from event:', eve);
-        // console.log('Random Word:', eve);
-    } catch (error) {
-      console.log('error in vrf', error)
-        errorResponse(true, `Error in VRF: ${error}`);
-    }
-};
 
 export const commit = (gameId, commitment, playerAddress) => {
 
@@ -293,6 +255,26 @@ export const playGame = ({gameId, playerAddress, response, commitment}) => {
   return errorResponse(false)
 }
 
+export const updateBalance = async (playerAddress, amount, gameId) => {
+
+  const formattedAmount = parseFloat(ethers.formatEther(amount))
+  console.log('formatted amount ', formattedAmount)
+  const game = games.find(game => game.id === gameId)
+  const participant = game.participants.find(p => p.address === playerAddress)
+
+  // check if the deposited amount equals game bet amount
+
+  if (formattedAmount < game.gameSettings.bettingAmount) {
+    console.log('Amount deposited is less than betting amount')
+    return errorResponse(true, 'Amount deposited is less than betting amount')
+  }
+
+  participant.deposited = true
+  console.log('deposited ', formattedAmount)
+  return errorResponse(false)
+
+}
+
 const getParticipantsForGame = gameId => {
 
   const game = games.find(game => game.id === gameId)
@@ -319,7 +301,6 @@ const calculateWinner = game => {
 
   return winnerAddress;
 }
-
 
 const endGame = game => {
 

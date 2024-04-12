@@ -11,9 +11,9 @@ import { generateCommitment } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import { selectParticipantAddresses } from '@/features/games/gamesSlice'
-import { dappAddress } from '@/lib/utils'
-import { useConnectWallet } from '@web3-onboard/react'
-import { addInput } from '@/lib/cartesi'
+import { dappAddress, dappRelayAddress, hasDeposited } from '@/lib/utils'
+import { useConnectWallet, useSetChain } from '@web3-onboard/react'
+import { addInput, sendEther, inspectCall } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
 import Button from '../shared/Button'
 
@@ -26,6 +26,7 @@ interface ApparatusProps {
 
 const Dice: FC<ApparatusProps> = ({ game }) => {
 
+   const [{ connectedChain }] = useSetChain()
   const rollups = useRollups(dappAddress)
   const [{ wallet }] = useConnectWallet()
   const diceRollSound = useAudio('/sounds/diceRoll.mp3')
@@ -42,17 +43,41 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
   const [canRollDice, setCanRollDice] = useState<boolean>(false)
 
   const joinGame = async () => {
-    const id = window.location.pathname.split('/').pop()
-    if (!id) return toast.error('Game not found')
 
-    const addr: string | undefined = wallet?.accounts[0].address
+    
 
-    const jsonPayload = JSON.stringify({
-      method: 'addParticipant',
-      data: { gameId: id, playerAddress: addr },
-    })
+    if (wallet?.accounts[0].address) {
 
-    await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+      const playerAddress = wallet.accounts[0].address
+
+      if (game.gameSettings.bet) {
+        const reports = await inspectCall(
+          `balance/${playerAddress}/${game.id}`,
+          connectedChain
+        )
+        const res = hasDeposited(
+          playerAddress,
+          game.id,
+          game.gameSettings.bettingAmount,
+          reports
+        )
+
+        if (!res) return toast.error(`You need to deposit ${game.gameSettings.bettingAmount} to join`)
+      }
+
+      const id = window.location.pathname.split('/').pop()
+      if (!id) return toast.error('Game not found')
+
+
+      const jsonPayload = JSON.stringify({
+        method: 'addParticipant',
+        data: { gameId: id, playerAddress },
+      })
+
+      await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+    }
+
+    
 
   }
 
@@ -171,6 +196,40 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
     )
   }
 
+  const transfer = async () => {
+    console.log(wallet?.accounts[0].address.toUpperCase())
+    console.log('0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65')
+
+    const jsonPayload = JSON.stringify({
+      method: 'transfer',
+      // from: wallet?.accounts[0].address,
+      from: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
+      to: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+      ether: '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044',
+      amount: 1000000000000000000,
+    })
+
+    await addInput(JSON.stringify(jsonPayload), dappAddress, rollups)
+  }
+
+  const depositHandler = async () => {
+    if (!game.gameSettings.bet) return toast.error('Not a betting game')
+
+    await sendEther(dappAddress, game.id, game.bettingAmount, rollups)
+
+  }
+
+  const sendRelayAddress = async () => {
+    if (rollups) {
+      try {
+        await rollups.relayContract.relayDAppAddress(dappRelayAddress)
+        
+      } catch (e) {
+        console.log(`${e}`)
+      }
+    }
+  }
+
   useEffect(() => {
     console.log('inside reveal useeffect')
     if (game && game.participants && game.participants.length > 0) {
@@ -265,17 +324,41 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
       </button>
 
       <div className="flex justify-center">
-        {game && game.status === 'In Progress' && !game.commitPhase && !game.movePhase && (
-          <div>
-            <Button
-              className="mt-6"
-              style={{ background: '' }}
-              onClick={() => playGame('no')}
-            >
-              Pass
-            </Button>
-          </div>
-        )}
+        {game &&
+          game.status === 'New' &&
+          game.gameSettings.bet &&
+          wallet &&
+          // game?.participants.some(
+          //   (participant: any) =>
+          //     participant.playerAddress === wallet.accounts[0].address &&
+          //     !participant.deposited
+          // ) &&
+          !game.commitPhase &&
+          !game.movePhase && (
+            <div>
+              <Button
+                className="mt-6"
+                style={{ background: '' }}
+                onClick={depositHandler}
+              >
+                Deposit
+              </Button>
+            </div>
+          )}
+        {game &&
+          game.status === 'In Progress' &&
+          !game.commitPhase &&
+          !game.movePhase && (
+            <div>
+              <Button
+                className="mt-6"
+                style={{ background: '' }}
+                onClick={() => playGame('no')}
+              >
+                Pass
+              </Button>
+            </div>
+          )}
         {game &&
           game.status === 'New' &&
           wallet &&
@@ -296,11 +379,11 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
               !game?.commitPhase &&
               game?.participants &&
               game?.participants.length) ||
-              game?.participants.some(
-                (participant: any) =>
-                  participant.playerAddress === wallet.accounts[0].address &&
-                  participant.commitment !== null
-              )
+            game?.participants.some(
+              (participant: any) =>
+                participant.playerAddress === wallet.accounts[0].address &&
+                participant.commitment !== null
+            )
               ? 'hidden'
               : ''
           }
@@ -315,6 +398,8 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
           Reveal
         </Button>
       </div>
+      {/* <Button onClick={sendRelayAddress}>Set Relay Address</Button> */}
+      <Button onClick={transfer}>Transfer</Button>
     </div>
   )
 }

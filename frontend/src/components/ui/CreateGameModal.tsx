@@ -20,7 +20,7 @@ const CreateGameModal = () => {
   const [creator, setCreator] = useState<string | undefined>('')
   const [gameName, setGameName] = useState<string>('')
   const [winningScore, setWinningScore] = useState<number>(20)
-  // const [startTime, setStartTime] = useState<string>('')
+  const [bet, setBet] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
 
   const game = {
@@ -65,6 +65,7 @@ const CreateGameModal = () => {
   const createGameHandler = async () => {
     game.gameName = gameName
     game.gameSettings.winningScore = winningScore
+    game.gameSettings.bet = bet
 
     const jsonPayload = JSON.stringify({
       method: 'createGame',
@@ -75,6 +76,10 @@ const CreateGameModal = () => {
 
     const result = await tx.wait(1)
     console.log(result)
+  }
+
+  const handleOptionChange = (value: boolean) => {
+    setBet(value)
   }
 
   const reset = () => {
@@ -178,9 +183,9 @@ const CreateGameModal = () => {
             <input
               type="radio"
               className="form-radio"
-              disabled
               name="accountType"
-              value="yes"
+              // checked={!bet} // Check if betGame is false
+              onChange={() => handleOptionChange(true)}
             />
             <span className="ml-2">Yes</span>
           </label>
@@ -188,9 +193,9 @@ const CreateGameModal = () => {
             <input
               type="radio"
               className="form-radio"
-              checked
               name="accountType"
-              value="no"
+              // checked={bet} // Check if betGame is false
+              onChange={() => handleOptionChange(false)}
             />
             <span className="ml-2">No</span>
           </label>
