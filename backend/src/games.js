@@ -7,13 +7,19 @@ const {
 
 const { v4: uuidv4 } = require('uuid')
 const { Wallet } = require('cartesi-wallet')
+const { Router } = require('cartesi-router')
 const { ethers } = require('ethers')
 
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL
 const wallet = new Wallet(new Map())
+const router = new Router(wallet)
 
 
 export const games = []
+
+export const withdraw = async (data) => {
+  return router.process('withdraw', data)
+}
 
 export const addGame = (game) => {
   const gameFound = games.length ? games.find(g => g.id === game.id) : null

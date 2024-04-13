@@ -16,6 +16,7 @@ import { useConnectWallet, useSetChain } from '@web3-onboard/react'
 import { addInput, sendEther, inspectCall } from '@/lib/cartesi'
 import { useRollups } from '@/hooks/useRollups'
 import Button from '../shared/Button'
+import { ethers } from 'ethers'
 
 const die = [Die1, Die2, Die3, Die4, Die5, Die6]
 
@@ -49,20 +50,18 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
     if (wallet?.accounts[0].address) {
 
       const playerAddress = wallet.accounts[0].address
+      console.log(typeof playerAddress)
+      console.log(playerAddress.length)
 
       if (game.gameSettings.bet) {
         const reports = await inspectCall(
           `balance/${playerAddress}/${game.id}`,
           connectedChain
         )
-        const res = hasDeposited(
-          playerAddress,
-          game.id,
-          game.gameSettings.bettingAmount,
-          reports
-        )
+   
+        const res = hasDeposited(game.bettingAmount, reports)
 
-        if (!res) return toast.error(`You need to deposit ${game.gameSettings.bettingAmount} to join`)
+        if (!res) return toast.error(`You need to deposit ${game.bettingAmount} ether to join`)
       }
 
       const id = window.location.pathname.split('/').pop()
@@ -197,12 +196,10 @@ const Dice: FC<ApparatusProps> = ({ game }) => {
   }
 
   const transfer = async () => {
-    console.log(wallet?.accounts[0].address.toUpperCase())
-    console.log('0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65')
 
     const jsonPayload = JSON.stringify({
       method: 'transfer',
-      // from: wallet?.accounts[0].address,
+      // from: (wallet?.accounts[0].address)?.toLowerCase(),
       from: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
       to: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
       ether: '0xFfdbe43d4c855BF7e0f105c400A50857f53AB044',

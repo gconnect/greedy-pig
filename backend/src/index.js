@@ -42,9 +42,10 @@ async function handle_advance(data) {
         try {
           console.log('payment payload ', payload)
           const res = await router.process("ether_deposit", payload);
-          console.log('after payment payload ', res.payload)
+          console.log ('after payment payload ', res.payload)
           // const res = updateBalance(address, amount, gameId)
           // TODO: update the payment record
+          return res
 
         } catch (e) {
           return new Error_out(`failed to process ether deposit ${payload} ${e}`);
@@ -70,7 +71,18 @@ async function handle_advance(data) {
 
   try {
 
-     if (JSONpayload.method === 'transfer') {
+    if (JSONpayload.method === 'withdraw') {
+      
+      try {
+        const res = router.process('ether_withdraw', data)
+        console.log('result from withraw ', res)
+        return res
+      } catch (error) {
+       console.log(`Error occured trying to withdraw ${error}`)
+       return new Error_out(`Error occured trying to withdraw ${error}`)
+      }
+      
+    } else if (JSONpayload.method === 'transfer') {
       
       try {
         let res = wallet.ether_transfer(JSONpayload.from, JSONpayload.to, BigInt(JSONpayload.amount));
@@ -79,7 +91,7 @@ async function handle_advance(data) {
         //   headers: { "Content-Type": "application/json" },
         //   body: JSON.stringify({ payload: notice.payload }),
         // });
-        console.log('notice after deposit ', res)
+        console.log('result after transfer ', res)
       } catch (error) {
         console.log("ERROR transfering");
         console.log(error);
@@ -181,27 +193,32 @@ async function handle_inspect(data) {
   console.log('Received inspect request data ' + JSON.stringify(data));
   try {
     const url = viem.hexToString(data.payload).split('/')
+
+    const balance = url[0]
     const address = url[1]
     const gameId = url[2]
 
-    amount = wallet.balance_get(url[1]).ether_get()
-    const amountString = amount.toString();
+    return router.process(balance, address)
 
-    console.log('retrieved bal ', amount)
 
-    const res = {
-      address,
-      gameId,
-      amount: amountString 
-    }
+    // amount = wallet.balance_get(url[1]).ether_get()
+    // const amountString = amount.toString();
 
-    await fetch(rollup_server + "/report", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ payload: viem.stringToHex(JSON.stringify(res)) }),
-    });
+    // console.log('retrieved bal ', amount)
+
+    // const res = {
+    //   address,
+    //   gameId,
+    //   amount 
+    // }
+
+    // await fetch(rollup_server + "/report", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ payload: viem.stringToHex(JSON.stringify(res)) }),
+    // });
     
-    return Report(`balance for ${address} for ${gameId} is ${viem.stringToHex(amountString)}`)
+    // return new Report(`balance for ${address} for ${gameId} is ${viem.stringToHex(amountString)}`)
 
   } catch (error) {
     const error_msg = `failed to process inspect request ${error}`;
@@ -209,6 +226,20 @@ async function handle_inspect(data) {
     return new Error_out(error_msg);
   }
 
+}
+
+const send_request = async (output) => {
+  let endpoint = '/report'
+
+  if (output.type === '/voucher') {
+    endpoint = 'voucher'
+  }
+
+  await fetch(rollup_server + endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(output),
+    });
 }
 
 var handlers = {
@@ -235,7 +266,9 @@ var finish = { status: 'accept' };
     } else {
       const rollup_req = await finish_req.json();
       var handler = handlers[rollup_req['request_type']];
-      finish['status'] = await handler(rollup_req['data']);
+      let output = await handler(rollup_req['data']);
+      await send_request(output)
+      finish.status = 'accept'
     }
   }
 })();
