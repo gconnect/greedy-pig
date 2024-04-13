@@ -14,7 +14,7 @@
     "esbuild": "^0.19.2"
   },
   "scripts": {
-    "build": "yarn && npm i @sunodo/cli && sunodo build esbuild ./src/index.js --bundle --outfile=dist/index.js --platform=node --target=node20 && sunodo build",
+    "build": "yarn && npm i -g @sunodo/cli && sunodo build",
     "start:dev": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:5004\" node src/index.js",
     "start": "sunodo run"
   },
