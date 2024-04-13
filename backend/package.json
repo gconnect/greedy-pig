@@ -14,9 +14,8 @@
     "esbuild": "^0.19.2"
   },
   "scripts": {
-    "build": "yarn && curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh && docker run --privileged --rm tonistiigi/binfmt:riscv && npm i -g @sunodo/cli  && sunodo build",
-    "start:dev": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:5004\" node src/index.js",
-    "start": "sunodo run"
+    "build": "esbuild ./src/index.js --bundle --outfile=dist/index.js --platform=node --target=node20",
+    "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:5004\" node src/index.js"
   },
   "keywords": [
     "cartesi"
