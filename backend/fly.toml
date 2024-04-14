@@ -1,0 +1,43 @@
+# fly.toml app configuration file generated for greedypig on 2024-04-14T01:57:59+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'greedypig'
+primary_region = 'lhr'
+
+[build]
+  image = 'registry.fly.io/greedypig'
+
+[env]
+  CARTESI_BLOCKCHAIN_FINALITY_OFFSET = '1'
+  CARTESI_BLOCKCHAIN_ID = '11155420'
+  CARTESI_CONTRACTS_APPLICATION_ADDRESS = '0x9A4Aacaecf14265c45d728d330976c0BD190c565'
+  CARTESI_CONTRACTS_APPLICATION_DEPLOYMENT_BLOCK_NUMBER = '10625409'
+  CARTESI_CONTRACTS_AUTHORITY_ADDRESS = '0xCa6eC6ad61ED0a7938762B8f68Ce9226fBb344F0'
+  CARTESI_CONTRACTS_HISTORY_ADDRESS = '0x56c0efC62585E5d3772Ee3dda3CFeBfEeF2e1dA0'
+  CARTESI_CONTRACTS_INPUT_BOX_ADDRESS = '0x59b22D57D4f067708AB0c00552767405926dc768'
+  CARTESI_CONTRACTS_INPUT_BOX_DEPLOYMENT_BLOCK_NUMBER = '5393079'
+  CARTESI_EPOCH_DURATION = '86400'
+
+[http_service]
+  internal_port = 10000
+  force_https = true
+
+  [http_service.concurrency]
+    type = 'requests'
+    hard_limit = 250
+    soft_limit = 200
+
+[[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/healthz'
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '2gb'
+  cpu_kind = 'shared'
+  cpus = 1
